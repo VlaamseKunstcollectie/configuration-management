@@ -1,0 +1,48 @@
+server {
+  listen      {{ datahub['nginx']['listen_port'] }};
+  server_name {{ datahub['nginx']['server_name'] }};
+
+  access_log  /var/log/nginx/datahub_access.log combined;
+  error_log   /var/log/nginx/datahub_error.log;
+
+  root        {{ datahub['nginx']['document_root'] }};
+
+  location / {
+    index index.php index.html index.htm;
+    # try_files $uri $uri/index.php $uri/index.html $uri/index.htm =404;
+    try_files $uri /{{ datahub['nginx']['index'] }}$is_args$args;
+  }
+
+  # Speed up (missing) favicon.
+  location = /favicon.ico {
+    access_log off;
+    #empty_gif;
+  }
+
+  # Deny access to hidden files & dirs.
+  location ~ /\. {
+    access_log off;
+    log_not_found off;
+    return 404;
+    deny all;
+  }
+
+  location ~ \.php$ {
+    try_files $uri =404;
+    fastcgi_pass unix:/run/php/php{{ php['version'] }}-fpm-datahub.sock;
+    #fastcgi_index app.php;
+    fastcgi_param SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+    include /etc/nginx/fastcgi_params;
+  }
+
+  # Set proper expiration times for static files & don't log them.
+  location ~* \.(jpe?g|gif|png|bmp|svg|css|js|ico|xml|html|htm|swf|htc|cur|ttf|woff2?)$ {
+    try_files $uri =404;
+    access_log off;
+    log_not_found off;
+    expires 7d;
+    add_header Pragma public;
+    add_header Cache-Control "public, must-revalidate, proxy-revalidate";
+  }
+}
+

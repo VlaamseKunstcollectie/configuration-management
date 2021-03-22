@@ -1,0 +1,10 @@
+---
+- name: Check if admin user exists in MongoDB
+  command: mongo --quiet --eval "db.Users.find({ 'username'{{ ':' }} '{{ datahub_dashboard['admin']['username'] }}' })" datahub_dashboard
+  register: mongodb_admin_user_exists
+  become_user: "{{ application_user }}"
+
+- name: Insert admin user into MongoDB
+  command: mongo --eval 'db.Users.insert({{ lookup("template", "./mongodb_admin_user.json") }})' datahub_dashboard
+  when: mongodb_admin_user_exists.stdout | length == 0
+  become_user: "{{ application_user }}"

@@ -1,0 +1,14 @@
+---
+- name: Install nginx, and php-fpm
+  hosts: datahub
+  remote_user: root
+  # become: yes
+  # become_method: sudo
+
+  roles:
+    - common
+    - php-fpm
+    - nginx
+    - mongodb
+    - datahub
+    - datahub-pipeline

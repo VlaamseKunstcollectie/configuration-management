@@ -1,0 +1,100 @@
+---
+- name: Sets pipeline datahub_url if not specified
+  set_fact:
+    datahub_pipeline:
+      datahub_url: "http://{{ datahub['nginx']['server_name'] }}" #TODO make protocol dynamic
+  when: datahub_pipeline['datahub_url'] is undefined
+  become_user: "{{ application_user }}"
+
+- name: Install apt packages
+  apt:
+    name:
+      - sqlite3
+      - perl=5.26*
+      - cpanminus
+      - libssl-dev
+      - libxslt1-dev
+      - libxml2-dev
+      - make
+      - build-essential
+      - expat
+      - libexpat1
+      - libexpat1-dev
+      - libcrypt-ssleay-perl
+      - libmysqlclient-dev
+    state: present
+#  become_user: root
+
+- name: Install Catmandu
+  cpanm:
+    name: Catmandu
+  become_user: "{{ application_user }}"
+
+# Install without tests due to Catmandu::XML LibXSLT bug: https://rt.cpan.org/Public/Bug/Display.html?id=131156
+- name: Install Catmandu::XML
+  cpanm:
+    name: Catmandu::XML
+    notest: true
+  become_user: "{{ application_user }}"
+
+- name: Install Catmandu
+  cpanm:
+    name: "{{ item }}"
+  with_items:
+    - Catmandu::OAI
+    - Datahub::Factory
+    - Datahub::Factory::Cmd
+    - DBD::SQLite
+    - Datahub::Factory::Importer::EIZ
+    - Datahub::Factory::Exporter
+  become_user: "{{ application_user }}"
+
+- name: Create repo folders
+  file: 
+    path: "{{ item }}"
+    state: directory
+    recurse: true 
+    owner: "{{ application_user }}"
+    group: "{{ application_user }}"
+  with_items:
+    - "{{ datahub_pipeline['fixes']['repo_dir'] }}"
+    - "{{ datahub_pipeline['authority_files']['repo_dir'] }}"
+#  become_user: root
+
+- name: Checkout datahub-pipeline repos
+  git:
+    repo: "{{ datahub_pipeline['repo_url'] }}"
+    dest: "{{ datahub_pipeline['repo_dir'] }}/repo/"
+    force: true
+#    version: release-0.22
+  become_user: "{{ application_user }}"
+
+- name: Override vocabularies.sh
+  template:
+    src: vocabularies.sh
+    dest: "{{ datahub_pipeline['fixes']['repo_dir'] }}/repo/scripts/vocabularies.sh"
+#    owner: "{{ application_user }}"
+#    group: "{{ application_user }}"
+  become_user: "{{ application_user }}"
+
+- name: Copy datahub.ini for datahub pipeline
+  template:
+    src: datahub.ini
+    dest: "{{ datahub_pipeline['dir'] }}/datahub.ini"
+#    owner: "{{ application_user }}"
+#    group: "{{ application_user }}"
+  become_user: "{{ application_user }}"
+
+- name: Link fixes and authority_files repos
+  file:
+    src: "{{ item.src }}/repo/"
+    dest: "{{ item.dest }}"
+    state: link
+    owner: "{{ application_user }}"
+    group: "{{ application_user }}"
+#  become_user: root
+  with_items:
+    - src: "{{ datahub_pipeline['fixes']['repo_dir'] }}"
+      dest: "{{ datahub_pipeline['dir'] }}/fixes"
+    - src: "{{ datahub_pipeline['authority_files']['repo_dir'] }}"
+      dest: "{{ datahub_pipeline['dir'] }}/authority_files"

@@ -1,0 +1,39 @@
+---
+- name: Install php-fpm and deps
+  apt:
+    name:
+#      - php{{ php.version }}-fpm
+      - php{{ php.version }}-fpm
+      - php{{ php.version }}-cli
+      - php{{ php.version }}-intl
+      - php{{ php.version }}-mbstring
+      - php-mongodb
+      - php{{ php.version }}-xml
+      - php{{ php.version }}-zip
+      - php{{ php.version }}-dev
+      - php-pear
+      - composer=1.*
+    state: present
+#  become_user: root
+
+- name: Disable default pool
+  command: mv /etc/php/{{ php.version }}/fpm/pool.d/www.conf /etc/php/{{ php.version }}/fpm/pool.d/www.conf.disabled creates=/etc/php/{{ php.version }}/fpm/pool.d/www.conf.disabled
+  notify: restart php-fpm
+#  become_user: root
+
+- name: Copy php-fpm pool
+  template: src=datahub.conf dest=/etc/php/{{ php.version }}/fpm/pool.d/datahub.conf
+  notify: restart php-fpm
+#  become_user: root
+
+- name: Copy php.ini
+  template: src=php.ini dest=/etc/php/{{ php.version }}/fpm/php.ini
+  notify: restart php-fpm
+#  become_user: root
+
+- name: Enable php-fpm service
+  service:
+    name: php{{ php.version }}-fpm
+    state: started
+    enabled: yes
+#  become_user: root

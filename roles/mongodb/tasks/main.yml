@@ -1,0 +1,35 @@
+---
+- name: Install MongoDB
+  apt: name=mongodb-server state=present
+#  become_user: root
+
+- name: Install pymongo
+  apt: name=python3-pymongo state=present
+#  become_user: root
+
+- name: Setup MongoDB root user
+  community.mongodb.mongodb_user:
+    database: admin
+    name: "{{ datahub['mongodb']['root_username'] }}"
+    password: "{{ datahub['mongodb']['root_password'] }}"
+    roles: root
+  become_user: "{{ application_user }}"
+
+- name: Setup MongoDB datahub user
+  community.mongodb.mongodb_user:
+    login_user: "{{ datahub['mongodb']['root_username'] }}"
+    login_password: "{{ datahub['mongodb']['root_password'] }}"
+    database: "{{ datahub['mongodb']['database'] }}"
+    name: "{{ datahub['mongodb']['username'] }}"
+    password: "{{ datahub['mongodb']['password'] }}"
+    roles: readWrite,dbAdmin
+    state: present
+  become_user: "{{ application_user }}"
+
+- name: Enable MongoDB
+  service:
+    name: mongodb
+    state: started
+    enabled: yes
+#  become_user: root
+
