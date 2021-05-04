@@ -12,3 +12,15 @@
     - mongodb
     - datahub
     - datahub-pipeline
+    - datahub-dashboard
+#    - { role: rvm.ruby,
+#        tags: ruby,
+#        become_user: "{{ application_user }}",
+#        rvm1_rubies: ["ruby-2.7.3"],
+#        rvm1_user: "{{ application_user }}",
+#        rvm1_install_flags: '--auto-dotfiles --user-install',
+#        rvm1_install_path: "/home/{{ application_user }}/.rvm",
+#        rvm1_ruby_install_flags: '--autolibs=0'
+#      }
+    - arthub
+    - cron

@@ -31,10 +31,10 @@ monolog:
         #    level:  info
 
 swiftmailer:
-    transport: {{ datahub['mailer']['transport'] }}
-    username: {{ datahub['mailer']['username'] }}
-    password: {{ datahub['mailer']['password'] }}
-    delivery_address: {{ datahub['mailer']['delivery_address'] }}
+    transport: {{ datahub.mailer.transport }}
+    username: {{ datahub.mailer.username }}
+    password: {{ datahub.mailer.password }}
+    delivery_address: {{ datahub.mailer.delivery_address }}
 
 #swiftmailer:
 #    delivery_address: me@example.com

@@ -1,13 +1,13 @@
 {
     "createdAt": ISODate(),
-    "email": "{{ datahub['consumer']['email'] }}",
+    "email": "{{ datahub.consumer.email }}",
     "enabled": true,
-    "firstName": "{{ datahub['consumer']['first_name'] }}",
-    "lastName": "{{ datahub['consumer']['last_name'] }}",
-    "password": "{{ datahub['consumer']['password'] | password_hash('bcrypt') }}",
+    "firstName": "{{ datahub.consumer.first_name }}",
+    "lastName": "{{ datahub.consumer.last_name }}",
+    "password": "{{ datahub.consumer.password | password_hash('bcrypt') }}",
     "roles": [
         "ROLE_CONSUMER"
     ],
     "updatedAt": ISODate(),
-    "username": "{{ datahub['consumer']['username'] }}"
+    "username": "{{ datahub.consumer.username }}"
 }

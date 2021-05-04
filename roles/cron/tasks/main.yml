@@ -1,0 +1,8 @@
+---
+- name: Provide crontab entry for daily reload of arthub records
+  cron:
+    name: "Reload arthub records"
+    minute: "0"
+    hour: "2"
+    user: "{{ application_user }}"
+    job: "{{ cronjobs | join('; ') }}"

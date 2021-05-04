@@ -52,4 +52,30 @@ datahub_pipeline:
     - name: Mu.ZEE, Kunstmuseum aan zee
       shorthand: MUZEE
       fix_file_path: muzee_oai_adlib.fix
-
+datahub_dashboard:
+  repo_url: https://github.com/thedatahub/Datahub-Dashboard.git
+  repo_dir: /opt/.repos/datahub-dashboard/
+  dir: /opt/datahub-dashboard
+  service_name: Datahub Dashboard
+  nginx:
+    listen_port: 80
+    server_name: dashboard.example.com
+    #    document_root: "{{ (datahub_dashboard['dir'], 'web') | path_join }}"
+    #    index: "{{ 'app_dev.php' if datahub_dashboard['development'] else 'app.php' }}"
+    document_root: /opt/datahub-dashboard/web
+    # TODO differentiate between dev and production
+    index: app_dev.php
+  mongodb:
+    host: 127.0.0.1
+    port: 27017
+    database: datahub_dashboard
+    username: datahub_dashboard
+arthub:
+  repo_url: https://github.com/VlaamseKunstcollectie/Arthub-Frontend
+  repo_dir: /opt/.repos/arthub/
+  dir: /opt/arthub
+  nginx:
+    listen_port: 80
+    server_name: arthub.example.com
+cronjobs:
+  - /opt/datahub-pipeline/fixes/scripts/vocabularies.sh

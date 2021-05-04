@@ -1,0 +1,12 @@
+---
+- name: "Setup MongoDB {{ db_user_name }} admin user"
+  community.mongodb.mongodb_user:
+    login_user: "{{ db_login_user }}"
+    login_password: "{{ db_login_password }}"
+    database: "{{ db_database }}"
+    name: "{{ db_name }}"
+    password: "{{ db_password }}"
+    roles: readWrite,dbAdmin
+    state: present
+  become_user: "{{ application_user }}"
+

@@ -8,19 +8,6 @@
   notify: restart nginx
 #  become_user: root
 
-- name: Copy nginx vhost for datahub
-  template: src=datahub.vhost dest=/etc/nginx/sites-available/datahub
-  notify: restart nginx
-#  become_user: root
-
-- name: Create symlink nginx vhost
-  file:
-    src=/etc/nginx/sites-available/datahub
-    dest=/etc/nginx/sites-enabled/datahub
-    state=link
-  notify: restart nginx
-#  become_user: root
-
 - name: Enable nginx service
   service:
     name: nginx

@@ -1,16 +1,16 @@
 server {
-  listen      {{ datahub['nginx']['listen_port'] }};
-  server_name {{ datahub['nginx']['server_name'] }};
+  listen      {{ listen_port }};
+  server_name {{ server_name }};
 
-  access_log  /var/log/nginx/datahub_access.log combined;
-  error_log   /var/log/nginx/datahub_error.log;
+  access_log  /var/log/nginx/{{ vhost_name }}_access.log combined;
+  error_log   /var/log/nginx/{{ vhost_name }}_error.log;
 
-  root        {{ datahub['nginx']['document_root'] }};
+  root        {{ document_root }};
 
   location / {
     index index.php index.html index.htm;
     # try_files $uri $uri/index.php $uri/index.html $uri/index.htm =404;
-    try_files $uri /{{ datahub['nginx']['index'] }}$is_args$args;
+    try_files $uri /{{ index }}$is_args$args;
   }
 
   # Speed up (missing) favicon.
@@ -29,7 +29,7 @@ server {
 
   location ~ \.php$ {
     try_files $uri =404;
-    fastcgi_pass unix:/run/php/php{{ php['version'] }}-fpm-datahub.sock;
+    fastcgi_pass unix:/run/php/php{{ php.version }}-fpm-{{ php_socket_name }}.sock;
     #fastcgi_index app.php;
     fastcgi_param SCRIPT_FILENAME  $document_root$fastcgi_script_name;
     include /etc/nginx/fastcgi_params;

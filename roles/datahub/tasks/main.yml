@@ -1,4 +1,39 @@
 ---
+- name: Include datahub php-fpm pool
+  include_role:
+    name: php-fpm
+    tasks_from: create_pool
+    apply:
+      vars:
+        pool_name: datahub
+
+- name: Include datahub nginx vhost
+  include_role:
+    name: nginx
+    tasks_from: create_vhost
+    apply:
+      vars:
+        listen_port: "{{ datahub.nginx.listen_port }}"
+        server_name: "{{ datahub.nginx.server_name }}"
+        vhost_name: datahub
+        vhost_type: php
+        document_root: "{{ datahub.nginx.document_root }}"
+        index: "{{ datahub.nginx.index }}"
+        php_socket_name: datahub
+
+- name: Include MongoDB admin user role for datahub
+  include_role:
+    name: mongodb
+    tasks_from: create_admin_user
+    apply:
+      vars:
+        db_user_name: datahub
+        db_login_user: "{{  datahub.mongodb.root_username }}"
+        db_login_password: "{{ datahub.mongodb.root_password }}"
+        db_database: "{{ datahub.mongodb.database }}"
+        db_name: "{{ datahub.mongodb.username }}"
+        db_password: "{{ datahub.mongodb.password }}"
+
 - name: Check if admin user exists in MongoDB
   command: mongo --quiet --eval "db.Users.find({ 'username'{{ ':' }} '{{ datahub.admin.username }}' })" datahub
   register: mongodb_admin_user_exists
@@ -33,7 +68,7 @@
 - name: Store _id in a var, generate client_id, secret and external_id
   set_fact:
     datahub:
-      repo_dir: "{{ datahub['repo_dir'] | regex_replace('\\/$', '') }}"
+      repo_dir: "{{ datahub.repo_dir | regex_replace('\\/$', '') }}"
       secret_token: "{{ lookup('password', '/dev/null chars=ascii_lowercase,digits length=32') }}"
       oauth:
         mongodb_consumer_id: "{{ mongodb_consumer_id_string.stdout | regex_replace('^.*ObjectId.\"(.*)\".*$', '\\1') }}"
@@ -41,7 +76,7 @@
         secret: "{{ lookup('password', '/dev/null chars=ascii_lowercase,digits length=50') }}"
         external_id: "{{ lookup('password', '/dev/null chars=hexdigits length=6') | lower }}"
   when: mongodb_oauth_client_exists.stdout | length == 0
-  become_user: "{{ application_user }}"
+#  become_user: "{{ application_user }}"
 
 - name: Insert OAuth client into MongoDB
   command: mongo --eval 'db.Client.insert({{ lookup("template", "./mongodb_oauth_client.json") }})' datahub
@@ -49,7 +84,7 @@
   become_user: "{{ application_user }}"
 
 - name: Fetch client_id to use in the datahub pipeline
-  command: mongo --quiet --eval "db.Client.find({ 'applicationName' {{ ':' }} '{{ datahub.oauth.application_name'] }}' }, { '_id' {{ ':' }} 0, 'randomId' {{ ':' }} 1 })" datahub
+  command: mongo --quiet --eval "db.Client.find({ 'applicationName' {{ ':' }} '{{ datahub.oauth.application_name }}' }, { '_id' {{ ':' }} 0, 'randomId' {{ ':' }} 1 })" datahub
   register: oauth_client_id_raw
   when: mongodb_oauth_client_exists.stdout | length > 0
   become_user: "{{ application_user }}"
@@ -69,7 +104,7 @@
         client_id: "{{ oauth_client_id_raw.stdout | regex_replace('.*\"randomId\".*\"(.*)\".*', '\\1') }}"
         secret: "{{ oauth_secret_raw.stdout | regex_replace('.*\"secret\".*\"(.*)\".*', '\\1') }}"
   when: mongodb_oauth_client_exists.stdout | length > 0
-  become_user: "{{ application_user }}"
+#  become_user: "{{ application_user }}"
 
 - name: Create repo folder
   file: 
@@ -124,7 +159,7 @@
 - name: Copy parameters.yml for datahub
   template:
     src: parameters.yml
-    dest: "{{ datahub.dir }}/app/config/parameters.yml"
+    dest: "{{ datahub.repo_dir }}/repo/app/config/parameters.yml"
 #    owner: "{{ application_user }}"
 #    group: "{{ application_user }}"
   become_user: "{{ application_user }}"
@@ -132,7 +167,7 @@
 - name: Copy config_dev.yml for datahub
   template:
     src: config_dev.yml
-    dest: "{{ datahub.dir }}/app/config/config_dev.yml"
+    dest: "{{ datahub.repo_dir }}/repo/app/config/config_dev.yml"
 #    owner: "{{ application_user }}"
 #    group: "{{ application_user }}"
   become_user: "{{ application_user }}"

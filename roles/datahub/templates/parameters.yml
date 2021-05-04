@@ -10,29 +10,29 @@ parameters:
     mailer_password:   ~
 
     # A secret key that's used to generate certain security-related tokens
-    secret: {{ datahub['secret_token'] }}
+    secret: {{ datahub.secret_token }}
 
     # IP addresses of reverse proxies infront of this application,
     # in order to correctly parse X-Forwarded-For headers and such
     trusted_proxies:    []
 
     # Name of the application
-    service_name:       {{ datahub['service_name'] }}
+    service_name:       {{ datahub.service_name }}
 
     # Name of the organisation managing the application
-    service_organisation: {{ datahub['service_organisation'] }}
+    service_organisation: {{ datahub.service_organisation }}
 
     # Website of the organisation managing the application
-    service_organisation_website: {{ datahub['service_organisation_website'] }}
+    service_organisation_website: {{ datahub.service_organisation_website }}
 
     # Email address of the application
-    service_address: {{ datahub['service_email'] }}
+    service_address: {{ datahub.service_email }}
 
     # MongoDB connection string & database
-    mongodb_server: mongodb://{{ datahub['mongodb']['host'] }}:{{ datahub['mongodb']['port'] }}/{{ datahub['mongodb']['database'] }}
-    mongodb_database: {{ datahub['mongodb']['database'] }}
-    mongodb_user: {{ datahub['mongodb']['username'] }}
-    mongodb_password: {{ datahub['mongodb']['password'] }}
+    mongodb_server: mongodb://{{ datahub.mongodb.host }}:{{ datahub.mongodb.port }}/{{ datahub.mongodb.database }}
+    mongodb_database: {{ datahub.mongodb.database }}
+    mongodb_user: {{ datahub.mongodb.username }}
+    mongodb_password: {{ datahub.mongodb.password }}
 
     # Enforced transport channel
     security_requires_channel: http
@@ -54,5 +54,5 @@ parameters:
 
     # OAI endpoint config
     datahub_oai_repo_name: 'Datahub' # name of the OAI endpoint
-    datahub_oai_contact_email: {{ datahub['contact_email'] }} # comma separated 'email1', 'email2'
-    datahub_oai_pagination_num_records: {{ datahub['pagination_num_records'] }} # number of records per page
+    datahub_oai_contact_email: {{ datahub.contact_email }} # comma separated 'email1', 'email2'
+    datahub_oai_pagination_num_records: {{ datahub.pagination_num_records }} # number of records per page

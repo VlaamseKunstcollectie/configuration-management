@@ -1,10 +1,33 @@
 ---
-- name: Sets pipeline datahub_url if not specified
+- name: Set pipeline datahub_url if not specified
   set_fact:
     datahub_pipeline:
-      datahub_url: "http://{{ datahub['nginx']['server_name'] }}" #TODO make protocol dynamic
-  when: datahub_pipeline['datahub_url'] is undefined
+      datahub_url: "http://{{ datahub.nginx.server_name }}" #TODO make protocol dynamic
+    cacheable: yes
+  when: datahub_pipeline.datahub_url is undefined
   become_user: "{{ application_user }}"
+
+- name: Remove trailing slashes from paths
+  set_fact:
+    datahub_pipeline:
+      dir: "{{ datahub_pipeline.dir | regex_replace('\\/$', '') }}"
+      fixes:
+        repo_dir: "{{ datahub_pipeline.fixes.repo_dir | regex_replace('\\/$', '') }}"
+      authority_files:
+        repo_dir: "{{ datahub_pipeline.authority_files.repo_dir | regex_replace('\\/$', '') }}"
+  become_user: "{{ application_user }}"
+
+- name: Initialize datahub_pipeline_paths array
+  set_fact:
+    datahub_pipeline_fix_file_paths: {}
+
+- name: Set absolute paths for fix file paths and store them in the new array
+  set_fact:
+    datahub_pipeline_fix_file_paths:
+      "{{ datahub_pipeline_fix_file_paths 
+        | combine({ item.shorthand: item.fix_file_path | regex_replace('^(.*)$', datahub_pipeline.dir + '/fixes/\\1') if not item.fix_file_path.startswith('/') else item.fix_file_path }) }}"
+  with_items:
+    - "{{ datahub_pipeline.institutions }}"
 
 - name: Install apt packages
   apt:
@@ -22,8 +45,6 @@
       - libexpat1-dev
       - libcrypt-ssleay-perl
       - libmysqlclient-dev
-    state: present
-#  become_user: root
 
 - name: Install Catmandu
   cpanm:
@@ -37,7 +58,7 @@
     notest: true
   become_user: "{{ application_user }}"
 
-- name: Install Catmandu
+- name: Install additional pipeline dependencies
   cpanm:
     name: "{{ item }}"
   with_items:
@@ -49,6 +70,13 @@
     - Datahub::Factory::Exporter
   become_user: "{{ application_user }}"
 
+- name: Create datahub-pipeline folder
+  file:
+    path: "{{ datahub_pipeline.dir }}"
+    state: directory
+    owner: "{{ application_user }}"
+    group: "{{ application_user }}"
+
 - name: Create repo folders
   file: 
     path: "{{ item }}"
@@ -57,22 +85,27 @@
     owner: "{{ application_user }}"
     group: "{{ application_user }}"
   with_items:
-    - "{{ datahub_pipeline['fixes']['repo_dir'] }}"
-    - "{{ datahub_pipeline['authority_files']['repo_dir'] }}"
+    - "{{ datahub_pipeline.fixes.repo_dir }}"
+    - "{{ datahub_pipeline.authority_files.repo_dir }}"
 #  become_user: root
 
 - name: Checkout datahub-pipeline repos
   git:
-    repo: "{{ datahub_pipeline['repo_url'] }}"
-    dest: "{{ datahub_pipeline['repo_dir'] }}/repo/"
+    repo: "{{ item.url }}"
+    dest: "{{ item.dest }}/repo/"
     force: true
 #    version: release-0.22
   become_user: "{{ application_user }}"
+  with_items:
+    - url: "{{ datahub_pipeline.fixes.repo_url }}"
+      dest: "{{ datahub_pipeline.fixes.repo_dir }}"
+    - url: "{{ datahub_pipeline.authority_files.repo_url }}"
+      dest: "{{ datahub_pipeline.authority_files.repo_dir }}"
 
 - name: Override vocabularies.sh
   template:
     src: vocabularies.sh
-    dest: "{{ datahub_pipeline['fixes']['repo_dir'] }}/repo/scripts/vocabularies.sh"
+    dest: "{{ datahub_pipeline.fixes.repo_dir }}/repo/scripts/vocabularies.sh"
 #    owner: "{{ application_user }}"
 #    group: "{{ application_user }}"
   become_user: "{{ application_user }}"
@@ -80,7 +113,7 @@
 - name: Copy datahub.ini for datahub pipeline
   template:
     src: datahub.ini
-    dest: "{{ datahub_pipeline['dir'] }}/datahub.ini"
+    dest: "{{ datahub_pipeline.dir }}/datahub.ini"
 #    owner: "{{ application_user }}"
 #    group: "{{ application_user }}"
   become_user: "{{ application_user }}"
@@ -94,7 +127,11 @@
     group: "{{ application_user }}"
 #  become_user: root
   with_items:
-    - src: "{{ datahub_pipeline['fixes']['repo_dir'] }}"
-      dest: "{{ datahub_pipeline['dir'] }}/fixes"
-    - src: "{{ datahub_pipeline['authority_files']['repo_dir'] }}"
-      dest: "{{ datahub_pipeline['dir'] }}/authority_files"
+    - src: "{{ datahub_pipeline.fixes.repo_dir }}"
+      dest: "{{ datahub_pipeline.dir }}/fixes"
+    - src: "{{ datahub_pipeline.authority_files.repo_dir }}"
+      dest: "{{ datahub_pipeline.dir }}/authority_files"
+
+- name: Provide crontab entry for daily reload of datahub records
+  set_fact:
+    cronjobs: "{{ cronjobs }} + [ 'PERL5LIB=/home/vkc/perl5/lib/perl5/ /home/vkc/perl5/bin/dhconveyor transport -p /opt/datahub-pipeline/datahub.ini -L1' ]"

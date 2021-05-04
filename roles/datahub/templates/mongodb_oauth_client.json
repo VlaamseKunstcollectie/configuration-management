@@ -1,7 +1,7 @@
 {
-    "randomId" : "{{ datahub['oauth']['client_id'] }}",
+    "randomId" : "{{ datahub.oauth.client_id }}",
     "redirectUris" : [ null ],
-    "secret" : "{{ datahub['oauth']['secret'] }}",
+    "secret" : "{{ datahub.oauth.secret }}",
     "allowedGrantTypes" : [
         "authorization_code",
         "token",
@@ -10,7 +10,7 @@
     ],
     "createdAt" : ISODate(),
     "updatedAt" : ISODate(),
-    "externalId" : "{{ datahub['oauth']['external_id'] }}",
-    "applicationName" : "{{ datahub['oauth']['application_name' ]}}",
-    "user" : DBRef("Users", ObjectId("{{ datahub['oauth']['mongodb_consumer_id'] }}"), "{{ datahub['mongodb']['database'] }}")
+    "externalId" : "{{ datahub.oauth.external_id }}",
+    "applicationName" : "{{ datahub.oauth.application_name' ]}}",
+    "user" : DBRef("Users", ObjectId("{{ datahub.oauth.mongodb_consumer_id }}"), "{{ datahub.mongodb.database }}")
 }
