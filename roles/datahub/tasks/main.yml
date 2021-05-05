@@ -117,7 +117,7 @@
     repo: "{{ datahub.repo_url }}"
     dest: "{{ datahub.repo_dir }}/repo/"
     force: true
-#    version: release-0.22
+    version:"{{ datahub.branch }}"
   become_user: "{{ application_user }}"
 
 - name: Create shared folders

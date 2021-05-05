@@ -7,6 +7,7 @@ datahub:
   development: false
   repo_url: https://github.com/thedatahub/Datahub.git
   repo_dir: /opt/.repos/datahub/
+  branch: master
   dir: /opt/datahub
   service_name: Datahub
   pagination_num_records: 25 
@@ -36,9 +37,11 @@ datahub_pipeline:
   fixes:
     repo_url: https://github.com/VlaamseKunstcollectie/Datahub-Fixes.git
     repo_dir: /opt/.repos/datahub-fixes/
+    branch: master
   authority_files:
     repo_url: https://github.com/VlaamseKunstcollectie/Authority-Files.git
     repo_dir: /opt/.repos/authority-files/
+    branch: master
   eiz:
     url: https://cjm-web.adlibhosting.com/arthubflanders/oai.ashx
     set: vkc
@@ -55,6 +58,7 @@ datahub_pipeline:
 datahub_dashboard:
   repo_url: https://github.com/thedatahub/Datahub-Dashboard.git
   repo_dir: /opt/.repos/datahub-dashboard/
+  branch: master
   dir: /opt/datahub-dashboard
   service_name: Datahub Dashboard
   nginx:
@@ -73,6 +77,7 @@ datahub_dashboard:
 arthub:
   repo_url: https://github.com/VlaamseKunstcollectie/Arthub-Frontend
   repo_dir: /opt/.repos/arthub/
+  branch: master
   dir: /opt/arthub
   nginx:
     listen_port: 80

@@ -53,7 +53,7 @@
     repo: "{{ datahub_dashboard.repo_url }}"
     dest: "{{ datahub_dashboard.repo_dir }}/repo/"
     force: true
-#    version: master
+    version: "{{ datahub_dashboard.branch }}"
   become_user: "{{ application_user }}"
 
 - name: Create shared folders

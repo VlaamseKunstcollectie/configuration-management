@@ -93,13 +93,15 @@
     repo: "{{ item.url }}"
     dest: "{{ item.dest }}/repo/"
     force: true
-#    version: master
+    version: "{{ item.branch }}"
   become_user: "{{ application_user }}"
   with_items:
     - url: "{{ datahub_pipeline.fixes.repo_url }}"
       dest: "{{ datahub_pipeline.fixes.repo_dir }}"
+      branch: "{{ datahub_pipeline.fixes.branch }}"
     - url: "{{ datahub_pipeline.authority_files.repo_url }}"
       dest: "{{ datahub_pipeline.authority_files.repo_dir }}"
+      branch: "{{ datahub_pipeline.authority_files.branch }}"
 
 - name: Override vocabularies.sh
   template:
