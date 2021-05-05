@@ -7,7 +7,7 @@
       - php{{ php.version }}-cli
       - php{{ php.version }}-intl
       - php{{ php.version }}-mbstring
-#      - php-mongodb
+      - php-mongodb
       - php{{ php.version }}-xml
       - php{{ php.version }}-zip
       - php{{ php.version }}-dev
