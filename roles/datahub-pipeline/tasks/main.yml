@@ -130,4 +130,4 @@
 
 - name: Provide crontab entry for daily reload of datahub records
   set_fact:
-    cronjobs: "{{ cronjobs }} + [ 'PERL5LIB=/home/vkc/perl5/lib/perl5/ /home/vkc/perl5/bin/dhconveyor transport -p /opt/datahub-pipeline/datahub.ini -L1' ]"
+    cronjobs: "{{ cronjobs }} + [ 'PERL5LIB=/home/{{ application_user }}/perl5/lib/perl5/ /home/{{ application_user }}/perl5/bin/dhconveyor transport -p /opt/datahub-pipeline/datahub.ini -L1' ]"
