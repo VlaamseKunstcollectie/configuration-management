@@ -5,12 +5,9 @@
 
 - name: Install git
   apt: name=git state=present
-#  become_user: root
 
 - name: Create application user if it does not yet exist
   user:
     name: "{{ application_user }}"
     password: "{{ application_password | password_hash('sha512') }}"
     state: present
-#  vars:
-#    ansible_become_user: root

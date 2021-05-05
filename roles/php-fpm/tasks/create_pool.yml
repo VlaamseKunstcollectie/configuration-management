@@ -4,4 +4,3 @@
     src: pool.conf
     dest: "/etc/php/{{ php.version }}/fpm/pool.d/{{ pool_name }}.conf"
   notify: restart php-fpm
-#  become_user: root

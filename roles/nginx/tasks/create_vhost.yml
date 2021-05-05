@@ -4,7 +4,6 @@
     src: "{{ vhost_type }}.vhost"
     dest: "/etc/nginx/sites-available/{{ vhost_name }}"
   notify: restart nginx
-#  become_user: root
 
 - name: "Create symlink for {{ vhost_name }} nginx vhost"
   file:
@@ -12,5 +11,3 @@
     dest: "/etc/nginx/sites-enabled/{{ vhost_name }}"
     state: link
   notify: restart nginx
-#  become_user: root
-

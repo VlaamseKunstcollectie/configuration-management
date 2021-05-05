@@ -76,7 +76,6 @@
         secret: "{{ lookup('password', '/dev/null chars=ascii_lowercase,digits length=50') }}"
         external_id: "{{ lookup('password', '/dev/null chars=hexdigits length=6') | lower }}"
   when: mongodb_oauth_client_exists.stdout | length == 0
-#  become_user: "{{ application_user }}"
 
 - name: Insert OAuth client into MongoDB
   command: mongo --eval 'db.Client.insert({{ lookup("template", "./mongodb_oauth_client.json") }})' datahub
@@ -104,7 +103,6 @@
         client_id: "{{ oauth_client_id_raw.stdout | regex_replace('.*\"randomId\".*\"(.*)\".*', '\\1') }}"
         secret: "{{ oauth_secret_raw.stdout | regex_replace('.*\"secret\".*\"(.*)\".*', '\\1') }}"
   when: mongodb_oauth_client_exists.stdout | length > 0
-#  become_user: "{{ application_user }}"
 
 - name: Create repo folder
   file: 
@@ -113,7 +111,6 @@
     recurse: true 
     owner: "{{ application_user }}"
     group: "{{ application_user }}"
-#  become_user: root
 
 - name: Checkout datahub repo
   git:
@@ -160,16 +157,12 @@
   template:
     src: parameters.yml
     dest: "{{ datahub.repo_dir }}/repo/app/config/parameters.yml"
-#    owner: "{{ application_user }}"
-#    group: "{{ application_user }}"
   become_user: "{{ application_user }}"
 
 - name: Copy config_dev.yml for datahub
   template:
     src: config_dev.yml
     dest: "{{ datahub.repo_dir }}/repo/app/config/config_dev.yml"
-#    owner: "{{ application_user }}"
-#    group: "{{ application_user }}"
   become_user: "{{ application_user }}"
 
 - name: Link datahub repo
@@ -179,7 +172,6 @@
     state: link
     owner: "{{ application_user }}"
     group: "{{ application_user }}"
-#  become_user: root
 
 - name: Install datahub through composer
   command: composer install
@@ -197,4 +189,3 @@
   with_items:
     - cache
     - logs
-#  become_user: root

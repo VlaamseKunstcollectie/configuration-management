@@ -87,14 +87,13 @@
   with_items:
     - "{{ datahub_pipeline.fixes.repo_dir }}"
     - "{{ datahub_pipeline.authority_files.repo_dir }}"
-#  become_user: root
 
 - name: Checkout datahub-pipeline repos
   git:
     repo: "{{ item.url }}"
     dest: "{{ item.dest }}/repo/"
     force: true
-#    version: release-0.22
+#    version: master
   become_user: "{{ application_user }}"
   with_items:
     - url: "{{ datahub_pipeline.fixes.repo_url }}"
@@ -106,16 +105,12 @@
   template:
     src: vocabularies.sh
     dest: "{{ datahub_pipeline.fixes.repo_dir }}/repo/scripts/vocabularies.sh"
-#    owner: "{{ application_user }}"
-#    group: "{{ application_user }}"
   become_user: "{{ application_user }}"
 
 - name: Copy datahub.ini for datahub pipeline
   template:
     src: datahub.ini
     dest: "{{ datahub_pipeline.dir }}/datahub.ini"
-#    owner: "{{ application_user }}"
-#    group: "{{ application_user }}"
   become_user: "{{ application_user }}"
 
 - name: Link fixes and authority_files repos
@@ -125,7 +120,6 @@
     state: link
     owner: "{{ application_user }}"
     group: "{{ application_user }}"
-#  become_user: root
   with_items:
     - src: "{{ datahub_pipeline.fixes.repo_dir }}"
       dest: "{{ datahub_pipeline.dir }}/fixes"

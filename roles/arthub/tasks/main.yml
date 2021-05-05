@@ -70,7 +70,6 @@
 - name: Install gems through bundler
   community.general.bundler:
     state: present
-#    executable: /home/vkc/.gem/ruby/2.5.0/gems/bundler-2.1.2/exe/bundler
     executable: "{{ arthub.dir }}/bin/bundle"
     gemfile: "{{ arthub.dir }}/Gemfile"
     deployment_mode: yes

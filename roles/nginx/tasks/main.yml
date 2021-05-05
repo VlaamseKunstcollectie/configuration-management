@@ -1,16 +1,13 @@
 ---
 - name: Install nginx
   apt: name=nginx state=present
-#  become_user: root
 
 - name: Delete default nginx vhost symlink
   file: path=/etc/nginx/sites-enabled/default state=absent
   notify: restart nginx
-#  become_user: root
 
 - name: Enable nginx service
   service:
     name: nginx
     state: started
     enabled: yes
-#  become_user: root

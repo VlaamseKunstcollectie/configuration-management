@@ -6,4 +6,3 @@ for file in "${FILES[@]}"; do
   echo "Generating $file.";
   catmandu import CSV to DBI --data_source "dbi:SQLite:/tmp/import.${file}.sqlite" < "{{ datahub_pipeline.dir }}/authority_files/${file}.csv"
 done
-
