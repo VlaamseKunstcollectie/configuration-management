@@ -12,5 +12,4 @@
     minute: "0"
     hour: "2"
     user: "{{ application_user }}"
-    job: "bash {{ datahub_pipeline.fixes.repo_dir }}/repo/scripts/import_data.sh"
-#    job: "{{ cronjobs | join('; ') }}"
+    job: "bash {{ datahub_pipeline.fixes.dir }}/fixes/scripts/import_data.sh"
