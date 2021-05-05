@@ -2,7 +2,7 @@
 - name: Create shell script for cron task
   template:
     src: import_data.sh
-    dest: "{{ datahub_pipeline.fixes.repo_dir }}/repo/scripts/import_data.sh"
+    dest: "{{ datahub_pipeline.dir }}/fixes/scripts/import_data.sh"
     mode: '755'
   with_items: "{{ cronjobs }}"
 
@@ -12,4 +12,4 @@
     minute: "0"
     hour: "2"
     user: "{{ application_user }}"
-    job: "bash {{ datahub_pipeline.fixes.dir }}/fixes/scripts/import_data.sh"
+    job: "bash {{ datahub_pipeline.dir }}/fixes/scripts/import_data.sh"
