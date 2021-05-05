@@ -11,6 +11,6 @@
     "createdAt" : ISODate(),
     "updatedAt" : ISODate(),
     "externalId" : "{{ datahub.oauth.external_id }}",
-    "applicationName" : "{{ datahub.oauth.application_name' ]}}",
+    "applicationName" : "{{ datahub.oauth.application_name }}",
     "user" : DBRef("Users", ObjectId("{{ datahub.oauth.mongodb_consumer_id }}"), "{{ datahub.mongodb.database }}")
 }
