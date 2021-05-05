@@ -14,10 +14,13 @@
       - composer=1.*
     state: present
 
+# First run of install will output a huge error, but this can be safely ignored
 - name: Install mongodb through pear
   community.general.pear:
     name: pecl/mongodb
     state: present
+  ignore_errors: yes
+  no_log: yes
 
 - name: Disable default pool
   command: mv /etc/php/{{ php.version }}/fpm/pool.d/www.conf /etc/php/{{ php.version }}/fpm/pool.d/www.conf.disabled creates=/etc/php/{{ php.version }}/fpm/pool.d/www.conf.disabled
