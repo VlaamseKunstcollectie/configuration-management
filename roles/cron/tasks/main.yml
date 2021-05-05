@@ -1,8 +1,16 @@
 ---
+- name: Create shell script for cron task
+  template:
+    src: import_data.sh
+    dest: "{{ datahub_pipeline.fixes.repo_dir }}/repo/scripts/import_data.sh"
+    mode: '755'
+  with_items: "{{ cronjobs }}"
+
 - name: Provide crontab entry for daily reload of arthub records
   cron:
     name: "Reload arthub records"
     minute: "0"
     hour: "2"
     user: "{{ application_user }}"
-    job: "{{ cronjobs | join('; ') }}"
+    job: "bash {{ datahub_pipeline.fixes.repo_dir }}/repo/scripts/import_data.sh"
+#    job: "{{ cronjobs | join('; ') }}"

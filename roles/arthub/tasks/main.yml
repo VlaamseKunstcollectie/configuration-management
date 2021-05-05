@@ -135,14 +135,20 @@
   become_user: "{{ application_user }}"
   when: not stat_result.stat.exists
 
+- name: Set rails secret from previously run command
+  set_fact:
+    rails_secret: "{{ rails_secret_cmd.stdout }}"
+  when: not stat_result.stat.exists
+
 - name: Fetch rails secret from file if it exists
   command: "cat {{ arthub.dir }}/.rails_secret.txt"
-  register: rails_secret_cmd
+  register: rails_secret_file
   when: stat_result.stat.exists
 
 - name: Set rails secret from previously run command
   set_fact:
-    rails_secret: "{{ rails_secret_cmd.stdout }}"
+    rails_secret: "{{ rails_secret_file.stdout }}"
+  when: stat_result.stat.exists
 
 - name: Copy rails secret into file
   copy:
