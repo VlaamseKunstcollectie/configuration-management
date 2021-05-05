@@ -1,26 +1,4 @@
 ---
-- name: Include datahub php-fpm pool
-  include_role:
-    name: php-fpm
-    tasks_from: create_pool
-    apply:
-      vars:
-        pool_name: datahub
-
-- name: Include datahub nginx vhost
-  include_role:
-    name: nginx
-    tasks_from: create_vhost
-    apply:
-      vars:
-        listen_port: "{{ datahub.nginx.listen_port }}"
-        server_name: "{{ datahub.nginx.server_name }}"
-        vhost_name: datahub
-        vhost_type: php
-        document_root: "{{ datahub.nginx.document_root }}"
-        index: "{{ datahub.nginx.index }}"
-        php_socket_name: datahub
-
 - name: Include MongoDB admin user role for datahub
   include_role:
     name: mongodb
@@ -189,3 +167,25 @@
   with_items:
     - cache
     - logs
+
+- name: Include datahub php-fpm pool
+  include_role:
+    name: php-fpm
+    tasks_from: create_pool
+    apply:
+      vars:
+        pool_name: datahub
+
+- name: Include datahub nginx vhost
+  include_role:
+    name: nginx
+    tasks_from: create_vhost
+    apply:
+      vars:
+        listen_port: "{{ datahub.nginx.listen_port }}"
+        server_name: "{{ datahub.nginx.server_name }}"
+        vhost_name: datahub
+        vhost_type: php
+        document_root: "{{ datahub.nginx.document_root }}"
+        index: "{{ datahub.nginx.index }}"
+        php_socket_name: datahub

@@ -1,26 +1,4 @@
 ---
-- name: Set up datahub dashboard php-fpm pool
-  include_role:
-    name: php-fpm
-    tasks_from: create_pool
-    apply:
-      vars:
-        pool_name: datahub-dashboard
-
-- name: Set up datahub dashboard nginx vhost
-  include_role:
-    name: nginx
-    tasks_from: create_vhost
-    apply:
-      vars:
-        listen_port: "{{ datahub_dashboard.nginx.listen_port }}"
-        server_name: "{{ datahub_dashboard.nginx.server_name }}"
-        vhost_name: datahub-dashboard
-        vhost_type: php
-        document_root: "{{ datahub_dashboard.nginx.document_root }}"
-        index: "{{ datahub_dashboard.nginx.index }}"
-        php_socket_name: datahub-dashboard
-
 - name: Include MongoDB admin user role for datahub dashboard
   include_role:
     name: mongodb
@@ -131,3 +109,25 @@
 - name: Provide crontab entry for daily reload of dashboard records
   set_fact:
     cronjobs: "{{ cronjobs }} + [ 'php {{ datahub_dashboard.dir }}/bin/console app:fetch-data' ]"
+
+- name: Set up datahub dashboard php-fpm pool
+  include_role:
+    name: php-fpm
+    tasks_from: create_pool
+    apply:
+      vars:
+        pool_name: datahub-dashboard
+
+- name: Set up datahub dashboard nginx vhost
+  include_role:
+    name: nginx
+    tasks_from: create_vhost
+    apply:
+      vars:
+        listen_port: "{{ datahub_dashboard.nginx.listen_port }}"
+        server_name: "{{ datahub_dashboard.nginx.server_name }}"
+        vhost_name: datahub-dashboard
+        vhost_type: php
+        document_root: "{{ datahub_dashboard.nginx.document_root }}"
+        index: "{{ datahub_dashboard.nginx.index }}"
+        php_socket_name: datahub-dashboard
