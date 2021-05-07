@@ -12,4 +12,4 @@
     minute: "0"
     hour: "2"
     user: "{{ application_user }}"
-    job: "bash {{ datahub_pipeline.dir }}/fixes/scripts/import_data.sh"
+    job: "bash {{ datahub_pipeline.dir }}/fixes/scripts/import_data.sh > {{ datahub_pipeline.dir }}/cron_output.log 2>&1"
