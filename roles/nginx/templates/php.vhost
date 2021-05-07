@@ -28,7 +28,7 @@ server {
 
   location ~ \.php$ {
     try_files $uri =404;
-    fastcgi_pass unix:/run/php/php{{ php.version }}-fpm-{{ php_socket_name }}.sock;
+    fastcgi_pass unix:/run/php/php{{ php_version }}-fpm-{{ php_socket_name }}.sock;
     fastcgi_param SCRIPT_FILENAME  $document_root$fastcgi_script_name;
     include /etc/nginx/fastcgi_params;
   }

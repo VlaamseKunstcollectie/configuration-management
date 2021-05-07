@@ -1,15 +1,25 @@
 ---
+- name: Set php version to 7.2 on Ubuntu 18.04
+  set_fact:
+    php_version: 7.2     
+  when: php_version is not defined and ansible_facts.distribution == 'Ubuntu' and ansible_facts.distribution_major_version == '18'
+
+- name: Set php version to 7.3 on Debian 10
+  set_fact:
+    php_version: 7.3
+  when: php_version is not defined and ansible_facts.distribution == 'Debian' and ansible_facts.distribution_major_version == '10'
+
 - name: Install php-fpm and deps
   apt:
     name:
-      - php{{ php.version }}-fpm
-      - php{{ php.version }}-cli
-      - php{{ php.version }}-intl
-      - php{{ php.version }}-mbstring
+      - php{{ php_version }}-fpm
+      - php{{ php_version }}-cli
+      - php{{ php_version }}-intl
+      - php{{ php_version }}-mbstring
       - php-mongodb
-      - php{{ php.version }}-xml
-      - php{{ php.version }}-zip
-      - php{{ php.version }}-dev
+      - php{{ php_version }}-xml
+      - php{{ php_version }}-zip
+      - php{{ php_version }}-dev
       - php-pear
       - composer=1.*
     state: present
@@ -23,15 +33,15 @@
   no_log: yes
 
 - name: Disable default pool
-  command: mv /etc/php/{{ php.version }}/fpm/pool.d/www.conf /etc/php/{{ php.version }}/fpm/pool.d/www.conf.disabled creates=/etc/php/{{ php.version }}/fpm/pool.d/www.conf.disabled
+  command: mv /etc/php/{{ php_version }}/fpm/pool.d/www.conf /etc/php/{{ php_version }}/fpm/pool.d/www.conf.disabled creates=/etc/php/{{ php_version }}/fpm/pool.d/www.conf.disabled
   notify: restart php-fpm
 
 - name: Copy php.ini
-  template: src=php.ini dest=/etc/php/{{ php.version }}/fpm/php.ini
+  template: src=php.ini dest=/etc/php/{{ php_version }}/fpm/php.ini
   notify: restart php-fpm
 
 - name: Enable php-fpm service
   service:
-    name: php{{ php.version }}-fpm
+    name: php{{ php_version }}-fpm
     state: started
     enabled: yes

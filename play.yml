@@ -1,15 +1,41 @@
 ---
-- name: Install nginx, and php-fpm
-  hosts: datahub
-  remote_user: root
-
+- name: Install common packages
+  hosts: datahub,datahub_pipeline,datahub_dashboard,arthub
   roles:
     - common
+
+- name: Install php-fpm and mongodb
+  hosts: datahub,datahub_dashboard
+  roles:
     - php-fpm
-    - nginx
     - mongodb
+
+- name: Install nginx
+  hosts: datahub,datahub_dashboard,arthub
+  roles:
+    - nginx
+
+- name: Install datahub
+  hosts: datahub
+  roles:
     - datahub
+
+- name: Install datahub pipeline
+  hosts: datahub_pipeline
+  roles:
     - datahub-pipeline
+
+- name: Install datahub dashboard
+  hosts: datahub_dashboard
+  roles:
     - datahub-dashboard
+
+- name: Install arthub
+  hosts: arthub
+  roles:
     - arthub
+
+- name: Set up cronjob
+  hosts: datahub,datahub_pipeline,datahub_dashboard,arthub
+  roles:
     - cron

@@ -1,6 +1,5 @@
 ---
 php:
-  version: 7.2
   user: www-data
   group: www-data
 datahub:
@@ -14,8 +13,8 @@ datahub:
   nginx:
     listen_port: 80
     server_name: datahub.example.com
-    #    document_root: "{{ (datahub['dir'], 'web') | path_join }}"
-    #    index: "{{ 'app_dev.php' if datahub['development'] else 'app.php' }}"
+    #    document_root: "{{ (datahub.dir, 'web') | path_join }}"
+    #    index: "{{ 'app_dev.php' if datahub.development else 'app.php' }}"
     document_root: /opt/datahub/web
     # TODO differentiate between dev and production
     index: app_dev.php
@@ -64,8 +63,8 @@ datahub_dashboard:
   nginx:
     listen_port: 80
     server_name: dashboard.example.com
-    #    document_root: "{{ (datahub_dashboard['dir'], 'web') | path_join }}"
-    #    index: "{{ 'app_dev.php' if datahub_dashboard['development'] else 'app.php' }}"
+    #    document_root: "{{ (datahub_dashboard.dir, 'web') | path_join }}"
+    #    index: "{{ 'app_dev.php' if datahub_dashboard.development else 'app.php' }}"
     document_root: /opt/datahub-dashboard/web
     # TODO differentiate between dev and production
     index: app_dev.php
