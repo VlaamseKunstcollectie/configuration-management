@@ -29,11 +29,22 @@
   with_items:
     - "{{ datahub_pipeline.institutions }}"
 
+- name: Install perl 5.26 if Ubuntu 18.04
+  apt:
+    name:
+      - perl=5.26*
+  when: ansible_facts.distribution == 'Ubuntu' and ansible_facts.distribution_major_version == '18'
+
+- name: Install perl 5.28 if Debian 10
+  apt:
+    name:
+      - perl=5.28*
+  when: ansible_facts.distribution == 'Debian' and ansible_facts.distribution_major_version == '10'
+
 - name: Install apt packages
   apt:
     name:
       - sqlite3
-      - perl=5.26*
       - cpanminus
       - libssl-dev
       - libxslt1-dev
@@ -44,7 +55,18 @@
       - libexpat1
       - libexpat1-dev
       - libcrypt-ssleay-perl
+
+- name: Install libmysqlclient-dev if Ubuntu 18.04
+  apt:
+    name:
       - libmysqlclient-dev
+  when: ansible_facts.distribution == 'Ubuntu' and ansible_facts.distribution_major_version == '18'
+
+- name: Install default-libmysqlclient-dev if Debian 10
+  apt:
+    name:
+      - default-libmysqlclient-dev
+  when: ansible_facts.distribution == 'Debian' and ansible_facts.distribution_major_version == '10'
 
 - name: Install Catmandu
   cpanm:

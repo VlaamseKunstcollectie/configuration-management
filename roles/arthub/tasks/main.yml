@@ -1,7 +1,7 @@
 ---
-- name: Install java
+- name: Install openjdk-11-jre
   apt:
-    name: openjdk-8-jre
+    name: openjdk-11-jre
 
 - name: Install sqlite3
   apt:
@@ -76,20 +76,22 @@
     deployment_mode: yes
   become_user: "{{ application_user }}"
 
-- name: Perform database migration (?)
-  command: rake db:migrate
+- name: Initialize db/production.sqlite3
+  command: "{{ arthub.dir }}/bin/bundle exec rake db:migrate"
   args:
     chdir: "{{ arthub.dir }}"
+  environment:
+    RAILS_ENV: production
   become_user: "{{ application_user }}"
 
 - name: Clean up solr installation
-  command: rake solr:clean
+  command: "{{ arthub.dir }}/bin/bundle exec rake solr:clean"
   args:
     chdir: "{{ arthub.dir }}"
   become_user: "{{ application_user }}"
 
 - name: Stop solr on redeploy
-  command: rake solr:stop
+  command: "{{ arthub.dir }}/bin/bundle exec rake solr:stop"
   args:
     chdir: "{{ arthub.dir }}"
   become_user: "{{ application_user }}"
@@ -107,7 +109,7 @@
   template: src=solr.conf dest=/etc/security/limits.d/solr.conf
 
 - name: Restart solr on redeploy
-  command: rake solr:restart
+  command: "{{ arthub.dir }}/bin/bundle exec rake solr:restart"
   args:
     chdir: "{{ arthub.dir }}"
   become_user: "{{ application_user }}"

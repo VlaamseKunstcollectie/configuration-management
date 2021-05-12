@@ -1,11 +1,18 @@
 ---
-- name: Install MongoDB
+- name: Add apt repository
+  include_tasks: add_apt_repository.yml
+
+- name: Install mongodb-org
   apt:
-    name: mongodb-server
+    name: mongodb-org
+  notify: Restart mongodb
+
+- name: Flush handlers
+  meta: flush_handlers
 
 - name: Install pymongo
-  apt:
-    name: python3-pymongo
+  pip:
+    name: pymongo
 
 - name: Setup MongoDB root user
   community.mongodb.mongodb_user:
@@ -15,8 +22,8 @@
     roles: root
   become_user: "{{ application_user }}"
 
-- name: Enable MongoDB
+- name: Enable mongod
   service:
-    name: mongodb
+    name: mongod
     state: started
     enabled: yes

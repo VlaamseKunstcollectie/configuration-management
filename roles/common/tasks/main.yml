@@ -3,8 +3,16 @@
   apt:
     update_cache: yes
 
-- name: Install git
-  apt: name=git state=present
+- name: Install git, pip, virtualenv, setuptools, software-properties-common, apt-transport-https and ca-certificates
+  apt:
+    name:
+      - git
+      - python3-pip
+      - python3-virtualenv
+      - python3-setuptools
+      - software-properties-common
+      - apt-transport-https
+      - ca-certificates
 
 - name: Create application user if it does not yet exist
   user:
