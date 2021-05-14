@@ -1,0 +1,16 @@
+---
+- name: Install certbot
+  apt:
+    name:
+      - certbot
+
+#- name: Check it
+#  set_fact:
+#    something: "{{ letsencrypt_domains | join(' -d ') }}"
+
+#- name: Debug
+#  debug:
+#    var: something
+
+#- name: Install LetsEncrypt certificates for all domains
+#  command: "certbot certonly -n --post-hook '/etc/init.d/nginx reload' --agree-tos --webroot --cert-name {{ letsencrypt_domains[0] }} -d {{ letsencrypt_domains | join(' -d ') }}"

@@ -1,7 +1,8 @@
 ---
 - name: Add apt repository if needed
   include_tasks: add_apt_repository.yml
-  when: ansible_facts.distribution == 'Debian' and ansible_facts.distribution_major_version == '10'
+  when: (ansible_facts.distribution == 'Debian' and ansible_facts.distribution_major_version == '10')
+     or (ansible_facts.distribution == 'Ubuntu' and ansible_facts.distribution_major_version == '20')
 
 - name: Install php-fpm and deps
   apt:

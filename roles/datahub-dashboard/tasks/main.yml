@@ -63,6 +63,7 @@
     dest: "{{ datahub_dashboard.repo_dir }}/repo/{{ item.dest }}"
     state: link
     force: true
+    mode: "775"
   with_items:
     - src: cache
       dest: var/cache
@@ -99,7 +100,7 @@
     path: "{{ datahub_dashboard.repo_dir }}/shared/{{ item }}/"
     state: directory
     recurse: true
-    owner: "{{ php.user }}"
+    owner: "{{ application_user }}"
     group: "{{ php.group }}"
   with_items:
     - cache
@@ -131,3 +132,4 @@
         document_root: "{{ datahub_dashboard.nginx.document_root }}"
         index: "{{ datahub_dashboard.nginx.index }}"
         php_socket_name: datahub-dashboard
+        vhost_ssl: "{{ datahub_dashboard.nginx.ssl | default([]) }}"

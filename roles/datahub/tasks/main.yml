@@ -189,3 +189,4 @@
         document_root: "{{ datahub.nginx.document_root }}"
         index: "{{ datahub.nginx.index }}"
         php_socket_name: datahub
+        vhost_ssl: "{{ datahub.nginx.ssl | default([]) }}"

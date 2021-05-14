@@ -85,3 +85,4 @@ arthub:
     server_name: arthub.example.com
 cronjobs:
   - /opt/datahub-pipeline/fixes/scripts/vocabularies.sh
+letsencrypt_domains: []

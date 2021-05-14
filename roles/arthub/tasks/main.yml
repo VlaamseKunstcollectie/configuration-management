@@ -109,7 +109,7 @@
   template: src=solr.conf dest=/etc/security/limits.d/solr.conf
 
 - name: Restart solr on redeploy
-  command: "{{ arthub.dir }}/bin/bundle exec rake solr:restart"
+  command: "{{ arthub.dir }}/bin/bundle exec rake solr:start"
   args:
     chdir: "{{ arthub.dir }}"
   become_user: "{{ application_user }}"
@@ -196,14 +196,11 @@
         vhost_name: arthub
         vhost_type: proxy
         upstream: http://localhost:3000
+        vhost_ssl: "{{ arthub.nginx.ssl | default([]) }}"
 
 - name: Provide crontab entry for daily reload of arthub records
   set_fact:
     cronjobs: "{{ cronjobs }} + [ '{{ item }}' ]"
   with_items:
-    - "{{ datahub_pipeline.dir }}/fixes/scripts/arthub-index.sh -e http://{{ datahub.nginx.server_name }}/oai -l nl"
-    - "{{ datahub_pipeline.dir }}/fixes/scripts/arthub-index.sh -e http://{{ datahub.nginx.server_name }}/oai -l en"
-
-- name: debug
-  debug:
-    var: cronjobs
+    - "(cd {{ datahub_pipeline.dir }}/fixes/scripts; {{ datahub_pipeline.dir }}/fixes/scripts/arthub-index.sh -e http://{{ datahub.nginx.server_name }}/oai -l nl)"
+    - "(cd {{ datahub_pipeline.dir }}/fixes/scripts; {{ datahub_pipeline.dir }}/fixes/scripts/arthub-index.sh -e http://{{ datahub.nginx.server_name }}/oai -l en)"

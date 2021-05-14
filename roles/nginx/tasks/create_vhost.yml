@@ -11,3 +11,8 @@
     dest: "/etc/nginx/sites-enabled/{{ vhost_name }}"
     state: link
   notify: restart nginx
+
+- name: Add domain to LetsEncrypt array to request SSL certificates at the end of the play
+  set_fact:
+    letsencrypt_domains: "{{ letsencrypt_domains }} + [ '{{ server_name }}' ]"
+  when: vhost_ssl | length == 0
