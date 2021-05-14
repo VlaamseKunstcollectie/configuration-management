@@ -4,13 +4,21 @@
     name:
       - certbot
 
-#- name: Check it
-#  set_fact:
-#    something: "{{ letsencrypt_domains | join(' -d ') }}"
+- name: Make sure lib, log and work dir exist
+  file:
+    path: "{{ item.path }}"
+    state: directory
+    recurse: true
+    owner: "{{ application_user }}"
+    group: "{{ application_user }}"
+    mode: "{{ item.mode }}"
+  with_items:
+    - path: "/etc/letsencrypt/"
+      mode: "u+rw,go+r,go-w"
+    - path: "/var/lib/letsencrypt/"
+      mode: "u+rw,go+r,go-w"
+    - path: "/var/log/letsencrypt/"
+      mode: "u+rw,go-rwx"
 
-#- name: Debug
-#  debug:
-#    var: something
-
-#- name: Install LetsEncrypt certificates for all domains
-#  command: "certbot certonly -n --post-hook '/etc/init.d/nginx reload' --agree-tos --webroot --cert-name {{ letsencrypt_domains[0] }} -d {{ letsencrypt_domains | join(' -d ') }}"
+- name: Install LetsEncrypt certificates for all domains
+  command: "certbot certonly -n --agree-tos --email {{ letsencrypt_email }} --webroot -w /var/lib/letsencrypt/ --cert-name {{ letsencrypt_domains[0] }} -d {{ letsencrypt_domains | join(' -d ') }}"

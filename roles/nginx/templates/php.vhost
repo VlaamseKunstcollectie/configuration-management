@@ -7,6 +7,12 @@ server {
 
   root        {{ document_root }};
 
+  # Allow LetsEncrypt domain validation
+  location ~ ^/\.well-known/acme-challenge/ {
+    default_type text/plain;
+    root /var/lib/letsencrypt;
+  }
+
   location / {
     index index.php index.html index.htm;
     try_files $uri /{{ index }}$is_args$args;
@@ -41,12 +47,6 @@ server {
     expires 7d;
     add_header Pragma public;
     add_header Cache-Control "public, must-revalidate, proxy-revalidate";
-  }
-
-  # Allow LetsEncrypt domain validation
-  location ~ ^/\.well-known/acme-challenge/ {
-    default_type text/plain;
-    root /var/lib/letsencrypt;
   }
 }
 
