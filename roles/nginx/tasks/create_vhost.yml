@@ -1,18 +1,68 @@
 ---
-- name: "Copy nginx vhost for {{ vhost_name }}"
+# TODO check if LetsEncrypt cert file already exists
+- name: Check if cert file exists
+  stat:
+    path: "{{ vhost.ssl.cert }}"
+  register: cert_exists
+  when: vhost.ssl.cert is defined
+
+- name: Check if key file exists
+  stat:
+    path: "{{ vhost.ssl.cert }}"
+  register: key_exists
+  when: vhost.ssl.key is defined
+
+- name: Check if chain file exists
+  stat:
+    path: "{{ vhost.ssl.chain }}"
+  register: chain_exists
+  when: vhost.ssl.chain is defined
+
+- name: Set chain file to cert file
+  set_fact:
+    vhost: "{{ vhost | combine({ 'ssl': { 'cert': '{{ vhost.ssl.chain }}' }, recursive=true) }}"
+    cert_exists:
+      stat:
+        exists: true
+  when: (cert_exists.stat is not defined or not cert_exists.stat.exists) and chain_exists.stat is defined and chain_exists.stat.exists
+
+- name: Set cert file to chain file
+  set_fact:
+    vhost: "{{ vhost | combine({ 'ssl': { 'chain': '{{ vhost.ssl.cert }}' }, recursive=true) }}"
+    chain_exists:
+      stat:
+        exists: true
+  when: (chain_exists.stat is not defined or not chain_exists.stat.exists) and cert_exists.stat is defined and cert_exists.stat.exists
+
+- name: Initialize listen_ports
+  set_fact:
+    listen_ports: []
+
+- name: Add port 80 to nginx config
+  set_fact:
+    listen_ports: "{{ listen_ports }} + [ '80' ]"
+  when: vhost.ssl.cert is not defined or vhost.redirect_to_https
+
+- name: Add port 443 to nginx config
+  set_fact:
+    listen_ports: "{{ listen_ports }} + [ '443' ]"
+  when: cert_exists.stat is defined and cert_exists.stat.exists and key_exists.stat is defined and key_exists.stat.exists and chain_exists.stat is defined and chain_exists.stat.exists
+
+- name: "Copy nginx vhost for {{ vhost.name }}"
   template:
-    src: "{{ vhost_type }}.vhost"
-    dest: "/etc/nginx/sites-available/{{ vhost_name }}"
+    src: "{{ vhost.type }}.vhost"
+    dest: "/etc/nginx/sites-available/{{ vhost.name }}"
   notify: restart nginx
 
-- name: "Create symlink for {{ vhost_name }} nginx vhost"
+- name: "Create symlink for {{ vhost.name }} nginx vhost"
   file:
-    src: "/etc/nginx/sites-available/{{ vhost_name }}"
-    dest: "/etc/nginx/sites-enabled/{{ vhost_name }}"
+    src: "/etc/nginx/sites-available/{{ vhost.name }}"
+    dest: "/etc/nginx/sites-enabled/{{ vhost.name }}"
     state: link
   notify: restart nginx
 
 - name: Add domain to LetsEncrypt array to request SSL certificates at the end of the play
   set_fact:
-    letsencrypt_domains: "{{ letsencrypt_domains }} + [ '{{ server_name }}' ]"
-  when: vhost_ssl | length == 0
+    letsencrypt_domains: "{{ letsencrypt_domains }} + [ '{{ vhost.server_name }}' ]"
+    letsencrypt_vhosts: "{{ letsencrypt_vhosts }} + [ {{ vhost }} ]"
+  when: vhost.ssl | length == 0

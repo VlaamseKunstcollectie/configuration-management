@@ -12,7 +12,8 @@
 
 - name: Install pymongo
   pip:
-    name: pymongo
+    name:
+      - pymongo
 
 - name: Setup MongoDB root user
   community.mongodb.mongodb_user:

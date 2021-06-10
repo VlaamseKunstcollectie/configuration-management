@@ -125,11 +125,12 @@
     tasks_from: create_vhost
     apply:
       vars:
-        listen_port: "{{ datahub_dashboard.nginx.listen_port }}"
-        server_name: "{{ datahub_dashboard.nginx.server_name }}"
-        vhost_name: datahub-dashboard
-        vhost_type: php
-        document_root: "{{ datahub_dashboard.nginx.document_root }}"
-        index: "{{ datahub_dashboard.nginx.index }}"
-        php_socket_name: datahub-dashboard
-        vhost_ssl: "{{ datahub_dashboard.nginx.ssl | default([]) }}"
+        vhost:
+          server_name: "{{ datahub_dashboard.nginx.server_name }}"
+          name: datahub-dashboard
+          type: php
+          document_root: "{{ datahub_dashboard.nginx.document_root }}"
+          index: "{{ datahub_dashboard.nginx.index }}"
+          php_socket_name: datahub-dashboard
+          ssl: "{{ datahub_dashboard.nginx.ssl }}"
+          redirect_to_https: "{{ datahub_dashboard.nginx.redirect_to_https }}"

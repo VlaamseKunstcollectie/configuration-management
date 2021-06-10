@@ -1,11 +1,41 @@
 server {
-  listen      {{ listen_port }};
-  server_name {{ server_name }};
+{% for listen_port in listen_ports %}
+  listen      {{ listen_port }}{{ ' ssl' if listen_port == '443' else '' }};
+{% endfor %}
+  server_name {{ vhost.server_name }};
 
-  access_log  /var/log/nginx/{{ vhost_name }}_access.log combined;
-  error_log   /var/log/nginx/{{ vhost_name }}_error.log;
+  access_log  /var/log/nginx/{{ vhost.name }}_access.log combined;
+  error_log   /var/log/nginx/{{ vhost.name }}_error.log;
+
+{% if '443' in listen_ports %}
+  ssl_certificate {{ vhost.ssl.cert }};
+  ssl_certificate_key {{ vhost.ssl.key }};
+  ssl_trusted_certificate {{ vhost.ssl.chain }};
+{% endif %}
 
   root        /var/empty;
+
+{% if '80' in listen_ports %}
+  # Allow LetsEncrypt domain validation
+  location ~ ^/\.well-known/acme-challenge/ {
+    default_type text/plain;
+    root /var/lib/letsencrypt;
+  }
+{% endif %}
+
+  location / {
+    proxy_redirect     off;
+    proxy_set_header   Host             $host;
+    proxy_set_header   X-Real-IP        $remote_addr;
+    proxy_set_header   X-Forwarded-For  $proxy_add_x_forwarded_for;
+    proxy_pass         {{ vhost.upstream }};
+  }
+}
+
+{% if '80' not in listen_ports %}
+server {
+  listen      80;
+  server_name {{ vhost.server_name }};
 
   # Allow LetsEncrypt domain validation
   location ~ ^/\.well-known/acme-challenge/ {
@@ -14,10 +44,11 @@ server {
   }
 
   location / {
-    proxy_redirect     off;
-    proxy_set_header   Host             $host;
-    proxy_set_header   X-Real-IP        $remote_addr;
-    proxy_set_header   X-Forwarded-For  $proxy_add_x_forwarded_for;
-    proxy_pass         {{ upstream }};
+    # See https://www.nginx.com/resources/wiki/start/topics/tutorials/config_pitfalls/#taxing-rewrites
+    # Good
+    #rewrite ^ https://$host$request_uri? permanent;
+    # Better
+    return 301 https://$host$request_uri;
   }
 }
+{% endif %}

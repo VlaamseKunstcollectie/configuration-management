@@ -182,11 +182,12 @@
     tasks_from: create_vhost
     apply:
       vars:
-        listen_port: "{{ datahub.nginx.listen_port }}"
-        server_name: "{{ datahub.nginx.server_name }}"
-        vhost_name: datahub
-        vhost_type: php
-        document_root: "{{ datahub.nginx.document_root }}"
-        index: "{{ datahub.nginx.index }}"
-        php_socket_name: datahub
-        vhost_ssl: "{{ datahub.nginx.ssl | default([]) }}"
+        vhost:
+          server_name: "{{ datahub.nginx.server_name }}"
+          name: datahub
+          type: php
+          document_root: "{{ datahub.nginx.document_root }}"
+          index: "{{ datahub.nginx.index }}"
+          php_socket_name: datahub
+          ssl: "{{ datahub.nginx.ssl }}"
+          redirect_to_https: "{{ datahub.nginx.redirect_to_https }}"
