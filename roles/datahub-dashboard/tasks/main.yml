@@ -95,12 +95,12 @@
     chdir: "{{ datahub_dashboard.dir }}"
   become_user: "{{ application_user }}"
 
-- name: Chown cache and logs folders
+- name: Chown cache, logs and sessions folders
   file:
     path: "{{ datahub_dashboard.repo_dir }}/shared/{{ item }}/"
     state: directory
     recurse: true
-    owner: "{{ application_user }}"
+    owner: "{{ php.user }}"
     group: "{{ php.group }}"
   with_items:
     - cache

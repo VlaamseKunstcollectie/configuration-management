@@ -1,5 +1,4 @@
 ---
-# TODO check if LetsEncrypt cert file already exists
 - name: Check if cert file exists
   stat:
     path: "{{ vhost.ssl.cert }}"

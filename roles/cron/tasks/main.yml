@@ -13,3 +13,13 @@
     hour: "2"
     user: "{{ application_user }}"
     job: "bash {{ datahub_pipeline.dir }}/fixes/scripts/import_data.sh > {{ datahub_pipeline.dir }}/cron_output.log 2>&1"
+
+- name: Renew SSL certificates through LetsEncrypt
+  cron:
+    name: "Renew LetsEncrypt certificates"
+    minute: "0"
+    hour: "2"
+    user: "root"
+    job: "certbot renew -n -q --agree-tos --webroot -w /var/lib/letsencrypt/ --post-hook '/etc/init.d/nginx reload'"
+    state: "{{ 'present' if (letsencrypt_domains | length > 0) else 'absent' }}"
+

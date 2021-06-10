@@ -5,7 +5,7 @@ php:
   user: www-data
   group: www-data
 datahub:
-  development: false
+  environment: production
   repo_url: https://github.com/thedatahub/Datahub.git
   repo_dir: /opt/.repos/datahub/
   branch: master
@@ -13,13 +13,9 @@ datahub:
   service_name: Datahub
   pagination_num_records: 25 
   nginx:
-    #listen_port: 80
     server_name: datahub.example.com
-    #    document_root: "{{ (datahub.dir, 'web') | path_join }}"
-    #    index: "{{ 'app_dev.php' if datahub.development else 'app.php' }}"
     document_root: /opt/datahub/web
-    # TODO differentiate between dev and production
-    index: app_dev.php
+    index: app.php
     redirect_to_https: false
     ssl : []
   mongodb:
@@ -59,19 +55,16 @@ datahub_pipeline:
       shorthand: MUZEE
       fix_file_path: muzee_oai_adlib.fix
 datahub_dashboard:
+  environment: production
   repo_url: https://github.com/thedatahub/Datahub-Dashboard.git
   repo_dir: /opt/.repos/datahub-dashboard/
   branch: master
   dir: /opt/datahub-dashboard
   service_name: Datahub Dashboard
   nginx:
-    #listen_port: 80
     server_name: dashboard.example.com
-    #    document_root: "{{ (datahub_dashboard.dir, 'web') | path_join }}"
-    #    index: "{{ 'app_dev.php' if datahub_dashboard.development else 'app.php' }}"
     document_root: /opt/datahub-dashboard/web
-    # TODO differentiate between dev and production
-    index: app_dev.php
+    index: app.php
     redirect_to_https: true
     ssl: []
   mongodb:
@@ -84,6 +77,7 @@ arthub:
   repo_dir: /opt/.repos/arthub/
   branch: master
   dir: /opt/arthub
+  environment: production
   nginx:
     #listen_port: 80
     server_name: arthub.example.com

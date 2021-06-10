@@ -121,7 +121,7 @@
     chdir: "{{ arthub.dir }}"
   become_user: "{{ application_user }}"
   environment:
-    RAILS_ENV: production
+    RAILS_ENV: "{{ arthub.environment }}"
   when: gitrc is changed
 
 - name: Check if rails secret file exists
@@ -159,31 +159,21 @@
   become_user: "{{ application_user }}"
   when: not stat_result.stat.exists
 
-- name: Check if rails is running
-  shell: "[ -f tmp/pids/server.pid ] && kill -0 $(cat tmp/pids/server.pid) 2>/dev/null"
-  args:
-    chdir: "{{ arthub.dir }}"
-  register: rails_running
-  ignore_errors: yes
+- name: Set rails environment file
+  copy:
+    dest: /etc/default/arthub
+    content: |
+      RAILS_SERVE_STATIC_FILES=true
+      SECRET_KEY_BASE={{ rails_secret }}
 
-- name: Get rails server process id
-  command: "cat {{ arthub.dir }}/tmp/pids/server.pid"
-  register: rails_pid
-  when: rails_running.rc == 0
+- name: Create arthub daemon
+  template:
+    src: arthub.service
+    dest: /etc/systemd/system/arthub.service
 
-- name: Kill rails if it runs
-  shell: "kill {{ rails_pid.stdout }}"
-  when: rails_running.rc == 0 and gitrc is changed
-
-- name: Start arthub
-  command: "{{ arthub.dir }}/bin/rails s --binding=127.0.0.1 -e production -d"
-  become_user: "{{ application_user }}"
-  args:
-    chdir: "{{ arthub.dir }}"
-  environment:
-    RAILS_SERVE_STATIC_FILES: true
-    SECRET_KEY_BASE: "{{ rails_secret }}"
-  when: rails_running.rc != 0 or gitrc is changed
+- name: Restart rails if gitrc has changed
+  shell: "systemctl restart arthub"
+  when: gitrc is changed
 
 - name: Include arthub nginx vhost
   include_role:
