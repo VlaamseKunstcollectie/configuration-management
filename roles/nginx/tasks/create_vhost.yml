@@ -40,7 +40,7 @@
 - name: Add port 80 to nginx config
   set_fact:
     listen_ports: "{{ listen_ports }} + [ '80' ]"
-  when: vhost.ssl.cert is not defined or vhost.redirect_to_https
+  when: vhost.ssl.cert is not defined or not vhost.redirect_to_https
 
 - name: Add port 443 to nginx config
   set_fact:
