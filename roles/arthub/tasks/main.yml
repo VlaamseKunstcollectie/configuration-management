@@ -97,9 +97,18 @@
   template:
     src: solr.service
     dest: /etc/systemd/system/solr.service
+  register: solr_template
+
+- name: Enable solr
+  systemd:
+    name: solr
+    daemon_reload: yes
+    enabled: yes
 
 - name: Stop solr on redeploying
-  shell: "systemctl stop solr"
+  systemd:
+    name: solr
+    state: stopped
   when: gitrc is changed
 
 - name: Copy solr configuration
@@ -111,7 +120,9 @@
   when: gitrc is changed
 
 - name: Restart solr on redeploy
-  shell: "systemctl start solr"
+  systemd:
+    name: solr
+    state: started
   when: gitrc is changed
 
 - name: Compile assets
@@ -170,8 +181,16 @@
     src: arthub.service
     dest: /etc/systemd/system/arthub.service
 
+- name: Enable arthub
+  systemd:
+    name: arthub
+    daemon_reload: yes
+    enabled: yes
+
 - name: Restart rails if gitrc has changed
-  shell: "systemctl restart arthub"
+  systemd: 
+    name: arthub
+    state: restarted
   when: gitrc is changed
 
 - name: Include arthub nginx vhost
