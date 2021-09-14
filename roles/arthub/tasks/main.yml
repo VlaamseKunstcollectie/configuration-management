@@ -89,6 +89,7 @@
   args:
     chdir: "{{ arthub.dir }}"
   become_user: "{{ application_user }}"
+  when: gitrc is changed
 
 - name: Copy solr.conf
   template: src=solr.conf dest=/etc/security/limits.d/solr.conf
