@@ -2,7 +2,7 @@
 - name: Set pipeline datahub_url if not specified
   set_fact:
     datahub_pipeline:
-      datahub_url: "http://{{ datahub.nginx.server_name }}" #TODO make protocol dynamic
+      datahub_url: "{{ datahub_pipeline.datahub_protocol }}://{{ datahub.nginx.server_name }}"
     cacheable: yes
   when: datahub_pipeline.datahub_url is undefined
   become_user: "{{ application_user }}"
@@ -153,4 +153,4 @@
 
 - name: Provide crontab entry for daily reload of datahub records
   set_fact:
-    cronjobs: "{{ cronjobs }} + [ 'PERL5LIB=/home/{{ application_user }}/perl5/lib/perl5/ /home/{{ application_user }}/perl5/bin/dhconveyor transport -p /opt/datahub-pipeline/datahub.ini -L1' ]"
+    cronjobs: "{{ cronjobs }} + [ 'PERL5LIB=~{{ application_user }}/perl5/lib/perl5/ ~{{ application_user }}/perl5/bin/dhconveyor transport -p /opt/datahub-pipeline/datahub.ini -L1' ]"

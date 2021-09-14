@@ -33,6 +33,7 @@ datahub:
     application_name: importer
 datahub_pipeline:
   dir: /opt/datahub-pipeline
+  datahub_protocol: https
   fixes:
     repo_url: https://github.com/VlaamseKunstcollectie/Datahub-Fixes.git
     repo_dir: /opt/.repos/datahub-fixes/
@@ -48,8 +49,8 @@ datahub_pipeline:
     - name: Museum voor Schone Kunsten Gent
       shorthand: MSK
       fix_file_path: msk_oai_adlib.fix
-    - name: Musea Brugge - Groeningemuseum
-      shorthand: GRO
+    - name: Musea Brugge
+      shorthand: BRUGGE
       fix_file_path: groeninge_oai_adlib.fix
     - name: Mu.ZEE, Kunstmuseum aan zee
       shorthand: MUZEE
@@ -85,5 +86,4 @@ arthub:
     ssl: []
 cronjobs:
   - /opt/datahub-pipeline/fixes/scripts/vocabularies.sh
-letsencrypt_domains: []
 letsencrypt_vhosts: []

@@ -190,7 +190,7 @@
     tasks_from: create_vhost
     apply:
       vars:
-        vhost:
+        nginx_vhost:
           server_name: "{{ datahub.nginx.server_name }}"
           name: datahub
           type: php

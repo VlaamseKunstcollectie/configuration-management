@@ -20,37 +20,11 @@
     - path: "/var/log/letsencrypt/"
       mode: "u+rw,go-rwx"
 
-- name: Check if LetsEncrypt certificate folder exists
-  stat:
-    path: "/etc/letsencrypt/live/{{ letsencrypt_domains[0] }}/"
-  register: stat_result
-
-- name: Install LetsEncrypt certifiicates for all domains
-  command: "certbot certonly -n --agree-tos --email {{ letsencrypt_email }} --webroot -w /var/lib/letsencrypt/ --cert-name {{ letsencrypt_domains[0] }} -d {{ letsencrypt_domains | join(' -d ') }}"
-  when: not stat_result.stat.exists
-
-- name: Check if LetsEncrypt certificate folder exists
-  stat:
-    path: "/etc/letsencrypt/live/{{ letsencrypt_domains[0] }}/"
-  register: stat_result
-
-- name: Set key and chain location 
-  set_fact:
-    letsencrypt_key_paths:
-      ssl:
-        cert: "/etc/letsencrypt/live/{{ letsencrypt_domains[0] }}/fullchain.pem"
-        key: "/etc/letsencrypt/live/{{ letsencrypt_domains[0] }}/privkey.pem"
-        chain: "/etc/letsencrypt/live/{{ letsencrypt_domains[0] }}/fullchain.pem"
-  when: stat_result.stat.exists
-
-- name: Redeploy nginx vhosts
-  include_role:
-    name: nginx
-    tasks_from: create_vhost
+- name: Install certificates for each domain
+  include_tasks:
+    file: "install_cert.yml"
     apply:
       vars:
-        vhost: "{{ item | combine(letsencrypt_key_paths) }}"
+        letsencrypt_vhost: "{{ item }}"
   with_items: "{{ letsencrypt_vhosts }}"
-  when: stat_result.stat.exists
 
-# certbot renew -n --agree-tos --webroot -w /var/lib/letsencrypt/ --post-hook '/etc/init.d/nginx reload'

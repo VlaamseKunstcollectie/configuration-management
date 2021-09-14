@@ -90,11 +90,16 @@
     chdir: "{{ arthub.dir }}"
   become_user: "{{ application_user }}"
 
-- name: Stop solr on redeploy
-  command: "{{ arthub.dir }}/bin/bundle exec rake solr:stop"
-  args:
-    chdir: "{{ arthub.dir }}"
-  become_user: "{{ application_user }}"
+- name: Copy solr.conf
+  template: src=solr.conf dest=/etc/security/limits.d/solr.conf
+
+- name: Create solr daemon
+  template:
+    src: solr.service
+    dest: /etc/systemd/system/solr.service
+
+- name: Stop solr on redeploying
+  shell: "systemctl stop solr"
   when: gitrc is changed
 
 - name: Copy solr configuration
@@ -105,14 +110,8 @@
   become_user: "{{ application_user }}"
   when: gitrc is changed
 
-- name: Copy solr.conf
-  template: src=solr.conf dest=/etc/security/limits.d/solr.conf
-
 - name: Restart solr on redeploy
-  command: "{{ arthub.dir }}/bin/bundle exec rake solr:start"
-  args:
-    chdir: "{{ arthub.dir }}"
-  become_user: "{{ application_user }}"
+  shell: "systemctl start solr"
   when: gitrc is changed
 
 - name: Compile assets
@@ -181,7 +180,7 @@
     tasks_from: create_vhost
     apply:
       vars:
-        vhost:
+        nginx_vhost:
           server_name: "{{ arthub.nginx.server_name }}"
           name: arthub
           type: proxy
@@ -193,5 +192,5 @@
   set_fact:
     cronjobs: "{{ cronjobs }} + [ '{{ item }}' ]"
   with_items:
-    - "(cd {{ datahub_pipeline.dir }}/fixes/scripts; {{ datahub_pipeline.dir }}/fixes/scripts/arthub-index.sh -e http://{{ datahub.nginx.server_name }}/oai -l nl)"
-    - "(cd {{ datahub_pipeline.dir }}/fixes/scripts; {{ datahub_pipeline.dir }}/fixes/scripts/arthub-index.sh -e http://{{ datahub.nginx.server_name }}/oai -l en)"
+    - "(cd {{ datahub_pipeline.dir }}/fixes/scripts; PERL5LIB=~{{ application_user }}/perl5/lib/perl5/ PATH=~{{ application_user }}/perl5/bin/:$PATH {{ datahub_pipeline.dir }}/fixes/scripts/arthub-index.sh -e http://{{ datahub.nginx.server_name }}/oai -l nl)"
+    - "(cd {{ datahub_pipeline.dir }}/fixes/scripts; PERL5LIB=~{{ application_user }}/perl5/lib/perl5/ PATH=~{{ application_user }}/perl5/bin/:$PATH {{ datahub_pipeline.dir }}/fixes/scripts/arthub-index.sh -e http://{{ datahub.nginx.server_name }}/oai -l en)"

@@ -35,14 +35,13 @@
   roles:
     - arthub
 
-#- name: Set up SSL Certificates through LetsEncrypt
-#  hosts: datahub,datahub_pipeline,datahub_dashboard,arthub
-#  roles:
-#    - name: certbot
-#      when: letsencrypt_domains | length > 0
-
 - name: Set up cronjob
   hosts: datahub,datahub_pipeline,datahub_dashboard,arthub
   roles:
     - cron
 
+- name: Set up SSL Certificates through LetsEncrypt
+  hosts: datahub,datahub_pipeline,datahub_dashboard,arthub
+  roles:
+    - name: certbot
+      when: letsencrypt_vhosts | length > 0

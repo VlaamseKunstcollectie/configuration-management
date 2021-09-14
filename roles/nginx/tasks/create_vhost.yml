@@ -1,4 +1,28 @@
 ---
+- name: Set nginx_vhost to vhost
+  set_fact:
+    vhost: "{{ nginx_vhost }}"
+
+- name: Check if LetsEncrypt certificate folder exists
+  stat:
+    path: "/etc/letsencrypt/live/{{ vhost.server_name }}/"
+  register: stat_result
+  when: vhost.ssl | length == 0
+
+- name: Set key and chain location
+  set_fact:
+    vhost_ssl:
+      ssl:
+        cert: "/etc/letsencrypt/live/{{ vhost.server_name }}/fullchain.pem"
+        key: "/etc/letsencrypt/live/{{ vhost.server_name }}/privkey.pem"
+        chain: "/etc/letsencrypt/live/{{ vhost.server_name }}/fullchain.pem"
+  when: vhost.ssl | length == 0 and stat_result.stat.exists
+
+- name: Append key and chain location to vhost
+  set_fact:
+    vhost: "{{ vhost | combine(vhost_ssl, recursive=true) }}"
+  when: vhost.ssl | length == 0 and stat_result.stat.exists
+
 - name: Check if cert file exists
   stat:
     path: "{{ vhost.ssl.cert }}"
@@ -62,6 +86,5 @@
 
 - name: Add domain to LetsEncrypt array to request SSL certificates at the end of the play
   set_fact:
-    letsencrypt_domains: "{{ letsencrypt_domains }} + [ '{{ vhost.server_name }}' ]"
     letsencrypt_vhosts: "{{ letsencrypt_vhosts }} + [ {{ vhost }} ]"
   when: vhost.ssl | length == 0

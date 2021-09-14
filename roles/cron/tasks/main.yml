@@ -21,5 +21,5 @@
     hour: "2"
     user: "root"
     job: "certbot renew -n -q --agree-tos --webroot -w /var/lib/letsencrypt/ --post-hook '/etc/init.d/nginx reload'"
-    state: "{{ 'present' if (letsencrypt_domains | length > 0) else 'absent' }}"
+    state: "{{ 'present' if (letsencrypt_vhosts | length > 0) else 'absent' }}"
 
