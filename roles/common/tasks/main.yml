@@ -4,7 +4,7 @@
     update_cache: yes
 
 # We also need python-pip, python-virtualenv and python-setutools to work on Debian 10 (and other systems that have python 2 installed)
-- name: Install git, pip, virtualenv, setuptools, software-properties-common, apt-transport-https and ca-certificates
+- name: Install git, pip, virtualenv, setuptools, software-properties-common, dirmngr, apt-transport-https and ca-certificates
   apt:
     name:
       - git
@@ -15,6 +15,7 @@
 #      - python3-virtualenv
 #      - python3-setuptools
       - software-properties-common
+      - dirmngr
       - apt-transport-https
       - ca-certificates
 

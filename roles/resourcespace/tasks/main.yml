@@ -1,0 +1,11 @@
+---
+- name: Install subversion
+  apt:
+    name:
+      - subversion
+
+- name: Clone ResourceSpace
+  subversion:
+    repo: "{{ resourcespace.repo_url }}/{{ resourcespace.version }}"
+    dest: "{{ resourcespace.repo_dir }}"
+

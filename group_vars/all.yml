@@ -84,6 +84,10 @@ arthub:
     server_name: arthub.example.com
     redirect_to_https: true
     ssl: []
+resourcespace:
+  repo_url: http://svn.resourcespace.com/svn/rs/releases/
+  version: 9.6
+  repo_dir: /var/www/resourcespace/
 cronjobs:
   - /opt/datahub-pipeline/fixes/scripts/vocabularies.sh
 letsencrypt_vhosts: []
