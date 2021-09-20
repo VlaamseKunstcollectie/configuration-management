@@ -92,7 +92,9 @@
   when: gitrc is changed
 
 - name: Copy solr.conf
-  template: src=solr.conf dest=/etc/security/limits.d/solr.conf
+  template:
+    src: solr.conf
+    dest: /etc/security/limits.d/solr.conf
 
 - name: Create solr daemon
   template:
@@ -214,3 +216,11 @@
   with_items:
     - "(cd {{ datahub_pipeline.dir }}/fixes/scripts; PERL5LIB=~{{ application_user }}/perl5/lib/perl5/ PATH=~{{ application_user }}/perl5/bin/:$PATH {{ datahub_pipeline.dir }}/fixes/scripts/arthub-index.sh -e http://{{ datahub.nginx.server_name }}/oai -l nl)"
     - "(cd {{ datahub_pipeline.dir }}/fixes/scripts; PERL5LIB=~{{ application_user }}/perl5/lib/perl5/ PATH=~{{ application_user }}/perl5/bin/:$PATH {{ datahub_pipeline.dir }}/fixes/scripts/arthub-index.sh -e http://{{ datahub.nginx.server_name }}/oai -l en)"
+    - "(cd {{ arthub.dir }}; {{ arthub.dir }}/bin/bundle exec rake solr:stop)"
+    - "sleep 10"
+    - "rm -rf {{ arthub.dir }}/solr/server/solr/blacklight-core/data/*"
+    - "(cd {{ arthub.dir }}; {{ arthub.dir }}/bin/bundle exec rake solr:start)"
+    - "sleep 30"
+    - "PERL5LIB=~{{ application_user }}/perl5/lib/perl5/ PATH=~{{ application_user }}/perl5/bin/:$PATH dhconveyor index -p {{ datahub_pipeline.dir }}/fixes/pipelines/arthub_nl.ini"
+    - "PERL5LIB=~{{ application_user }}/perl5/lib/perl5/ PATH=~{{ application_user }}/perl5/bin/:$PATH dhconveyor index -p {{ datahub_pipeline.dir }}/fixes/pipelines/arthub_en.ini"
+

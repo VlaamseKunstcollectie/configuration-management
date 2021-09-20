@@ -39,12 +39,14 @@
     path: "{{ datahub_dashboard.repo_dir }}/shared/{{ item }}/"
     state: directory
     recurse: true
+    mode: "775"
+    owner: "{{ application_user }}"
+    group: "{{ php.group }}"
   with_items:
     - cache
     - logs
     - sessions
     - vendor
-  become_user: "{{ application_user }}"
 
 - name: Delete existing shared folders
   file:
@@ -63,7 +65,6 @@
     dest: "{{ datahub_dashboard.repo_dir }}/repo/{{ item.dest }}"
     state: link
     force: true
-    mode: "775"
   with_items:
     - src: cache
       dest: var/cache
@@ -86,8 +87,6 @@
     src: "{{ datahub_dashboard.repo_dir }}/repo/"
     dest: "{{ datahub_dashboard.dir }}"
     state: link
-    owner: "{{ application_user }}"
-    group: "{{ application_user }}"
 
 - name: Install datahub dashboard through composer
   command: composer install
@@ -100,6 +99,7 @@
     path: "{{ datahub_dashboard.repo_dir }}/shared/{{ item }}/"
     state: directory
     recurse: true
+    mode: "g+w"
     owner: "{{ application_user }}"
     group: "{{ php.group }}"
   with_items:

@@ -2,16 +2,21 @@
 - name: Add apt repository
   include_tasks: add_apt_repository.yml
 
+- name: Update apt repositories
+  apt:
+    update_cache: yes
+
 - name: Install MariaDB
   apt:
     name:
       - mariadb-server
       - python-pymysql
 
-- name: update mysql password for root account
+- name: Update MariaDB password for root account
   mysql_user:
     name: root
     login_unix_socket: /var/run/mysqld/mysqld.sock
+    login_password: '{{ mariadb_root_password }}'
     host: 'localhost'
     password: '{{ mariadb_root_password }}'
     priv: "*.*:ALL,GRANT"

@@ -1,0 +1,22 @@
+---
+- name: Create folder
+  file:
+    path: "{{ cantaloupe.dir }}"
+    state: directory
+    recurse: true
+    owner: "{{ application_user }}"
+    group: "{{ application_user }}"
+
+- name: Download and unzip cantaloupe
+  unarchive:
+    remote_src: yes
+    src: "https://github.com/cantaloupe-project/cantaloupe/releases/download/v{{ cantaloupe.version }}/cantaloupe-{{ cantaloupe.version }}.zip"
+    dest: "{{ cantaloupe.dir }}"
+  become_user: "{{ application_user }}"
+
+#- name: Set cantaloupe properties
+#  template: cantaloupe.properties
+
+- name: Set fact to inform imagehub that cantaloupe is present
+  set_fact:
+    is_cantaloupe: true

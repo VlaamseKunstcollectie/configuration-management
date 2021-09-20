@@ -43,6 +43,23 @@ server {
     include /etc/nginx/fastcgi_params;
   }
 
+  location ^~ /simplesaml {
+    alias {{ vhost.document_root }}/plugins/simplesaml/lib/www;
+
+    # The prefix must match the baseurlpath configuration option
+    location ~ ^(?<prefix>/simplesaml)(?<phpfile>.+?\.php)(?<pathinfo>/.*)?$ {
+      include fastcgi_params;
+      fastcgi_pass unix:/run/php/php{{ php.version }}-fpm-{{ vhost.php_socket_name }}.sock;
+      fastcgi_index index.php;
+      fastcgi_param SCRIPT_FILENAME $document_root$phpfile;
+
+      # Must be prepended with the baseurlpath
+      fastcgi_param SCRIPT_NAME /simplesaml$phpfile;
+
+      fastcgi_param PATH_INFO $pathinfo if_not_empty;
+    }
+  }
+
   # Set proper expiration times for static files & don't log them.
   location ~* \.(jpe?g|gif|png|bmp|svg|css|js|ico|xml|html|htm|swf|htc|cur|ttf|woff2?)$ {
     try_files $uri =404;

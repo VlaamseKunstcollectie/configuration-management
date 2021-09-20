@@ -1,11 +1,17 @@
 ---
-- name: Install subversion
+- name: Install subversion, php-gd, exiftool
   apt:
     name:
       - subversion
+      - php{{ php.version }}-gd
+      - exiftool
 
 - name: Clone ResourceSpace
   subversion:
     repo: "{{ resourcespace.repo_url }}/{{ resourcespace.version }}"
     dest: "{{ resourcespace.repo_dir }}"
+
+- name: Set fact to inform imagehub that ResourceSpace is present
+  set_fact:
+    is_resourcespace: true
 

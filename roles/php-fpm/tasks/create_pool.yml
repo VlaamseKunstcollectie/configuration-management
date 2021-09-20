@@ -1,29 +1,29 @@
 ---
 - name: Check if default pool exists
   stat:
-    path: "/etc/php/{{ php_version }}/fpm/pool.d/www.conf"
+    path: "/etc/php/{{ php.version }}/fpm/pool.d/www.conf"
   register: stat_result
 
 - name: Disable default pool if it exists
-  command: mv /etc/php/{{ php_version }}/fpm/pool.d/www.conf /etc/php/{{ php_version }}/fpm/pool.d/www.conf.disabled creates=/etc/php/{{ php_version }}/fpm/pool.d/www.conf.disabled
+  command: mv /etc/php/{{ php.version }}/fpm/pool.d/www.conf /etc/php/{{ php.version }}/fpm/pool.d/www.conf.disabled creates=/etc/php/{{ php.version }}/fpm/pool.d/www.conf.disabled
   when: stat_result.stat.exists
 
 - name: Get checksum of file before
-  shell: "md5sum /etc/php/{{ php_version }}/fpm/pool.d/{{ pool_name }}.conf 2>/dev/null | cut -d' ' -f1"
+  shell: "md5sum /etc/php/{{ php.version }}/fpm/pool.d/{{ pool_name }}.conf 2>/dev/null | cut -d' ' -f1"
   register: file_checksum_before
 
 - name: "Copy {{ pool_name }} php-fpm pool"
   template:
     src: pool.conf
-    dest: "/etc/php/{{ php_version }}/fpm/pool.d/{{ pool_name }}.conf"
+    dest: "/etc/php/{{ php.version }}/fpm/pool.d/{{ pool_name }}.conf"
   notify: restart php-fpm
 
 - name: Get checksum of file after
-  shell: "md5sum /etc/php/{{ php_version }}/fpm/pool.d/{{ pool_name }}.conf 2>/dev/null | cut -d' ' -f1"
+  shell: "md5sum /etc/php/{{ php.version }}/fpm/pool.d/{{ pool_name }}.conf 2>/dev/null | cut -d' ' -f1"
   register: file_checksum_after
 
 - name: Restart php-fpm if the file has changed
   service:
-    name: php{{ php_version }}-fpm
+    name: php{{ php.version }}-fpm
     state: restarted
   when: file_checksum_before.stdout != file_checksum_after.stdout

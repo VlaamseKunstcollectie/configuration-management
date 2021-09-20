@@ -1,12 +1,15 @@
 ---
 ansible_become: yes
-php_version: 7.2
 php:
+  version: 7.2
   user: www-data
   group: www-data
+  memory_limit: 256M
+  post_max_size: 50000M
+  upload_max_filesize: 50000M
 datahub:
   environment: production
-  repo_url: https://github.com/thedatahub/Datahub.git
+  repo_url: https://github.com/Hero-Solutions/Datahub.git
   repo_dir: /opt/.repos/datahub/
   branch: master
   dir: /opt/datahub
@@ -17,7 +20,7 @@ datahub:
     document_root: /opt/datahub/web
     index: app.php
     redirect_to_https: false
-    ssl : []
+    ssl : {}
   mongodb:
     host: 127.0.0.1
     port: 27017
@@ -35,7 +38,7 @@ datahub_pipeline:
   dir: /opt/datahub-pipeline
   datahub_protocol: https
   fixes:
-    repo_url: https://github.com/VlaamseKunstcollectie/Datahub-Fixes.git
+    repo_url: https://github.com/Hero-Solutions/Datahub-Fixes.git
     repo_dir: /opt/.repos/datahub-fixes/
     branch: master
   authority_files:
@@ -51,13 +54,13 @@ datahub_pipeline:
       fix_file_path: msk_oai_adlib.fix
     - name: Musea Brugge
       shorthand: BRUGGE
-      fix_file_path: groeninge_oai_adlib.fix
+      fix_file_path: musea_brugge_oai_adlib.fix
     - name: Mu.ZEE, Kunstmuseum aan zee
       shorthand: MUZEE
       fix_file_path: muzee_oai_adlib.fix
 datahub_dashboard:
   environment: production
-  repo_url: https://github.com/thedatahub/Datahub-Dashboard.git
+  repo_url: https://github.com/Hero-Solutions/Datahub-Dashboard.git
   repo_dir: /opt/.repos/datahub-dashboard/
   branch: master
   dir: /opt/datahub-dashboard
@@ -67,7 +70,7 @@ datahub_dashboard:
     document_root: /opt/datahub-dashboard/web
     index: app.php
     redirect_to_https: true
-    ssl: []
+    ssl: {}
   mongodb:
     host: 127.0.0.1
     port: 27017
@@ -83,11 +86,49 @@ arthub:
     #listen_port: 80
     server_name: arthub.example.com
     redirect_to_https: true
-    ssl: []
+    ssl: {}
 resourcespace:
   repo_url: http://svn.resourcespace.com/svn/rs/releases/
   version: 9.6
   repo_dir: /var/www/resourcespace/
+  nginx:
+    server_name: resourcespace.example.com
+    document_root: /var/www/resourcespace
+    redirect_to_https: true
+    ssl: {}
+cantaloupe:
+  version: 5.0.4
+  dir: /opt/cantaloupe
+  nginx:
+    server_name: images.example.com
+    upstream: "http://127.0.0.1:8182"
+    redirect_to_https: true
+    ssl: {}
+imagehub:
+  repo_url: https://github.com/kmska/Imagehub.git
+  repo_dir: /opt/.repos/imagehub/
+  branch: master
+  dir: /opt/imagehub
+  cantaloupe_url: https://images.example.com
+  resourcespace_api_url: https://resourcespace.example.com
+  resourcespace_api_username: admin
+  datahub_url: https://datahub.example.com
+  datahub_record_id_prefix: 'oai:datahub.example.com:example.com:'
+  credit_line_suffix: Collectie example
+  service_url: https://imagehub.example.com/public/iiif/2/
+  authentication_url: https://imagehub.example.com/public/authenticate/
+  authentication_service_description: Example requires that you log in with your museum account to view this content
+  mysql:
+    hostname: 127.0.0.1
+    port: 3306
+    username: imagehub
+    database: imagehub
+  nginx:
+    server_name: imagehub.example.com
+    document_root: /opt/imagehub/public
+    index: imagehub.php
+    redirect_to_https: true
+    ssl: {}
 cronjobs:
   - /opt/datahub-pipeline/fixes/scripts/vocabularies.sh
 letsencrypt_vhosts: []

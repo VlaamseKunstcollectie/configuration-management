@@ -1,0 +1,96 @@
+---
+- name: Set nginx vhost for cantaloupe if separate domain
+  include_role:
+    name: nginx
+    tasks_from: create_vhost
+    apply:
+      vars:
+        nginx_vhost:
+          server_name: "{{ cantaloupe.nginx.server_name }}"
+          name: cantaloupe
+          type: proxy
+          upstream: "{{ cantaloupe.nginx.upstream }}"
+          ssl: "{{ cantaloupe.nginx.ssl }}"
+          redirect_to_https: "{{ cantaloupe.nginx.redirect_to_https }}"
+  when: is_cantaloupe and (cantaloupe.nginx.server_name != imagehub.nginx.server_name and cantaloupe.nginx.server_name != resourcespace.nginx.server_name)
+
+- name: Add cantaloupe vhost for imagehub
+  set_fact:
+    image_server_upstream: "{{ cantaloupe.nginx.upstream }}"
+  when: is_cantaloupe and (cantaloupe.nginx.server_name == imagehub.nginx.server_name or cantaloupe.nginx.server_name == resourcespace.nginx.server_name)
+
+- name: Include resourcespace php-fpm pool
+  include_role:
+    name: php-fpm
+    tasks_from: create_pool
+    apply:
+      vars:
+        pool_name: resourcespace
+        memory_limit: 256M
+  when: is_resourcespace
+
+- name: Set nginx vhost for ResourceSpace if separate domain
+  include_role:
+    name: nginx
+    tasks_from: create_vhost
+    apply:
+      vars:
+        nginx_vhost:
+          server_name: "{{ resourcespace.nginx.server_name }}"
+          name: resourcespace
+          type: simplesamlphp
+          document_root: "{{ resourcespace.nginx.document_root }}"
+          index: index.php
+          php_socket_name: resourcespace
+          ssl: "{{ datahub.nginx.ssl }}"
+          redirect_to_https: "{{ resourcespace.nginx.redirect_to_https }}"
+  when: is_resourcespace and (resourcespace.nginx.server_name != imagehub.nginx.server_name and cantaloupe.nginx.server_name != resourcespace.nginx.server_name)
+
+- name: Add ResourceSpace vhost for imagehub
+  set_fact:
+    dam_document_root: "{{ resourcespace.nginx.document_root }}"
+    dam_php_socket_name: resourcespace
+  when: is_resourcespace and (resourcespace.nginx.server_name == imagehub.nginx.server_name or cantaloupe.nginx.server_name == resourcespace.nginx.server_name)
+
+- name: Include imagehub php-fpm pool
+  include_role:
+    name: php-fpm
+    tasks_from: create_pool
+    apply:
+      vars:
+        pool_name: imagehub
+
+- name: Add nginx vhost for imagehub if separate domain
+  include_role:
+    name: nginx
+    tasks_from: create_vhost
+    apply:
+      vars:
+        nginx_vhost:
+          server_name: "{{ datahub.nginx.server_name }}"
+          name: imagehub
+          type: simplesamlphp
+          document_root: "{{ datahub.nginx.document_root }}"
+          index: "{{ datahub.nginx.index }}"
+          php_socket_name: imagehub
+          ssl: "{{ datahub.nginx.ssl }}"
+          redirect_to_https: "{{ datahub.nginx.redirect_to_https }}"
+  when: is_resourcespace and is_cantaloupe and resourcespace.nginx.server_name != imagehub.nginx.server_name and cantaloupe.nginx.server_name != imagehub.nginx.server_name
+
+- name: Create nginx vhosts for imagehub, image server and DAM (or 2 of these 3)
+  include_role:
+    name: nginx
+    tasks_from: create_vhost
+    apply:
+      vars:
+        nginx_vhost:
+          server_name: "{{ imagehub.nginx.server_name }}"
+          name: imagehub
+          type: imagehub_combined
+          document_root: "{{ imagehub.nginx.document_root }}"
+          index: "{{ imagehub.nginx.index }}"
+          php_socket_name: imagehub
+          ssl: "{{ imagehub.nginx.ssl }}"
+          redirect_to_https: "{{ imagehub.nginx.redirect_to_https }}"
+  when: is_resourcespace and is_cantaloupe and (resourcespace.nginx.server_name == imagehub.nginx.server_name or cantaloupe.nginx.server_name == imagehub.nginx.server_name or cantaloupe.nginx.server_name == resourcespace.nginx.server_name)
+
