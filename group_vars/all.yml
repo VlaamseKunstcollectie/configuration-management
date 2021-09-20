@@ -83,7 +83,6 @@ arthub:
   dir: /opt/arthub
   environment: production
   nginx:
-    #listen_port: 80
     server_name: arthub.example.com
     redirect_to_https: true
     ssl: {}
@@ -91,6 +90,18 @@ resourcespace:
   repo_url: http://svn.resourcespace.com/svn/rs/releases/
   version: 9.6
   repo_dir: /var/www/resourcespace/
+  application_name: ResourceSpace
+  base_url: https://resourcespace.example.be
+  admin:
+    full_name: Admin user
+    email: admin@example.com
+    username: admin
+    from_email: resourcespace@example.com
+  mysql:
+    hostname: localhost
+    database: resourcespace
+    username: resourcespace
+    ro_username: resourcespace_ro
   nginx:
     server_name: resourcespace.example.com
     document_root: /var/www/resourcespace
