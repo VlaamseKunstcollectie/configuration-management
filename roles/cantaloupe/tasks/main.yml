@@ -40,6 +40,13 @@
   become_user: "{{ application_user }}"
   when: cantaloupe.delegate_script.enabled
 
+- name: Set cantaloupe delegate config
+  template:
+    src: delegate_config.yml
+    dest: "{{ cantaloupe.dir }}/"
+  become_user: "{{ application_user }}"
+  when: cantaloupe.delegate_script.enabled
+
 - name: Set cantaloupe properties
   template:
     src: cantaloupe.properties

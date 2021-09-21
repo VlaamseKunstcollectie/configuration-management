@@ -1,0 +1,25 @@
+---
+  # The keyword that the delegate script will look for in a request URL,
+  # indicating that an image should not be publicly available
+  # and authentication needs to be performed before being allowed access to this image or its info.json.
+  private_keyword: '{{ cantaloupe.delegate_script.private_keyword }}'
+
+  # The URL that will be called to check if this user is already authenticated.
+  # All cookies from the initial request will be passed along to this URL.
+  # If the URL returns a 200 response code, all is OK, serve the image.
+  # If it returns a 302 response code, the user needs to authenticate first.
+  # Any other response codes than 200 or 302 will result in the user not being granted access.
+  authcheck_url: '{{ cantaloupe.delegate_script.authcheck_url }}'
+
+  # URL where to redirect the user if they are not yet authenticated.
+  # This URL is expected to redirect back to here if authentication was successful.
+  # The current request_uri will be appended to this URL so it knows where to redirect to.
+  authenticator_url: '{{ cantaloupe.delegate_script.authenticator_url }}'
+
+  # Any requests from these addresses will automatically be allowed.
+  # This is needed for manifest generation inside an Imagehub.
+  whitelist:
+    - 127.0.0.1
+{% for ip in cantaloupe.delegate_script.whitelist %}
+    - {{ ip }}
+{% endfor %}
