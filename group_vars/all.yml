@@ -109,6 +109,7 @@ resourcespace:
     ssl: {}
 cantaloupe:
   version: 5.0.4
+  repo_dir: /opt/.repos/cantaloupe
   dir: /opt/cantaloupe
   image_dir: /var/www/resourcespace/filestore/iiif-ptif/
   delegate_script:
@@ -118,6 +119,10 @@ cantaloupe:
     repo_url: https://github.com/Hero-Solutions/cantaloupe_delegate.git
     repo_dir: /opt/.repos/cantaloupe_delegate
     branch: master
+    private_keyword: private
+    authcheck_url: https://imagehub.example.com/authcheck
+    authenticator_url: https://imagehub.example.com/authenticate?url=
+    whitelist: []
   nginx:
     server_name: images.example.com
     upstream: "http://127.0.0.1:8182"

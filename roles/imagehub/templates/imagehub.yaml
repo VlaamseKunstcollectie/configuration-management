@@ -86,7 +86,7 @@ parameters:
     validator_url: 'http://localhost:8080/validate?url='
 
     adfs_requirements:
-      public: {{ imagehub.public }}
+      public: {{ imagehub.public | to_json }}
       key: '{{ imagehub.adfs_key }}'
       values: 
 {% for value in imagehub.adfs_values %}
