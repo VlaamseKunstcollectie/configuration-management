@@ -1,4 +1,132 @@
 ---
+- name: Install php-curl, php-sqlite3
+  apt:
+    name:
+      - php{{ php.version }}-curl
+      - php{{ php.version }}-sqlite3
+
+- name: Make sure Imagehub database is present
+  mysql_db:
+    name: "{{ imagehub.mysql.database }}"
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    login_password: "{{ mariadb_root_password }}"
+
+- name: Create Imagehub user in MariaDB
+  mysql_user:
+    name: "{{ imagehub.mysql.username }}"
+    password: "{{ imagehub.mysql.password }}"
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    login_password: "{{ mariadb_root_password }}"
+    priv: "{{ imagehub.mysql.database }}.*:ALL,GRANT"
+    check_implicit_admin: true
+
+- name: Create repo folder
+  file:
+    path: "{{ imagehub.repo_dir }}"
+    state: directory
+    recurse: true
+    owner: "{{ application_user }}"
+    group: "{{ application_user }}"
+
+- name: Checkout imagehub repo
+  git:
+    repo: "{{ imagehub.repo_url }}"
+    dest: "{{ imagehub.repo_dir }}/repo/"
+    force: true
+    version: "{{ imagehub.branch }}"
+  become_user: "{{ application_user }}"
+
+- name: Create necessary Imagehub tables
+  mysql_db:
+    name: "{{ imagehub.mysql.database }}"
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    login_user: "{{ imagehub.mysql.username }}"
+    login_password: "{{ imagehub.mysql.password }}"
+    state: import
+    target: "{{ imagehub.repo_dir }}/repo/imagehub_tables.sql"
+
+- name: Create shared folders
+  file:
+    path: "{{ imagehub.repo_dir }}/shared/{{ item }}/"
+    state: directory
+    recurse: true
+    mode: "775"
+    owner: "{{ application_user }}"
+    group: "{{ php.group }}"
+  with_items:
+    - cache
+    - log
+    - vendor
+
+- name: Delete existing shared folders
+  file:
+    path: "{{ imagehub.repo_dir }}/repo/{{ item }}"
+    state: absent
+  with_items:
+    - var/cache
+    - var/log
+    - vendor
+  become_user: "{{ application_user }}"
+
+- name: Make sure var folder exists in repo
+  file:
+    path: "{{ imagehub.repo_dir }}/repo/var"
+    state: directory
+    recurse: true
+    owner: "{{ application_user }}"
+    group: "{{ application_user }}"
+
+- name: Link shared folders
+  file:
+    src: "{{ imagehub.repo_dir }}/shared/{{ item.src }}"
+    dest: "{{ imagehub.repo_dir }}/repo/{{ item.dest }}"
+    state: link
+    force: true
+  with_items:
+    - src: cache
+      dest: var/cache
+    - src: log
+      dest: var/log
+    - src: vendor
+      dest: vendor
+  become_user: "{{ application_user }}"
+
+- name: Copy imagehub.yaml for imagehub
+  template:
+    src: imagehub.yaml
+    dest: "{{ imagehub.repo_dir }}/repo/config/imagehub.yaml"
+  become_user: "{{ application_user }}"
+
+- name: Copy .env for imagehub
+  template:
+    src: .env
+    dest: "{{ imagehub.repo_dir }}/repo/.env"
+  become_user: "{{ application_user }}"
+
+- name: Link imagehub repo
+  file:
+    src: "{{ imagehub.repo_dir }}/repo/"
+    dest: "{{ imagehub.dir }}"
+    state: link
+
+- name: Install imagehub through composer
+  command: composer install
+  args:
+    chdir: "{{ imagehub.dir }}"
+  become_user: "{{ application_user }}"
+
+- name: Chown cache and log folders
+  file:
+    path: "{{ imagehub.repo_dir }}/shared/{{ item }}/"
+    state: directory
+    recurse: true
+    mode: "g+w"
+    owner: "{{ application_user }}"
+    group: "{{ php.group }}"
+  with_items:
+    - cache
+    - log
+
 - name: Set nginx vhost for cantaloupe if separate domain
   include_role:
     name: nginx

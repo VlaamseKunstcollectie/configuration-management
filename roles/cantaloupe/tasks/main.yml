@@ -14,8 +14,37 @@
     dest: "{{ cantaloupe.dir }}"
   become_user: "{{ application_user }}"
 
-#- name: Set cantaloupe properties
-#  template: cantaloupe.properties
+- name: Create cantaloupe_delegate repo folder
+  file:
+    path: "{{ cantaloupe.delegate_script.repo_dir }}"
+    state: directory
+    recurse: true
+    owner: "{{ application_user }}"
+    group: "{{ application_user }}"
+  when: cantaloupe.delegate_script.enabled
+
+- name: Checkout cantaloupe_delegate repo
+  git:
+    repo: "{{ cantaloupe.delegate_script.repo_url }}"
+    dest: "{{ cantaloupe.delegate_script.repo_dir }}/repo/"
+    force: true
+    version: "{{ cantaloupe.delegate_script.branch }}"
+  become_user: "{{ application_user }}"
+  when: cantaloupe.delegate_script.enabled
+
+- name: Copy delegate file to cantaloupe dir
+  copy:
+    src: "{{ cantaloupe.delegate_script.repo_dir }}/repo/{{ cantaloupe.delegate_script.script_name }}"
+    dest: "{{ cantaloupe.dir }}/"
+    remote_src: yes
+  become_user: "{{ application_user }}"
+  when: cantaloupe.delegate_script.enabled
+
+- name: Set cantaloupe properties
+  template:
+    src: cantaloupe.properties
+    dest: "{{ cantaloupe.dir }}/"
+  become_user: "{{ application_user }}"
 
 - name: Set fact to inform imagehub that cantaloupe is present
   set_fact:

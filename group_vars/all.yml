@@ -10,7 +10,7 @@ php:
 datahub:
   environment: production
   repo_url: https://github.com/Hero-Solutions/Datahub.git
-  repo_dir: /opt/.repos/datahub/
+  repo_dir: /opt/.repos/datahub
   branch: master
   dir: /opt/datahub
   service_name: Datahub
@@ -39,11 +39,11 @@ datahub_pipeline:
   datahub_protocol: https
   fixes:
     repo_url: https://github.com/Hero-Solutions/Datahub-Fixes.git
-    repo_dir: /opt/.repos/datahub-fixes/
+    repo_dir: /opt/.repos/datahub-fixes
     branch: master
   authority_files:
     repo_url: https://github.com/VlaamseKunstcollectie/Authority-Files.git
-    repo_dir: /opt/.repos/authority-files/
+    repo_dir: /opt/.repos/authority-files
     branch: master
   eiz:
     url: https://cjm-web.adlibhosting.com/arthubflanders/oai.ashx
@@ -61,7 +61,7 @@ datahub_pipeline:
 datahub_dashboard:
   environment: production
   repo_url: https://github.com/Hero-Solutions/Datahub-Dashboard.git
-  repo_dir: /opt/.repos/datahub-dashboard/
+  repo_dir: /opt/.repos/datahub-dashboard
   branch: master
   dir: /opt/datahub-dashboard
   service_name: Datahub Dashboard
@@ -78,7 +78,7 @@ datahub_dashboard:
     username: datahub_dashboard
 arthub:
   repo_url: https://github.com/VlaamseKunstcollectie/Arthub-Frontend
-  repo_dir: /opt/.repos/arthub/
+  repo_dir: /opt/.repos/arthub
   branch: master
   dir: /opt/arthub
   environment: production
@@ -89,7 +89,7 @@ arthub:
 resourcespace:
   repo_url: http://svn.resourcespace.com/svn/rs/releases/
   version: 9.6
-  repo_dir: /var/www/resourcespace/
+  repo_dir: /var/www/resourcespace
   application_name: ResourceSpace
   base_url: https://resourcespace.example.be
   admin:
@@ -110,14 +110,23 @@ resourcespace:
 cantaloupe:
   version: 5.0.4
   dir: /opt/cantaloupe
+  image_dir: /var/www/resourcespace/filestore/iiif-ptif/
+  delegate_script:
+    enabled: true
+    script_name: delegates.rb
+    pathname: delegates.rb
+    repo_url: https://github.com/Hero-Solutions/cantaloupe_delegate.git
+    repo_dir: /opt/.repos/cantaloupe_delegate
+    branch: master
   nginx:
     server_name: images.example.com
     upstream: "http://127.0.0.1:8182"
     redirect_to_https: true
     ssl: {}
 imagehub:
-  repo_url: https://github.com/kmska/Imagehub.git
-  repo_dir: /opt/.repos/imagehub/
+  public: false
+  repo_url: https://github.com/Hero-Solutions/Imagehub.git
+  repo_dir: /opt/.repos/imagehub
   branch: master
   dir: /opt/imagehub
   cantaloupe_url: https://images.example.com
@@ -136,7 +145,7 @@ imagehub:
     database: imagehub
   nginx:
     server_name: imagehub.example.com
-    document_root: /opt/imagehub/public
+    document_root: /opt/imagehub
     index: imagehub.php
     redirect_to_https: true
     ssl: {}

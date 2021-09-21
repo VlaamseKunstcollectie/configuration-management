@@ -1,0 +1,129 @@
+parameters:
+    # Url should have a trailing slash
+    resourcespace_api_url: '{{ imagehub.resourcespace_api_url }}'
+    resourcespace_api_username: '{{ imagehub.resourcespace_api_username }}'
+    resourcespace_api_key: '{{ imagehub.resourcespace_api_key }}'
+
+    datahub_url: '{{ imagehub.datahub_url }}'
+
+    datahub_language: nl
+    datahub_namespace: 'lido'
+    datahub_metadataprefix: 'oai_lido'
+    datahub_related_works_xpath: 'descriptiveMetadata[@xml:lang="{language}"]/objectRelationWrap/relatedWorksWrap/relatedWorkSet'
+
+    # The value of 'field' within each definition is the shorthand name of the field in ResourceSpace where this data is sent.
+    # These fields should not be manually edited in ResourceSpace, as any data within will automatically be overwritten with data from the Datahub!
+    # Field 'id' must always be present in the data definition (= inventory number, used a primary key in MySQL).
+    # Field 'dh_record_id' is a reserved keyword and should never be used (used to link inventory numbers with datahub records).
+    datahub_data_definition:
+        id:
+            xpath: 'descriptiveMetadata[@xml:lang="{language}"]/objectIdentificationWrap/repositoryWrap/repositorySet/workID[@type="object-number"]'
+            field: 'id'
+        work_pid:
+            xpath: 'objectPublishedID'
+            field: 'pidobject'
+        title_nl:
+            xpath: 'descriptiveMetadata[@xml:lang="{language}"]/objectIdentificationWrap/titleWrap/titleSet/appellationValue[@xml:lang="nl"]'
+            field: 'nl-titleartwork'
+        title_en:
+            xpath: 'descriptiveMetadata[@xml:lang="{language}"]/objectIdentificationWrap/titleWrap/titleSet/appellationValue[@xml:lang="en"]'
+            field: 'en-titleartwork'
+        short_description:
+            xpath: 'descriptiveMetadata[@xml:lang="{language}"]/objectIdentificationWrap/objectDescriptionWrap/objectDescriptionSet/descriptiveNoteValue'
+            field: 'description'
+        creator:
+            xpath: 'descriptiveMetadata[@xml:lang="{language}"]/eventWrap/eventSet/event[eventType/term="production"]/eventActor[not(actorInRole/attributionQualifierActor)]/actorInRole/actor/nameActorSet/appellationValue[@pref="preferred"]'
+            field: 'creatorofartworkobje'
+        creator_role:
+            xpath: 'descriptiveMetadata[@xml:lang="{language}"]/eventWrap/eventSet/event[eventType/term="production"]/eventActor[not(actorInRole/attributionQualifierActor)]/actorInRole/roleActor/term'
+            field: 'roleofcreatorofartworkobje'
+        earliest_date:
+            xpath: 'descriptiveMetadata[@xml:lang="{language}"]/eventWrap/eventSet/event[eventType/term="production"]/eventDate/date/earliestDate'
+            field: 'earliestdate'
+        latest_date:
+            xpath: 'descriptiveMetadata[@xml:lang="{language}"]/eventWrap/eventSet/event[eventType/term="production"]/eventDate/date/latestDate'
+            label: 'latestdate'
+        publisher:
+            xpath: 'administrativeMetadata[@xml:lang="{language}"]/recordWrap/recordSource/legalBodyName/appellationValue'
+            field: 'publisher'
+        keywords:
+            xpaths:
+              - 'descriptiveMetadata[@xml:lang="{language}"]/objectClassificationWrap/objectWorkTypeWrap/objectWorkType/conceptID[@source="AAT"]'
+              - 'descriptiveMetadata[@xml:lang="{language}"]/objectClassificationWrap/objectWorkTypeWrap/objectWorkType/term[@pref="preferred"]'
+            field: 'keywords'
+        copyright:
+            xpath: 'administrativeMetadata[@xml:lang="{language}"]/rightsWorkWrap/rightsWorkSet/creditLine'
+            field: 'copyrightnoticeofart'
+
+    credit_line:
+        nl:
+          field: 'nl-creditline'
+          title_field: 'nl-titleartwork'
+          suffix: '{{ imagehub.credit_suffix_nl }}'
+          sabam_suffix: 'België'
+          invnr: 'Inv.nr.'
+          photo: 'Foto'
+          photographer: 'Fotograaf'
+        en:
+          field: 'en-creditline'
+          title_field: 'en-titleartwork'
+          suffix: '{{ imagehub.credit_suffix_en }}'
+          sabam_suffix: 'Belgium'
+          invnr: 'Inv.no.'
+          photo: 'Photo'
+          photographer: 'Photographer'
+
+    cantaloupe_url: '{{ imagehub.cantaloupe_url }}'
+    cantaloupe_curl_opts:
+        CURLOPT_SSL_VERIFYHOST: false
+        CURLOPT_SSL_VERIFYPEER: false
+#        CURLOPT_CAINFO: /path/to/cacert.pem
+#        CURLOPT_CAPATH: /path/to/cacert.pem
+
+    service_url: '{{ imagehub.service_url }}'
+
+    validate_manifests: false
+    validator_url: 'http://localhost:8080/validate?url='
+
+    adfs_requirements:
+      public: {{ imagehub.public }}
+      key: '{{ imagehub.adfs_key }}'
+      values: 
+{% for value in imagehub.adfs_values %}
+        - {{ value }}
+{% endfor %}
+
+    public_use:
+      key: 'clearedforusage'
+      value: 'Public use'
+      # We need to encode the '/' character into %2F
+      public_folder: 'public%2F'
+      private_folder: 'private%2F'
+
+    recommended_for_publication:
+      key: 'recommendedimageforp'
+    iiif_sort_number:
+      key: 'iiifsortnumber'
+
+    authentication_url: '{{ imagehub.authentication_url }}'
+    authentication_whitelist:
+      - '127.0.0.1'
+    authentication_service_description:
+      confirmLabel: 'Login'
+      description: '{{ imagehub.auth_description }}'
+      failureDescription: 'Authentication failed'
+      failureHeader: 'Authentication Failed'
+      header: 'Please log in'
+      label: '{{ imagehub.auth_label }}'
+      profile: 'http://iiif.io/api/auth/1/login'
+
+    iiif_label: 'nl-titleartwork'
+    iiif_description: 'description'
+    iiif_attribution: 'publisher'
+    iiif_metadata_fields:
+      nl-titleartwork: 'NL - Title'
+      en-titleartwork: 'EN - Title'
+      sourceinvnr: 'Object ID'
+      publisher: 'Publisher'
+      nl-creditline: 'NL - Credit Line'
+      en-creditline: 'EN - Credit Line'
