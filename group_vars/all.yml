@@ -4,9 +4,6 @@ php:
   version: 7.2
   user: www-data
   group: www-data
-  memory_limit: 256M
-  post_max_size: 50000M
-  upload_max_filesize: 50000M
 datahub:
   environment: production
   repo_url: https://github.com/Hero-Solutions/Datahub.git
@@ -92,6 +89,10 @@ resourcespace:
   repo_dir: /var/www/resourcespace
   application_name: ResourceSpace
   base_url: https://resourcespace.example.be
+  rs_ptif:
+    repo_url: https://github.com/Hero-Solutions/RS_ptif
+    branch: master
+    repo_dir: /opt/.repos/rs_ptif
   admin:
     full_name: Admin user
     email: admin@example.com
@@ -107,6 +108,10 @@ resourcespace:
     document_root: /var/www/resourcespace
     redirect_to_https: true
     ssl: {}
+  php:
+    memory_limit: 256M
+    post_max_size: 50000M
+    upload_max_filesize: 50000M
 cantaloupe:
   version: 5.0.4
   repo_dir: /opt/.repos/cantaloupe

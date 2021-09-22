@@ -1,0 +1,7 @@
+---
+- name: Copy imagehub.yaml for imagehub
+  template:
+    src: imagehub.yaml
+    dest: "{{ imagehub.repo_dir }}/repo/config/imagehub.yaml"
+  become_user: "{{ application_user }}"
+

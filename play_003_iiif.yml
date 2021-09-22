@@ -55,6 +55,16 @@
   roles:
     - imagehub
 
+- name: Setup ResourceSpace
+  hosts: resourcespace
+  roles:
+    - resourcespace_setup
+
+- name: Setup imagehub
+  hosts: imagehub
+  roles:
+    - imagehub_setup
+
 #- name: Set up cronjob
 #  hosts: datahub,datahub_pipeline,datahub_dashboard,arthub
 #  roles:

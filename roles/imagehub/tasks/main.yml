@@ -91,12 +91,6 @@
       dest: vendor
   become_user: "{{ application_user }}"
 
-- name: Copy imagehub.yaml for imagehub
-  template:
-    src: imagehub.yaml
-    dest: "{{ imagehub.repo_dir }}/repo/config/imagehub.yaml"
-  become_user: "{{ application_user }}"
-
 - name: Copy .env for imagehub
   template:
     src: .env
@@ -146,16 +140,6 @@
   set_fact:
     image_server_upstream: "{{ cantaloupe.nginx.upstream }}"
   when: is_cantaloupe and (cantaloupe.nginx.server_name == imagehub.nginx.server_name or cantaloupe.nginx.server_name == resourcespace.nginx.server_name)
-
-- name: Include resourcespace php-fpm pool
-  include_role:
-    name: php-fpm
-    tasks_from: create_pool
-    apply:
-      vars:
-        pool_name: resourcespace
-        memory_limit: 256M
-  when: is_resourcespace
 
 - name: Set nginx vhost for ResourceSpace if separate domain
   include_role:

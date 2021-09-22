@@ -1,11 +1,20 @@
 ---
-- name: Install subversion, php-gd, php-mysql, exiftool
+- name: Install necessary packages
   apt:
     name:
       - subversion
       - php{{ php.version }}-gd
       - php{{ php.version }}-mysql
       - exiftool
+      - imagemagick
+      - inkscape
+      - ghostscript
+      - antiword
+      - postfix
+      - libimage-exiftool-perl
+      - ffmpeg
+      - poppler-utils
+      - wget
 
 - name: Clone ResourceSpace
   subversion:
@@ -39,3 +48,16 @@
     login_password: "{{ mariadb_root_password }}"
     priv: "{{ resourcespace.mysql.database }}.*:SELECT"
     check_implicit_admin: true
+
+- name: Include resourcespace php-fpm pool
+  include_role:
+    name: php-fpm
+    tasks_from: create_pool
+    apply:
+      vars:
+        pool_name: resourcespace
+        php_admin_values:
+          memory_limit: "{{ resourcespace.php.memory_limit }}" 
+          post_max_size: "{{ resourcespace.php.post_max_size }}"
+          upload_max_filesize: "{{ resourcespace.php.upload_max_filesize }}"
+
