@@ -75,13 +75,29 @@
     login_password: "{{ resourcespace.mysql.password }}"
     query: "INSERT INTO plugins(name, descrip, author, update_url, info_url, inst_version, config, config_json, config_url, enabled_groups, priority, disable_group_select, title, icon) VALUES('iiif_ptif', 'Allows files to be converted to Tiled Pyramidal TIFF (PTIF) on upload', 'Michiel Hebben', '', '', 1, NULL, NULL, '', NULL, 1, 0, '', '') ON DUPLICATE KEY UPDATE inst_version=VALUES(inst_version)"
 
+- name: Check if rs_ptif_config.php is already appended to config.php
+  shell: "fgrep -q '# RS_ptif configuration' {{ resourcespace.repo_dir }}/include/config.php"
+  register: first_rs_run
+
+- name: Provide necessary ResourceSpace metadata fields
+  mysql_db:
+    name: "{{ resourcespace.mysql.database }}"
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    login_user: "{{ resourcespace.mysql.username }}"
+    login_password: "{{ resourcespace.mysql.password }}"
+    state: import
+    target: "{{ imagehub.repo_dir }}/repo/resourcespace_metadata.sql"
+  when: first_rs_run.rc == 1
+
 - name: Put the config.php template
   template:
     src: config.php
-    dest: /tmp/rs_ptif_config.php 
+    dest: /tmp/rs_ptif_config.php
+  when: first_rs_run.rc == 1
 
 - name: Append rs_ptif_config.php to config.php if not already done so
-  shell: "fgrep -q '# RS_ptif configuration' {{ resourcespace.repo_dir }}/include/config.php || cat /tmp/rs_ptif_config.php >> {{ resourcespace.repo_dir }}/include/config.php"
+  shell: "cat /tmp/rs_ptif_config.php >> {{ resourcespace.repo_dir }}/include/config.php"
+  when: first_rs_run.rc == 1
 
 - name: Grab the api_scramble_key from config.php
   shell: sed -n "/api_scramble_key/s/.*'\([^']\+\)'.*/1\1/p" {{ resourcespace.repo_dir }}/include/config.php
@@ -91,6 +107,8 @@
   set_fact:
     rs_api_key: "{{ rs_api_scramble_key.stdout | hash('sha256') }}"
 
-- name: Debug
-  debug:
-    var: rs_api_key
+- name: Copy imagehub.yaml for imagehub
+  template:
+    src: imagehub.yaml
+    dest: "{{ imagehub.repo_dir }}/repo/config/imagehub.yaml"
+  become_user: "{{ application_user }}"

@@ -206,3 +206,7 @@
           redirect_to_https: "{{ imagehub.nginx.redirect_to_https }}"
   when: is_resourcespace and is_cantaloupe and (resourcespace.nginx.server_name == imagehub.nginx.server_name or cantaloupe.nginx.server_name == imagehub.nginx.server_name or cantaloupe.nginx.server_name == resourcespace.nginx.server_name)
 
+- name: Provide crontab entry for daily update of ResourceSpace data and generation of manifests
+  set_fact:
+    cronjobs: "{{ cronjobs }} + [  'php {{ imagehub.dir }}/bin/console app:datahub-to-resourcespace', 'php {{ imagehub.dir }}/bin/console app:generate-iiif-manifests' ]"
+
