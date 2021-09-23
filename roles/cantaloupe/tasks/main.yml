@@ -68,6 +68,18 @@
     dest: "{{ cantaloupe.dir }}/"
   become_user: "{{ application_user }}"
 
+- name: Create cantaloupe service
+  template:
+    src: cantaloupe.service
+    dest: /etc/systemd/system/cantaloupe.service
+
+- name: Enable cantaloupe
+  systemd:
+    name: cantaloupe
+    enabled: yes
+    daemon_reload: yes
+    state: restarted
+
 - name: Set fact to inform imagehub that cantaloupe is present
   set_fact:
     is_cantaloupe: true

@@ -1,12 +1,4 @@
 ---
-- name: Create the iiif_ptif folder inside the filestore
-  file:
-    path: "{{ resourcespace.repo_dir }}/filestore/iiif_ptif/"
-    state: directory
-    recurse: true
-    owner: "{{ php.user }}"
-    group: "{{ php.group }}"
-
 - name: Execute cURL call to setup.php
   uri:
     url: "{{ resourcespace.base_url }}/pages/setup.php"

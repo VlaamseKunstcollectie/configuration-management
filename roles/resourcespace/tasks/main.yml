@@ -21,9 +21,13 @@
     repo: "{{ resourcespace.repo_url }}/{{ resourcespace.version }}"
     dest: "{{ resourcespace.repo_dir }}"
 
-- name: Set fact to inform imagehub that ResourceSpace is present
-  set_fact:
-    is_resourcespace: true
+- name: Create the iiif_ptif folder inside the filestore
+  file:
+    path: "{{ resourcespace.repo_dir }}/filestore/iiif_ptif/"
+    state: directory
+    recurse: true
+    owner: "{{ php.user }}"
+    group: "{{ php.group }}"
 
 - name: Make sure ResourceSpace database is present
   mysql_db:
@@ -60,4 +64,8 @@
           memory_limit: "{{ resourcespace.php.memory_limit }}" 
           post_max_size: "{{ resourcespace.php.post_max_size }}"
           upload_max_filesize: "{{ resourcespace.php.upload_max_filesize }}"
+
+- name: Set fact to inform imagehub that ResourceSpace is present
+  set_fact:
+    is_resourcespace: true
 
