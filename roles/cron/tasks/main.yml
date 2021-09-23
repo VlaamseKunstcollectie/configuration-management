@@ -2,17 +2,17 @@
 - name: Create shell script for cron task
   template:
     src: import_data.sh
-    dest: "{{ datahub_pipeline.dir }}/fixes/scripts/import_data.sh"
+    dest: "{{ cron_dir }}/import_data.sh"
     mode: '755'
   with_items: "{{ cronjobs }}"
 
 - name: Provide crontab entry for daily reload of arthub records
   cron:
-    name: "Reload arthub records"
+    name: "Reload {{ cron_name }} records"
     minute: "0"
     hour: "2"
     user: "{{ application_user }}"
-    job: "bash {{ datahub_pipeline.dir }}/fixes/scripts/import_data.sh > {{ datahub_pipeline.dir }}/cron_output.log 2>&1"
+    job: "bash {{ cron_dir }}/import_data.sh > {{ cron_dir }}/cron_output.log 2>&1"
 
 - name: Renew SSL certificates through LetsEncrypt
   cron:
@@ -22,4 +22,3 @@
     user: "root"
     job: "certbot renew -n -q --agree-tos --webroot -w /var/lib/letsencrypt/ --post-hook '/etc/init.d/nginx reload'"
     state: "{{ 'present' if (letsencrypt_vhosts | length > 0) else 'absent' }}"
-

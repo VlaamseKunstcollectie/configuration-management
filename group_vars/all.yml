@@ -1,5 +1,7 @@
 ---
 ansible_become: yes
+cron_dir: /opt
+cron_name: arthub
 php:
   version: 7.2
   user: www-data

@@ -34,4 +34,3 @@
       vars:
         nginx_vhost: "{{ vhost }}"
   when: stat_result.stat.exists
-
