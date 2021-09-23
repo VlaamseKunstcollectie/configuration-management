@@ -46,6 +46,9 @@ $iiif_ptif_private_folder = 'private/';
 # Can be set to NULL if all images should be private
 $iiif_ptif_public_folder = 'public/';
 
+# Metadata field that denotes the quality of the generated PTIF image
+$iiif_ptif_quality_field = 'iiifquality';
+
 # CLI Commands to perform image conversion to PTIF.
 # 'extensions' defines a list of file extensions and the command that should be used to convert images with these extensions to PTIF.
 # 'command' should probably be 'vips im_vips2tiff' or 'convert', but accepts any installed command for image conversion (can be the full path to an executable).
@@ -55,9 +58,9 @@ $iiif_ptif_public_folder = 'public/';
 $iiif_ptif_commands = array(
     # vips cannot properly handle psb, so we need to use convert instead.
     array(
-        'extensions'   => array('jpg', 'jpeg', 'psb','psd'),
+        'extensions'   => array('jpg', 'jpeg', 'psb'),
         'command'      => 'convert',
-        'arguments'    => '-define tiff:tile-geometry=256x256 -compress jpeg -quality 100 -depth 8',
+        'arguments'    => '-define tiff:tile-geometry=256x256 -colorspace sRGB -compress jpeg -quality #ptif_quality# -depth 8',
         'dest_prefix'  => 'ptif:',
         'dest_postfix' => ''
     ),
@@ -68,12 +71,12 @@ $iiif_ptif_commands = array(
         'command'      => 'vips im_vips2tiff',
         'arguments'    => '',
         'dest_prefix'  => '',
-        'dest_postfix' => ':jpeg:100,tile:256x256,pyramid'
+        'dest_postfix' => ':jpeg:#ptif_quality#,tile:256x256,pyramid'
     )
 );
+
 $file_checksums     = true;
 $file_checksums_50k = true;
-#$file_checksums_offline = false;
 $file_checksums_offline = false;
 $file_checksums_fullfile = false;
 $file_upload_block_duplicates = true;
