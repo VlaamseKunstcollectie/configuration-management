@@ -60,7 +60,7 @@
     tasks_from: create_pool
     apply:
       vars:
-        pool_name: resourcespace
+        pool_name: "{{ resourcespace.nginx.name }}"
         php_admin_values:
           memory_limit: "{{ resourcespace.php.memory_limit }}" 
           post_max_size: "{{ resourcespace.php.post_max_size }}"

@@ -117,7 +117,7 @@
     tasks_from: create_pool
     apply:
       vars:
-        pool_name: datahub-dashboard
+        pool_name: "{{ datahub_dashboard.nginx.name }}"
 
 - name: Set up datahub dashboard nginx vhost
   include_role:
