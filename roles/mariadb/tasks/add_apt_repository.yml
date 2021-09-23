@@ -4,6 +4,11 @@
     mariadb_apt_repository: "deb [arch=amd64,arm64,ppc64el] http://ams2.mirrors.digitalocean.com/mariadb/repo/10.6/debian buster main"
   when: ansible_facts.distribution == 'Debian' and ansible_facts.distribution_major_version == '10'
 
+- name: Configure apt repository if Debian 11
+  set_fact:
+    mariadb_apt_repository: "deb [arch=amd64,arm64,ppc64el] http://ams2.mirrors.digitalocean.com/mariadb/repo/10.6/debian bullseye main"
+  when: ansible_facts.distribution == 'Debian' and ansible_facts.distribution_major_version == '11'
+
 - name: Configure apt repository if Ubuntu 18
   set_fact:
     mariadb_apt_repository: "deb [arch=amd64,arm64,ppc64el] http://ams2.mirrors.digitalocean.com/mariadb/repo/10.6/ubuntu bionic main"
