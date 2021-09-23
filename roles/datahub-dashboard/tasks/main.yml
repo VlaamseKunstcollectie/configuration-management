@@ -127,10 +127,10 @@
       vars:
         nginx_vhost:
           server_name: "{{ datahub_dashboard.nginx.server_name }}"
-          name: datahub-dashboard
+          name: "{{ datahub_dashboard.nginx.name }}"
           type: php
           document_root: "{{ datahub_dashboard.nginx.document_root }}"
           index: "{{ datahub_dashboard.nginx.index }}"
-          php_socket_name: datahub-dashboard
+          php_socket_name: "{{ datahub_dashboard.nginx.name }}"
           ssl: "{{ datahub_dashboard.nginx.ssl }}"
           redirect_to_https: "{{ datahub_dashboard.nginx.redirect_to_https }}"

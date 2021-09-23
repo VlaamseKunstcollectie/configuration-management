@@ -192,10 +192,10 @@
       vars:
         nginx_vhost:
           server_name: "{{ datahub.nginx.server_name }}"
-          name: datahub
+          name: "{{ datahub.nginx.name }}"
           type: php
           document_root: "{{ datahub.nginx.document_root }}"
           index: "{{ datahub.nginx.index }}"
-          php_socket_name: datahub
+          php_socket_name: "{{ datahub.nginx.name }}"
           ssl: "{{ datahub.nginx.ssl }}"
           redirect_to_https: "{{ datahub.nginx.redirect_to_https }}"

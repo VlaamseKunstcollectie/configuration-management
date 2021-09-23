@@ -13,6 +13,7 @@ datahub:
   service_name: Datahub
   pagination_num_records: 25 
   nginx:
+    name: datahub
     server_name: datahub.example.com
     document_root: /opt/datahub/web
     index: app.php
@@ -63,6 +64,7 @@ datahub_dashboard:
   dir: /opt/datahub-dashboard
   service_name: Datahub Dashboard
   nginx:
+    name: datahub-dashboard
     server_name: dashboard.example.com
     document_root: /opt/datahub-dashboard/web
     index: app.php
@@ -80,6 +82,7 @@ arthub:
   dir: /opt/arthub
   environment: production
   nginx:
+    name: arthub
     server_name: arthub.example.com
     redirect_to_https: true
     ssl: {}
@@ -104,6 +107,7 @@ resourcespace:
     username: resourcespace
     ro_username: resourcespace_ro
   nginx:
+    name: resourcespace
     server_name: resourcespace.example.com
     document_root: /var/www/resourcespace
     redirect_to_https: true
@@ -130,6 +134,7 @@ cantaloupe:
     authenticator_url: https://imagehub.example.com/authenticate?url=
     whitelist: []
   nginx:
+    name: cantaloupe
     server_name: images.example.com
     upstream: "http://127.0.0.1:8182"
     redirect_to_https: true
@@ -155,6 +160,7 @@ imagehub:
     username: imagehub
     database: imagehub
   nginx:
+    name: imagehub
     server_name: imagehub.example.com
     document_root: /opt/imagehub
     index: imagehub.php
