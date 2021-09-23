@@ -116,7 +116,7 @@ cantaloupe:
   version: 5.0.4
   repo_dir: /opt/.repos/cantaloupe
   dir: /opt/cantaloupe
-  image_dir: /var/www/resourcespace/filestore/iiif-ptif/
+  image_dir: /var/www/resourcespace/filestore/iiif_ptif/
   jvm_args: -Xmx512m
   delegate_script:
     enabled: true

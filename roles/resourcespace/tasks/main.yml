@@ -15,6 +15,7 @@
       - ffmpeg
       - poppler-utils
       - wget
+      - libvips
 
 - name: Clone ResourceSpace
   subversion:
