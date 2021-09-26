@@ -75,7 +75,7 @@
 
 - name: Enable cantaloupe
   systemd:
-    name: {{ cantaloupe.service_name }}
+    name: "{{ cantaloupe.service_name }}"
     enabled: yes
     daemon_reload: yes
     state: restarted
