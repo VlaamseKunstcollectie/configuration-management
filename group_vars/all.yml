@@ -123,7 +123,9 @@ cantaloupe:
   repo_dir: /opt/.repos/cantaloupe
   dir: /opt/cantaloupe
   image_dir: /var/www/resourcespace/filestore/iiif_ptif/
+  service_name: cantaloupe
   jvm_args: -Xmx512m
+  port: 8182
   delegate_script:
     enabled: true
     script_name: delegates.rb
@@ -138,7 +140,7 @@ cantaloupe:
   nginx:
     name: cantaloupe
     server_name: images.example.com
-    upstream: "http://127.0.0.1:8182"
+    upstream: http://127.0.0.1:8182
     redirect_to_https: true
     ssl: {}
 imagehub:
