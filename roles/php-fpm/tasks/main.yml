@@ -18,7 +18,8 @@
       - php{{ php.version }}-zip
       - php{{ php.version }}-dev
       - php-pear
-      - composer=1.*
+#      - composer=1.*
+      - composer
     state: present
 
 # First run of install will output a huge error, but this can be safely ignored

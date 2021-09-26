@@ -22,7 +22,7 @@
 
 - name: Install certificates for each domain
   include_tasks:
-    file: "install_cert.yml"
+    file: install_cert.yml
     apply:
       vars:
         letsencrypt_vhost: "{{ item }}"

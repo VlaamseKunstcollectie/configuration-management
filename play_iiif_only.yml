@@ -1,4 +1,14 @@
 ---
+- name: Install common packages
+  hosts: resourcespace
+  roles:
+    - common
+
+- name: Install mariadb
+  hosts: resourcespace
+  roles:
+    - mariadb
+
 - name: Install ResourceSpace
   hosts: resourcespace
   roles:

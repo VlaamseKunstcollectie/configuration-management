@@ -6,11 +6,13 @@
   apt:
     update_cache: yes
 
+# TODO python-pymysql or python3-mysql depending on distro or available python version
 - name: Install MariaDB
   apt:
     name:
       - mariadb-server
-      - python-pymysql
+      - python3-pymysql
+#      - python-pymysql
 
 - name: Update MariaDB password for root account
   mysql_user:

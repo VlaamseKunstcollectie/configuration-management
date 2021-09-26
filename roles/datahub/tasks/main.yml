@@ -2,7 +2,7 @@
 - name: Include MongoDB admin user role for datahub
   include_role:
     name: mongodb
-    tasks_from: create_admin_user
+    tasks_from: create_admin_user.yml
     apply:
       vars:
         db_user_name: datahub
@@ -179,7 +179,7 @@
 - name: Include datahub php-fpm pool
   include_role:
     name: php-fpm
-    tasks_from: create_pool
+    tasks_from: create_pool.yml
     apply:
       vars:
         pool_name: "{{ datahub.nginx.name }}"
@@ -187,7 +187,7 @@
 - name: Include datahub nginx vhost
   include_role:
     name: nginx
-    tasks_from: create_vhost
+    tasks_from: create_vhost.yml
     apply:
       vars:
         nginx_vhost:

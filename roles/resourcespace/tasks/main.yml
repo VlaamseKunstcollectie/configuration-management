@@ -1,5 +1,5 @@
 ---
-- name: Install necessary packages
+- name: Install subversion, php-gd, php-mysql, exiftool, imagemagick, inkscape, ghostscript, antiword, postfix, libimage-exiftool-perl, ffmpeg, poppler-utils, wget and libvips
   apt:
     name:
       - subversion
@@ -25,6 +25,14 @@
 - name: Create the iiif_ptif folder inside the filestore
   file:
     path: "{{ resourcespace.repo_dir }}/filestore/iiif_ptif/"
+    state: directory
+    recurse: true
+    owner: "{{ php.user }}"
+    group: "{{ php.group }}"
+
+- name: Chown all files and folders to the www user
+  file:
+    path: "{{ resourcespace.repo_dir }}"
     state: directory
     recurse: true
     owner: "{{ php.user }}"
@@ -57,7 +65,7 @@
 - name: Include resourcespace php-fpm pool
   include_role:
     name: php-fpm
-    tasks_from: create_pool
+    tasks_from: create_pool.yml
     apply:
       vars:
         pool_name: "{{ resourcespace.nginx.name }}"

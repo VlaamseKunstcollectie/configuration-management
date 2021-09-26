@@ -199,7 +199,7 @@
 - name: Include arthub nginx vhost
   include_role:
     name: nginx
-    tasks_from: create_vhost
+    tasks_from: create_vhost.yml
     apply:
       vars:
         nginx_vhost:

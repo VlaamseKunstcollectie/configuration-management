@@ -8,12 +8,12 @@
   apt:
     name:
       - git
-      - python-pip
-      - python-virtualenv
-      - python-setuptools
-#      - python3-pip
-#      - python3-virtualenv
-#      - python3-setuptools
+#      - python-pip
+#      - python-virtualenv
+#      - python-setuptools
+      - python3-pip
+      - python3-virtualenv
+      - python3-setuptools
       - software-properties-common
       - dirmngr
       - apt-transport-https

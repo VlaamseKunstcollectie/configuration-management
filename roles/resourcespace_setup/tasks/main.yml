@@ -1,4 +1,52 @@
 ---
+- name: Set base_url without https
+  set_fact:
+    base_url_http: "{{ resourcespace.base_url | replace('https://', 'http://') }}"
+
+- name: Pause a few seconds to ensure nginx is running
+  pause:
+    seconds: 5
+
+- name: Execute cURL call to setup.php
+  uri:
+    url: "{{ base_url_http }}/pages/setup.php"
+    method: POST
+    timeout: 300
+    follow_redirects: no
+    body_format: form-urlencoded
+    body:
+      - [ defaultlanguage, en ]
+      - [ mysql_server, "{{ resourcespace.mysql.hostname }}" ]
+      - [ mysql_username, "{{ resourcespace.mysql.username }}" ]
+      - [ mysql_password, "{{ resourcespace.mysql.password }}" ]
+      - [ read_only_db_username, "{{ resourcespace.mysql.ro_username }}" ]
+      - [ read_only_db_password, "{{ resourcespace.mysql.ro_password }}" ]
+      - [ mysql_db, "{{ resourcespace.mysql.database }}" ]
+      - [ mysql_bin_path, /usr/bin ]
+      - [ applicationname, ResourceSpace ]
+      - [ baseurl, "{{ base_url_http }}" ]
+      - [ admin_fullname, "{{ resourcespace.admin.full_name }}" ]
+      - [ admin_email, "{{ resourcespace.admin.email }}" ]
+      - [ admin_username, "{{ resourcespace.admin.username }}" ]
+      - [ admin_password, "{{ resourcespace.admin.password }}" ]
+      - [ email_from, "{{ resourcespace.admin.from_email }}" ]
+      - [ imagemagick_path, /usr/bin ]
+      - [ ghostscript_path, /usr/bin ]
+      - [ ffmpeg_path, /usr/bin ]
+      - [ exiftool_path, /usr/bin ]
+      - [ antiword_path, /usr/bin ]
+      - [ pdftotext_path, /usr/bin ]
+      - [ smtp_secure, '' ]
+      - [ smtp_host, '' ]
+      - [ smtp_port, '' ]
+      - [ smtp_auth, on ]
+      - [ smtp_username, '' ]
+      - [ smtp_password, '' ]
+      - [ google_vision_key, '' ]
+      - [ submit, Begin installation ]
+  register: setup_status_code
+  failed_when: setup_status_code.status != 200 and setup_status_code.status != 301 and setup_status_code.status != 302
+
 - name: Execute cURL call to setup.php
   uri:
     url: "{{ resourcespace.base_url }}/pages/setup.php"
@@ -35,6 +83,14 @@
       - [ smtp_password, '' ]
       - [ google_vision_key, '' ]
       - [ submit, Begin installation ]
+  when: setup_status_code.status == 301 or setup_status_code.status == 301
+
+- name: Replace ResourceSpace base_url
+  replace:
+    path: "{{ resourcespace.repo_dir }}/include/config.php"
+    regexp: "{{ base_url_http }}"
+    replace: "{{ resourcespace.base_url }}"
+  when: setup_status_code.status == 200
 
 - name: Create repo folder
   file:
@@ -78,6 +134,7 @@
 - name: Check if rs_ptif_config.php is already appended to config.php
   shell: "fgrep -q '# RS_ptif configuration' {{ resourcespace.repo_dir }}/include/config.php"
   register: first_rs_run
+  failed_when: first_rs_run.rc != 0 and first_rs_run.rc != 1
 
 - name: Provide necessary ResourceSpace metadata fields
   mysql_db:
@@ -108,7 +165,6 @@
     rs_api_key: "{{ rs_api_scramble_key.stdout | hash('sha256') }}"
 
 - name: Copy imagehub.yaml for imagehub
-  template:
-    src: imagehub.yaml
-    dest: "{{ imagehub.repo_dir }}/repo/config/imagehub.yaml"
-  become_user: "{{ application_user }}"
+  include_role:
+    name: imagehub
+    tasks_from: place_config.yml

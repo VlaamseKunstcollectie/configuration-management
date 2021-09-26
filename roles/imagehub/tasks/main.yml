@@ -97,6 +97,13 @@
     dest: "{{ imagehub.repo_dir }}/repo/.env"
   become_user: "{{ application_user }}"
 
+- name: Copy imagehub.yaml for imagehub
+  include_tasks:
+    file: place_config.yml
+    apply:
+      vars:
+        rs_api_key: placeholder
+
 - name: Link imagehub repo
   file:
     src: "{{ imagehub.repo_dir }}/repo/"
@@ -124,7 +131,7 @@
 - name: Set nginx vhost for cantaloupe if separate domain
   include_role:
     name: nginx
-    tasks_from: create_vhost
+    tasks_from: create_vhost.yml
     apply:
       vars:
         nginx_vhost:
@@ -144,7 +151,7 @@
 - name: Set nginx vhost for ResourceSpace if separate domain
   include_role:
     name: nginx
-    tasks_from: create_vhost
+    tasks_from: create_vhost.yml
     apply:
       vars:
         nginx_vhost:
@@ -161,13 +168,13 @@
 - name: Add ResourceSpace vhost for imagehub
   set_fact:
     dam_document_root: "{{ resourcespace.nginx.document_root }}"
-    dam_php_socket_name: resourcespace
+    dam_php_socket_name: "{{ resourcespace.nginx.name }}"
   when: is_resourcespace and (resourcespace.nginx.server_name == imagehub.nginx.server_name or cantaloupe.nginx.server_name == resourcespace.nginx.server_name)
 
 - name: Include imagehub php-fpm pool
   include_role:
     name: php-fpm
-    tasks_from: create_pool
+    tasks_from: create_pool.yml
     apply:
       vars:
         pool_name: "{{ imagehub.nginx.name }}"
@@ -175,7 +182,7 @@
 - name: Add nginx vhost for imagehub if separate domain
   include_role:
     name: nginx
-    tasks_from: create_vhost
+    tasks_from: create_vhost.yml
     apply:
       vars:
         nginx_vhost:
@@ -192,7 +199,7 @@
 - name: Create nginx vhosts for imagehub, image server and DAM (or 2 of these 3)
   include_role:
     name: nginx
-    tasks_from: create_vhost
+    tasks_from: create_vhost.yml
     apply:
       vars:
         nginx_vhost:
@@ -209,4 +216,3 @@
 - name: Provide crontab entry for daily update of ResourceSpace data and generation of manifests
   set_fact:
     cronjobs: "{{ cronjobs }} + [  'php {{ imagehub.dir }}/bin/console app:datahub-to-resourcespace', 'php {{ imagehub.dir }}/bin/console app:generate-iiif-manifests' ]"
-

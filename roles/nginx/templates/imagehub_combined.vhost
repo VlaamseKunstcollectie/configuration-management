@@ -47,7 +47,7 @@ server {
   location ~ ^/imagehub\.php(/|$) {
     alias {{ vhost.document_root }}/public;
 
-    fastcgi_pass unix:/run/php/php{{ php.version }}-fpm-imagehub.sock;
+    fastcgi_pass unix:/run/php/php{{ php.version }}-fpm-{{ vhost.php_socket_name }}.sock;
     fastcgi_split_path_info ^(.+\.php)(/.*)$;
     include fastcgi_params;
     fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
@@ -61,7 +61,7 @@ server {
     # The prefix must match the baseurlpath configuration option
     location ~ ^(?<prefix>/simplesaml_imagehub)(?<phpfile>.+?\.php)(?<pathinfo>/.*)?$ {
       include fastcgi_params;
-      fastcgi_pass unix:/run/php/php{{ php.version }}-fpm-imagehub.sock;
+      fastcgi_pass unix:/run/php/php{{ php.version }}-fpm-{{ vhost.php_socket_name }}.sock;
       fastcgi_index index.php;
       fastcgi_param SCRIPT_FILENAME $document_root$phpfile;
 
