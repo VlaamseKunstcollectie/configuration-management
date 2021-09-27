@@ -10,13 +10,13 @@
     - mariadb
 
 - name: Install php-fpm and mongodb
-  hosts: datahub,datahub_dashboard
+  hosts: datahub,datahub_dashboard,resourcespace,cantaloupe,imagehub
   roles:
     - php-fpm
     - mongodb
 
 - name: Install nginx
-  hosts: datahub,datahub_dashboard,arthub
+  hosts: datahub,datahub_dashboard,arthub,resourcespace,cantaloupe,imagehub
   roles:
     - nginx
 

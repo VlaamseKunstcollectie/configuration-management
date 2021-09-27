@@ -26,6 +26,8 @@ datahub:
     port: 27017
     database: datahub
     username: datahub
+  php:
+    memory_limit: 512M
   mailer:
     transport: gmail
   admin:

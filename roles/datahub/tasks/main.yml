@@ -183,6 +183,8 @@
     apply:
       vars:
         pool_name: "{{ datahub.nginx.name }}"
+        php_admin_values:
+          memory_limit: "{{ datahub.php.memory_limit }}"
 
 - name: Include datahub nginx vhost
   include_role:

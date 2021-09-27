@@ -11,7 +11,7 @@
     name:
       - mariadb-server
 
-- name: Install python-pymysql and python-setuptools when python 2.*
+- name: Install python-pymysql when python 2.*
   apt:
     name:
       - python-pymysql
