@@ -5,7 +5,7 @@
     - common
 
 - name: Install mariadb
-  hosts: resourcespace
+  hosts: resourcespace,imagehub
   roles:
     - mariadb
 
