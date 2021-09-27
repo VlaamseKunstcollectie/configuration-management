@@ -9,10 +9,14 @@
   roles:
     - mariadb
 
-- name: Install php-fpm and mongodb
+- name: Install php-fpm
   hosts: datahub,datahub_dashboard,resourcespace,cantaloupe,imagehub
   roles:
     - php-fpm
+
+- name: Install mongodb
+  hosts: datahub,datahub_dashboard
+  roles:
     - mongodb
 
 - name: Install nginx
