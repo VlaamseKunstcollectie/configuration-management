@@ -1,0 +1,36 @@
+---
+- name: Check if LetsEncrypt certificate folder exists
+  stat:
+    path: "/etc/letsencrypt/live/{{ letsencrypt_vhost.server_name }}/"
+  register: stat_result
+
+- name: Install LetsEncrypt certificate
+  command: "certbot certonly -n --agree-tos --email {{ letsencrypt_email }} --webroot -w /var/lib/letsencrypt/ --cert-name {{ letsencrypt_vhost.server_name }} -d {{ letsencrypt_vhost.server_name }}"
+  when: not stat_result.stat.exists
+
+- name: Check if LetsEncrypt certificate folder exists
+  stat:
+    path: "/etc/letsencrypt/live/{{ letsencrypt_vhost.server_name }}/"
+  register: stat_result
+
+- name: Set key and chain location
+  set_fact:
+    letsencrypt_key_paths:
+      ssl:
+        cert: "/etc/letsencrypt/live/{{ letsencrypt_vhost.server_name }}/fullchain.pem"
+        key: "/etc/letsencrypt/live/{{ letsencrypt_vhost.server_name }}/privkey.pem"
+        chain: "/etc/letsencrypt/live/{{ letsencrypt_vhost.server_name }}/fullchain.pem"
+  when: stat_result.stat.exists
+
+- name: Append ssl certificate files to vhost
+  set_fact:
+    vhost: "{{ letsencrypt_vhost | combine(letsencrypt_key_paths, recursive=True) }}"
+
+- name: Redeploy nginx vhost
+  include_role:
+    name: nginx
+    tasks_from: create_vhost.yml
+    apply:
+      vars:
+        nginx_vhost: "{{ vhost }}"
+  when: stat_result.stat.exists

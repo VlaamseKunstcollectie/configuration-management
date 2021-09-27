@@ -1,0 +1,80 @@
+---
+- name: Install subversion, php-gd, php-mysql, exiftool, imagemagick, inkscape, ghostscript, antiword, postfix, libimage-exiftool-perl, ffmpeg, poppler-utils, wget and libvips
+  apt:
+    name:
+      - subversion
+      - php{{ php.version }}-gd
+      - php{{ php.version }}-mysql
+      - exiftool
+      - imagemagick
+      - inkscape
+      - ghostscript
+      - antiword
+      - postfix
+      - libimage-exiftool-perl
+      - ffmpeg
+      - poppler-utils
+      - wget
+      - libvips
+
+- name: Clone ResourceSpace
+  subversion:
+    repo: "{{ resourcespace.repo_url }}/{{ resourcespace.version }}"
+    dest: "{{ resourcespace.repo_dir }}"
+
+- name: Create the iiif_ptif folder inside the filestore
+  file:
+    path: "{{ resourcespace.repo_dir }}/filestore/iiif_ptif/"
+    state: directory
+    recurse: true
+    owner: "{{ php.user }}"
+    group: "{{ php.group }}"
+
+- name: Chown all files and folders to the www user
+  file:
+    path: "{{ resourcespace.repo_dir }}"
+    state: directory
+    recurse: true
+    owner: "{{ php.user }}"
+    group: "{{ php.group }}"
+
+- name: Make sure ResourceSpace database is present
+  mysql_db:
+    name: "{{ resourcespace.mysql.database }}"
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    login_password: "{{ mariadb_root_password }}"
+
+- name: Create ResourceSpace user in MariaDB
+  mysql_user:
+    name: "{{ resourcespace.mysql.username }}"
+    password: "{{ resourcespace.mysql.password }}"
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    login_password: "{{ mariadb_root_password }}"
+    priv: "{{ resourcespace.mysql.database }}.*:ALL,GRANT"
+    check_implicit_admin: true
+
+- name: Create ResourceSpace read-only user in MariaDB
+  mysql_user:
+    name: "{{ resourcespace.mysql.ro_username }}"
+    password: "{{ resourcespace.mysql.ro_password }}"
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    login_password: "{{ mariadb_root_password }}"
+    priv: "{{ resourcespace.mysql.database }}.*:SELECT"
+    check_implicit_admin: true
+
+- name: Include resourcespace php-fpm pool
+  include_role:
+    name: php-fpm
+    tasks_from: create_pool.yml
+    apply:
+      vars:
+        pool_name: "{{ resourcespace.nginx.name }}"
+        php_admin_values:
+          memory_limit: "{{ resourcespace.php.memory_limit }}" 
+          post_max_size: "{{ resourcespace.php.post_max_size }}"
+          upload_max_filesize: "{{ resourcespace.php.upload_max_filesize }}"
+
+- name: Set fact to inform imagehub that ResourceSpace is present
+  set_fact:
+    is_resourcespace: true
+

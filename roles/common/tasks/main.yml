@@ -1,0 +1,26 @@
+---
+- name: Update apt repositories
+  apt:
+    update_cache: yes
+
+# We also need python-pip, python-virtualenv and python-setutools to work on Debian 10 (and other systems that have python 2 installed)
+- name: Install git, pip, virtualenv, setuptools, software-properties-common, dirmngr, apt-transport-https and ca-certificates
+  apt:
+    name:
+      - git
+#      - python-pip
+#      - python-virtualenv
+#      - python-setuptools
+      - python3-pip
+      - python3-virtualenv
+      - python3-setuptools
+      - software-properties-common
+      - dirmngr
+      - apt-transport-https
+      - ca-certificates
+
+- name: Create application user if it does not yet exist
+  user:
+    name: "{{ application_user }}"
+    password: "{{ application_password | password_hash('sha512') }}"
+    state: present
