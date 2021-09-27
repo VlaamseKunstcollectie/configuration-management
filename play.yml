@@ -1,8 +1,13 @@
 ---
 - name: Install common packages
-  hosts: datahub,datahub_pipeline,datahub_dashboard,arthub
+  hosts: datahub,datahub_pipeline,datahub_dashboard,arthub,resourcespace,cantaloupe,imagehub
   roles:
     - common
+
+- name: Install mariadb
+  hosts: resourcespace
+  roles:
+    - mariadb
 
 - name: Install php-fpm and mongodb
   hosts: datahub,datahub_dashboard
@@ -35,13 +40,33 @@
   roles:
     - arthub
 
+- name: Install ResourceSpace
+  hosts: resourcespace
+  roles:
+    - resourcespace
+
+- name: Install cantaloupe
+  hosts: cantaloupe
+  roles:
+    - cantaloupe
+
+- name: Install Imagehub
+  hosts: imagehub
+  roles:
+    - imagehub
+
+- name: Setup ResourceSpace
+  hosts: resourcespace
+  roles:
+    - resourcespace_setup
+
 - name: Set up cronjob
-  hosts: datahub_pipeline,datahub_dashboard,arthub
+  hosts: datahub_pipeline,datahub_dashboard,arthub,imagehub
   roles:
     - cron
 
 - name: Set up SSL Certificates through LetsEncrypt
-  hosts: datahub,datahub_dashboard,arthub
+  hosts: datahub,datahub_dashboard,arthub,imagehub
   roles:
     - name: certbot
       when: letsencrypt_vhosts | length > 0
