@@ -1,0 +1,29 @@
+---
+- name: Install certbot
+  apt:
+    name:
+      - certbot
+
+- name: Make sure lib, log and work dir exist
+  file:
+    path: "{{ item.path }}"
+    state: directory
+    recurse: true
+    owner: "{{ application_user }}"
+    group: "{{ application_user }}"
+    mode: "{{ item.mode }}"
+  with_items:
+    - path: "/etc/letsencrypt/"
+      mode: "u+rw,go+r,go-w"
+    - path: "/var/lib/letsencrypt/"
+      mode: "u+rw,go+r,go-w"
+    - path: "/var/log/letsencrypt/"
+      mode: "u+rw,go-rwx"
+
+- name: Install certificates for each domain
+  include_tasks:
+    file: install_cert.yml
+    apply:
+      vars:
+        letsencrypt_vhost: "{{ item }}"
+  with_items: "{{ letsencrypt_vhosts }}"

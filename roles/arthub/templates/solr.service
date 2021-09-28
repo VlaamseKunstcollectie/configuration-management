@@ -1,0 +1,19 @@
+[Unit]
+Description=Solr server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User={{ application_user }}
+Group={{ application_user }}
+#EnvironmentFile=/etc/default/solr
+WorkingDirectory={{ arthub.dir }}
+ExecStart={{ arthub.dir }}/bin/bundle exec rake solr:start
+ExecStop={{ arthub.dir }}/bin/bundle exec rake solr:stop
+KillMode=process
+Restart=on-failure
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+

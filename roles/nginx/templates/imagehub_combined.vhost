@@ -1,0 +1,156 @@
+server {
+{% for listen_port in listen_ports %}
+  listen      {{ listen_port }}{{ ' ssl' if listen_port == '443' else '' }};
+{% endfor %}
+  server_name {{ vhost.server_name }};
+
+  access_log  /var/log/nginx/{{ vhost.name }}_access.log combined;
+  error_log   /var/log/nginx/{{ vhost.name }}_error.log;
+
+{% if '443' in listen_ports %}
+  ssl_certificate {{ vhost.ssl.cert }};
+  ssl_certificate_key {{ vhost.ssl.key }};
+  ssl_trusted_certificate {{ vhost.ssl.chain }};
+{% endif %}
+
+{% if dam_document_root is defined %}
+  root        {{ dam_document_root }};
+{% else %}
+  root        {{ vhost.document_root }};
+{% endif %}
+
+{% if '80' in listen_ports %}
+  # Allow LetsEncrypt domain validation
+  location ~ ^/\.well-known/acme-challenge/ {
+    default_type text/plain;
+    root /var/lib/letsencrypt;
+  }
+{% endif %}
+
+#  location / {
+    index index.php index.html index.htm;
+#    try_files $uri /{{ vhost.index }}$is_args$args;
+#  }
+
+{% if vhost.document_root is defined %}
+  # Pass requests for the Imagehub to the appropriate PHP file
+  location ~ /iiif/2/.*(manifest\.json|collection/top) {
+    add_header Access-Control-Allow-Origin *;
+    try_files $uri /{{ vhost.index }}$is_args$args;
+  }
+
+  location ~ /imagehub/(authenticate|authcheck).* {
+    add_header Access-Control-Allow-Origin *;
+    try_files $uri /{{ vhost.index }}$is_args$args;
+  }
+
+  location ~ ^/imagehub\.php(/|$) {
+    alias {{ vhost.document_root }}/public;
+
+    fastcgi_pass unix:/run/php/php{{ php.version }}-fpm-{{ vhost.php_socket_name }}.sock;
+    fastcgi_split_path_info ^(.+\.php)(/.*)$;
+    include fastcgi_params;
+    fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+    fastcgi_param DOCUMENT_ROOT $realpath_root;
+    internal;
+  }
+
+  location ^~ /simplesaml_imagehub {
+    alias {{ vhost.document_root }}/vendor/simplesamlphp/simplesamlphp/www;
+
+    # The prefix must match the baseurlpath configuration option
+    location ~ ^(?<prefix>/simplesaml_imagehub)(?<phpfile>.+?\.php)(?<pathinfo>/.*)?$ {
+      include fastcgi_params;
+      fastcgi_pass unix:/run/php/php{{ php.version }}-fpm-{{ vhost.php_socket_name }}.sock;
+      fastcgi_index index.php;
+      fastcgi_param SCRIPT_FILENAME $document_root$phpfile;
+
+      # Must be prepended with the baseurlpath
+      fastcgi_param SCRIPT_NAME /simplesaml_imagehub$phpfile;
+
+      fastcgi_param PATH_INFO $pathinfo if_not_empty;
+    }
+  }
+{% endif %}
+
+{% if image_server_upstream is defined %}
+  # Pass all other requests for /iiif/.* to Cantaloupe
+  location ~ ^/iiif/2/(private|public).*$ {
+    proxy_redirect     off;
+    proxy_set_header   Host              $host;
+    proxy_set_header   X-Real-IP         $remote_addr;
+    proxy_set_header   X-Forwarded-Proto $scheme;
+    proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+    proxy_pass         {{ image_server_upstream }};
+  }
+{% endif %}
+
+{% if dam_document_root is defined %}
+  location ^~ /simplesaml {
+    alias {{ dam_document_root }}/plugins/simplesaml/lib/www;
+
+    # The prefix must match the baseurlpath configuration option
+    location ~ ^(?<prefix>/simplesaml)(?<phpfile>.+?\.php)(?<pathinfo>/.*)?$ {
+      include fastcgi_params;
+      fastcgi_pass unix:/run/php/php{{ php.version }}-fpm-{{ dam_php_socket_name }}.sock;
+      fastcgi_index index.php;
+      fastcgi_param SCRIPT_FILENAME $document_root$phpfile;
+
+      # Must be prepended with the baseurlpath
+      fastcgi_param SCRIPT_NAME /simplesaml$phpfile;
+
+      fastcgi_param PATH_INFO $pathinfo if_not_empty;
+    }
+  }
+
+  location ~ \.php$ {
+    try_files $uri =404;
+    fastcgi_pass unix:/run/php/php{{ php.version }}-fpm-{{ dam_php_socket_name }}.sock;
+    fastcgi_param SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+    fastcgi_param SCRIPT_NAME      $fastcgi_script_name;
+    include /etc/nginx/fastcgi_params;
+    fastcgi_read_timeout 300;
+    client_max_body_size 50000M;
+  }
+{% endif %}
+
+  # Deny access to hidden files & dirs.
+  location ~ /\. {
+    access_log off;
+    log_not_found off;
+    return 404;
+    deny all;
+  }
+
+  # Set proper expiration times for static files & don't log them.
+  location ~* \.(jpe?g|gif|png|bmp|svg|css|js|ico|xml|html|htm|swf|htc|cur|ttf|woff2?)$ {
+    try_files $uri =404;
+    access_log off;
+    log_not_found off;
+    expires 7d;
+    add_header Pragma public;
+    add_header Cache-Control "public, must-revalidate, proxy-revalidate";
+  }
+}
+
+{% if '80' not in listen_ports %}
+server {
+  listen      80;
+  server_name {{ vhost.server_name }};
+
+  # Allow LetsEncrypt domain validation
+  location ~ ^/\.well-known/acme-challenge/ {
+    default_type text/plain;
+    root /var/lib/letsencrypt;
+  }
+
+  location / {
+    # See https://www.nginx.com/resources/wiki/start/topics/tutorials/config_pitfalls/#taxing-rewrites
+    # Good
+    #rewrite ^ https://$host$request_uri? permanent;
+    # Better
+    return 301 https://$host$request_uri;
+  }
+}
+{% endif %}
+

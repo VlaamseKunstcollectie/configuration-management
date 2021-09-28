@@ -1,0 +1,20 @@
+---
+- name: Add apt key if Debian 10 or 11
+  apt_key:
+    url: "https://packages.sury.org/php/apt.gpg"
+  when: ansible_facts.distribution == 'Debian' and (ansible_facts.distribution_major_version == '10' or ansible_facts.distribution_major_version == '11')
+
+- name: Add Debian 10 apt repository
+  apt_repository:
+    repo: "deb https://packages.sury.org/php/ buster main"
+  when: ansible_facts.distribution == 'Debian' and ansible_facts.distribution_major_version == '10'
+
+- name: Add Debian 11 apt repository
+  apt_repository:
+    repo: "deb https://packages.sury.org/php/ bullseye main"
+  when: ansible_facts.distribution == 'Debian' and ansible_facts.distribution_major_version == '11'
+
+- name: Add Ubuntu 20 apt repository
+  apt_repository:
+    repo: "ppa:ondrej/php"
+  when: ansible_facts.distribution == 'Ubuntu' and ansible_facts.distribution_major_version == '20'

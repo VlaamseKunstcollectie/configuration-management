@@ -1,0 +1,14 @@
+{
+    "createdAt": ISODate(),
+    "email": "{{ datahub.admin.email }}",
+    "enabled": true,
+    "firstName": "{{ datahub.admin.first_name }}",
+    "lastName": "{{ datahub.admin.last_name }}",
+    "password": "{{ datahub.admin.password | password_hash('bcrypt') }}",
+    "roles": [
+        "ROLE_CONSUMER",
+        "ROLE_ADMIN"
+    ],
+    "updatedAt": ISODate(),
+    "username": "{{ datahub.admin.username }}"
+}

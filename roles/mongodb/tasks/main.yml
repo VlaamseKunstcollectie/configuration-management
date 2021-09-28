@@ -1,0 +1,30 @@
+---
+- name: Add apt repository
+  include_tasks: add_apt_repository.yml
+
+- name: Install mongodb-org
+  apt:
+    name: mongodb-org
+  notify: Restart mongodb
+
+- name: Flush handlers
+  meta: flush_handlers
+
+- name: Install pymongo
+  pip:
+    name:
+      - pymongo
+
+- name: Setup MongoDB root user
+  community.mongodb.mongodb_user:
+    database: admin
+    name: "{{ datahub.mongodb.root_username }}"
+    password: "{{ datahub.mongodb.root_password }}"
+    roles: root
+  become_user: "{{ application_user }}"
+
+- name: Enable mongod
+  service:
+    name: mongod
+    state: started
+    enabled: yes

@@ -1,0 +1,25 @@
+# This file is a "template" of what your parameters.yml file should look like
+# Set parameters here that may be different on each deployment target of the app, e.g. development, staging, production.
+# https://symfony.com/doc/current/best_practices/configuration.html#infrastructure-related-configuration
+parameters:
+    # Name of the application as shown on the homepage
+    service_name: {{ datahub_dashboard.service_name }}
+
+    # The default locale (language) of the application (available locales: en|nl)
+    locale: nl
+
+    # Email address where the admin of the application can be reached
+    service_address: {{ datahub_dashboard.service_email }}
+
+    # URL of the OAI-PMH endpoint for metadata harvesting
+    datahub_url: {{ datahub_dashboard.datahub_url }}
+
+    # MongoDB connection string & database
+    mongodb_server: mongodb://{{ datahub_dashboard.mongodb.host }}:{{ datahub_dashboard.mongodb.port }}/{{ datahub_dashboard.mongodb.database }}
+    mongodb_database: {{ datahub_dashboard.mongodb.database }}
+    mongodb_user: {{ datahub_dashboard.mongodb.username }}
+    mongodb_password: {{ datahub_dashboard.mongodb.password }}
+
+    # A secret key that's used to generate certain security-related tokens
+    secret: {{ datahub_dashboard.secret_token }}
+

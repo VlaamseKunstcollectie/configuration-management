@@ -1,0 +1,218 @@
+---
+- name: Install php-curl, php-sqlite3
+  apt:
+    name:
+      - php{{ php.version }}-curl
+      - php{{ php.version }}-sqlite3
+
+- name: Make sure Imagehub database is present
+  mysql_db:
+    name: "{{ imagehub.mysql.database }}"
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    login_password: "{{ mariadb_root_password }}"
+
+- name: Create Imagehub user in MariaDB
+  mysql_user:
+    name: "{{ imagehub.mysql.username }}"
+    password: "{{ imagehub.mysql.password }}"
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    login_password: "{{ mariadb_root_password }}"
+    priv: "{{ imagehub.mysql.database }}.*:ALL,GRANT"
+    check_implicit_admin: true
+
+- name: Create repo folder
+  file:
+    path: "{{ imagehub.repo_dir }}"
+    state: directory
+    recurse: true
+    owner: "{{ application_user }}"
+    group: "{{ application_user }}"
+
+- name: Checkout imagehub repo
+  git:
+    repo: "{{ imagehub.repo_url }}"
+    dest: "{{ imagehub.repo_dir }}/repo/"
+    force: true
+    version: "{{ imagehub.branch }}"
+  become_user: "{{ application_user }}"
+
+- name: Create necessary Imagehub tables
+  mysql_db:
+    name: "{{ imagehub.mysql.database }}"
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    login_user: "{{ imagehub.mysql.username }}"
+    login_password: "{{ imagehub.mysql.password }}"
+    state: import
+    target: "{{ imagehub.repo_dir }}/repo/imagehub_tables.sql"
+
+- name: Create shared folders
+  file:
+    path: "{{ imagehub.repo_dir }}/shared/{{ item }}/"
+    state: directory
+    recurse: true
+    mode: "775"
+    owner: "{{ application_user }}"
+    group: "{{ php.group }}"
+  with_items:
+    - cache
+    - log
+    - vendor
+
+- name: Delete existing shared folders
+  file:
+    path: "{{ imagehub.repo_dir }}/repo/{{ item }}"
+    state: absent
+  with_items:
+    - var/cache
+    - var/log
+    - vendor
+  become_user: "{{ application_user }}"
+
+- name: Make sure var folder exists in repo
+  file:
+    path: "{{ imagehub.repo_dir }}/repo/var"
+    state: directory
+    recurse: true
+    owner: "{{ application_user }}"
+    group: "{{ application_user }}"
+
+- name: Link shared folders
+  file:
+    src: "{{ imagehub.repo_dir }}/shared/{{ item.src }}"
+    dest: "{{ imagehub.repo_dir }}/repo/{{ item.dest }}"
+    state: link
+    force: true
+  with_items:
+    - src: cache
+      dest: var/cache
+    - src: log
+      dest: var/log
+    - src: vendor
+      dest: vendor
+  become_user: "{{ application_user }}"
+
+- name: Copy .env for imagehub
+  template:
+    src: .env
+    dest: "{{ imagehub.repo_dir }}/repo/.env"
+  become_user: "{{ application_user }}"
+
+- name: Copy imagehub.yaml for imagehub
+  include_tasks:
+    file: place_config.yml
+    apply:
+      vars:
+        rs_api_key: placeholder
+
+- name: Link imagehub repo
+  file:
+    src: "{{ imagehub.repo_dir }}/repo/"
+    dest: "{{ imagehub.dir }}"
+    state: link
+
+- name: Install imagehub through composer
+  command: composer install
+  args:
+    chdir: "{{ imagehub.dir }}"
+  become_user: "{{ application_user }}"
+
+- name: Chown cache and log folders
+  file:
+    path: "{{ imagehub.repo_dir }}/shared/{{ item }}/"
+    state: directory
+    recurse: true
+    mode: "g+w"
+    owner: "{{ application_user }}"
+    group: "{{ php.group }}"
+  with_items:
+    - cache
+    - log
+
+- name: Set nginx vhost for cantaloupe if separate domain
+  include_role:
+    name: nginx
+    tasks_from: create_vhost.yml
+    apply:
+      vars:
+        nginx_vhost:
+          server_name: "{{ cantaloupe.nginx.server_name }}"
+          name: "{{ cantaloupe.nginx.name }}"
+          type: proxy
+          upstream: "{{ cantaloupe.nginx.upstream }}"
+          ssl: "{{ cantaloupe.nginx.ssl }}"
+          redirect_to_https: "{{ cantaloupe.nginx.redirect_to_https }}"
+  when: is_cantaloupe and (cantaloupe.nginx.server_name != imagehub.nginx.server_name and cantaloupe.nginx.server_name != resourcespace.nginx.server_name)
+
+- name: Add cantaloupe vhost for imagehub
+  set_fact:
+    image_server_upstream: "{{ cantaloupe.nginx.upstream }}"
+  when: is_cantaloupe and (cantaloupe.nginx.server_name == imagehub.nginx.server_name or cantaloupe.nginx.server_name == resourcespace.nginx.server_name)
+
+- name: Set nginx vhost for ResourceSpace if separate domain
+  include_role:
+    name: nginx
+    tasks_from: create_vhost.yml
+    apply:
+      vars:
+        nginx_vhost:
+          server_name: "{{ resourcespace.nginx.server_name }}"
+          name: "{{ resourcespace.nginx.name }}"
+          type: simplesamlphp
+          document_root: "{{ resourcespace.nginx.document_root }}"
+          index: index.php
+          php_socket_name: "{{ resourcespace.nginx.name }}"
+          ssl: "{{ datahub.nginx.ssl }}"
+          redirect_to_https: "{{ resourcespace.nginx.redirect_to_https }}"
+  when: is_resourcespace and (resourcespace.nginx.server_name != imagehub.nginx.server_name and cantaloupe.nginx.server_name != resourcespace.nginx.server_name)
+
+- name: Add ResourceSpace vhost for imagehub
+  set_fact:
+    dam_document_root: "{{ resourcespace.nginx.document_root }}"
+    dam_php_socket_name: "{{ resourcespace.nginx.name }}"
+  when: is_resourcespace and (resourcespace.nginx.server_name == imagehub.nginx.server_name or cantaloupe.nginx.server_name == resourcespace.nginx.server_name)
+
+- name: Include imagehub php-fpm pool
+  include_role:
+    name: php-fpm
+    tasks_from: create_pool.yml
+    apply:
+      vars:
+        pool_name: "{{ imagehub.nginx.name }}"
+
+- name: Add nginx vhost for imagehub if separate domain
+  include_role:
+    name: nginx
+    tasks_from: create_vhost.yml
+    apply:
+      vars:
+        nginx_vhost:
+          server_name: "{{ imagehub.nginx.server_name }}"
+          name: "{{ imagehub.nginx.name }}"
+          type: simplesamlphp
+          document_root: "{{ imagehub.nginx.document_root }}"
+          index: "{{ imagehub.nginx.index }}"
+          php_socket_name: "{{ imagehub.nginx.name }}"
+          ssl: "{{ datahub.nginx.ssl }}"
+          redirect_to_https: "{{ imagehub.nginx.redirect_to_https }}"
+  when: is_resourcespace and is_cantaloupe and resourcespace.nginx.server_name != imagehub.nginx.server_name and cantaloupe.nginx.server_name != imagehub.nginx.server_name
+
+- name: Create nginx vhosts for imagehub, image server and DAM (or 2 of these 3)
+  include_role:
+    name: nginx
+    tasks_from: create_vhost.yml
+    apply:
+      vars:
+        nginx_vhost:
+          server_name: "{{ imagehub.nginx.server_name }}"
+          name: "{{ imagehub.nginx.name }}"
+          type: imagehub_combined
+          document_root: "{{ imagehub.nginx.document_root }}"
+          index: "{{ imagehub.nginx.index }}"
+          php_socket_name: "{{ imagehub.nginx.name }}"
+          ssl: "{{ imagehub.nginx.ssl }}"
+          redirect_to_https: "{{ imagehub.nginx.redirect_to_https }}"
+  when: is_resourcespace and is_cantaloupe and (resourcespace.nginx.server_name == imagehub.nginx.server_name or cantaloupe.nginx.server_name == imagehub.nginx.server_name or cantaloupe.nginx.server_name == resourcespace.nginx.server_name)
+
+- name: Provide crontab entry for daily update of ResourceSpace data and generation of manifests
+  set_fact:
+    cronjobs: "{{ cronjobs }} + [  'php {{ imagehub.dir }}/bin/console app:datahub-to-resourcespace', 'php {{ imagehub.dir }}/bin/console app:generate-iiif-manifests' ]"

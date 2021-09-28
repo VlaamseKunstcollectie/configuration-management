@@ -1,0 +1,17 @@
+[Unit]
+Description=Arthub server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User={{ application_user }}
+Group={{ application_user }}
+EnvironmentFile=/etc/default/arthub
+WorkingDirectory={{ arthub.dir }}
+ExecStart={{ arthub.dir }}/bin/rails server --binding=127.0.0.1 -e {{ arthub.environment }}
+KillMode=process
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+

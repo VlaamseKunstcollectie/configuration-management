@@ -1,0 +1,85 @@
+---
+- name: Create cantaloupe folder
+  file:
+    path: "{{ cantaloupe.dir }}"
+    state: directory
+    recurse: true
+    owner: "{{ application_user }}"
+    group: "{{ application_user }}"
+
+- name: Create cantaloupe repo folder
+  file:
+    path: "{{ cantaloupe.repo_dir }}"
+    state: directory
+    recurse: true
+    owner: "{{ application_user }}"
+    group: "{{ application_user }}"
+
+- name: Download and unzip cantaloupe
+  unarchive:
+    remote_src: yes
+    src: "https://github.com/cantaloupe-project/cantaloupe/releases/download/v{{ cantaloupe.version }}/cantaloupe-{{ cantaloupe.version }}.zip"
+    dest: "{{ cantaloupe.repo_dir }}"
+  become_user: "{{ application_user }}"
+
+- name: Place cantaloupe files in correct folder
+  copy:
+    src: "{{ cantaloupe.repo_dir }}/cantaloupe-{{ cantaloupe.version }}/"
+    dest: "{{ cantaloupe.dir }}/"
+    remote_src: yes
+  become_user: "{{ application_user }}"
+
+- name: Create cantaloupe_delegate repo folder
+  file:
+    path: "{{ cantaloupe.delegate_script.repo_dir }}"
+    state: directory
+    recurse: true
+    owner: "{{ application_user }}"
+    group: "{{ application_user }}"
+  when: cantaloupe.delegate_script.enabled
+
+- name: Checkout cantaloupe_delegate repo
+  git:
+    repo: "{{ cantaloupe.delegate_script.repo_url }}"
+    dest: "{{ cantaloupe.delegate_script.repo_dir }}/repo/"
+    force: true
+    version: "{{ cantaloupe.delegate_script.branch }}"
+  become_user: "{{ application_user }}"
+  when: cantaloupe.delegate_script.enabled
+
+- name: Copy delegate file to cantaloupe dir
+  copy:
+    src: "{{ cantaloupe.delegate_script.repo_dir }}/repo/{{ cantaloupe.delegate_script.script_name }}"
+    dest: "{{ cantaloupe.dir }}/"
+    remote_src: yes
+  become_user: "{{ application_user }}"
+  when: cantaloupe.delegate_script.enabled
+
+- name: Set cantaloupe delegate config
+  template:
+    src: delegate_config.yml
+    dest: "{{ cantaloupe.dir }}/"
+  become_user: "{{ application_user }}"
+  when: cantaloupe.delegate_script.enabled
+
+- name: Set cantaloupe properties
+  template:
+    src: cantaloupe.properties
+    dest: "{{ cantaloupe.dir }}/"
+  become_user: "{{ application_user }}"
+
+- name: Create cantaloupe service
+  template:
+    src: cantaloupe.service
+    dest: /etc/systemd/system/{{ cantaloupe.service_name }}.service
+
+- name: Enable cantaloupe
+  systemd:
+    name: "{{ cantaloupe.service_name }}"
+    enabled: yes
+    daemon_reload: yes
+    state: restarted
+
+- name: Set fact to inform imagehub that cantaloupe is present
+  set_fact:
+    is_cantaloupe: true

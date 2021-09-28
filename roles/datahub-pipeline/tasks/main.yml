@@ -1,0 +1,156 @@
+---
+- name: Set pipeline datahub_url if not specified
+  set_fact:
+    datahub_pipeline:
+      datahub_url: "{{ datahub_pipeline.datahub_protocol }}://{{ datahub.nginx.server_name }}"
+    cacheable: yes
+  when: datahub_pipeline.datahub_url is undefined
+  become_user: "{{ application_user }}"
+
+- name: Remove trailing slashes from paths
+  set_fact:
+    datahub_pipeline:
+      dir: "{{ datahub_pipeline.dir | regex_replace('\\/$', '') }}"
+      fixes:
+        repo_dir: "{{ datahub_pipeline.fixes.repo_dir | regex_replace('\\/$', '') }}"
+      authority_files:
+        repo_dir: "{{ datahub_pipeline.authority_files.repo_dir | regex_replace('\\/$', '') }}"
+  become_user: "{{ application_user }}"
+
+- name: Initialize datahub_pipeline_paths array
+  set_fact:
+    datahub_pipeline_fix_file_paths: {}
+
+- name: Set absolute paths for fix file paths and store them in the new array
+  set_fact:
+    datahub_pipeline_fix_file_paths:
+      "{{ datahub_pipeline_fix_file_paths 
+        | combine({ item.shorthand: item.fix_file_path | regex_replace('^(.*)$', datahub_pipeline.dir + '/fixes/\\1') if not item.fix_file_path.startswith('/') else item.fix_file_path }) }}"
+  with_items:
+    - "{{ datahub_pipeline.institutions }}"
+
+- name: Install perl
+  apt:
+    name:
+      - perl
+
+- name: Install apt packages
+  apt:
+    name:
+      - sqlite3
+      - cpanminus
+      - libssl-dev
+      - libxslt1-dev
+      - libxml2-dev
+      - make
+      - build-essential
+      - expat
+      - libexpat1
+      - libexpat1-dev
+      - libcrypt-ssleay-perl
+
+- name: Install libmysqlclient-dev if Ubuntu
+  apt:
+    name:
+      - libmysqlclient-dev
+#  when: ansible_facts.distribution == 'Ubuntu' and ansible_facts.distribution_major_version == '18'
+  when: ansible_facts.distribution == 'Ubuntu'
+
+- name: Install default-libmysqlclient-dev if Debian 10 or 11
+  apt:
+    name:
+      - default-libmysqlclient-dev
+  when: ansible_facts.distribution == 'Debian' and (ansible_facts.distribution_major_version == '10' or ansible_facts.distribution_major_version == '11')
+
+- name: Install Catmandu
+  cpanm:
+    name: Catmandu
+  become_user: "{{ application_user }}"
+
+# Install without tests due to Catmandu::XML LibXSLT bug: https://rt.cpan.org/Public/Bug/Display.html?id=131156
+- name: Install Catmandu::XML
+  cpanm:
+    name: Catmandu::XML
+    notest: true
+  become_user: "{{ application_user }}"
+
+# Also install without tests
+- name: Install XML::Easy
+  cpanm:
+    name: XML::Easy
+    notest: true
+  become_user: "{{ application_user }}"
+
+- name: Install additional pipeline dependencies
+  cpanm:
+    name: "{{ item }}"
+  with_items:
+    - Catmandu::OAI
+    - Datahub::Factory
+    - Datahub::Factory::Cmd
+    - DBD::SQLite
+    - Datahub::Factory::Importer::EIZ
+    - Datahub::Factory::Exporter
+  become_user: "{{ application_user }}"
+
+- name: Create datahub-pipeline folder
+  file:
+    path: "{{ datahub_pipeline.dir }}"
+    state: directory
+    owner: "{{ application_user }}"
+    group: "{{ application_user }}"
+
+- name: Create repo folders
+  file: 
+    path: "{{ item }}"
+    state: directory
+    recurse: true 
+    owner: "{{ application_user }}"
+    group: "{{ application_user }}"
+  with_items:
+    - "{{ datahub_pipeline.fixes.repo_dir }}"
+    - "{{ datahub_pipeline.authority_files.repo_dir }}"
+
+- name: Checkout datahub-pipeline repos
+  git:
+    repo: "{{ item.url }}"
+    dest: "{{ item.dest }}/repo/"
+    force: true
+    version: "{{ item.branch }}"
+  become_user: "{{ application_user }}"
+  with_items:
+    - url: "{{ datahub_pipeline.fixes.repo_url }}"
+      dest: "{{ datahub_pipeline.fixes.repo_dir }}"
+      branch: "{{ datahub_pipeline.fixes.branch }}"
+    - url: "{{ datahub_pipeline.authority_files.repo_url }}"
+      dest: "{{ datahub_pipeline.authority_files.repo_dir }}"
+      branch: "{{ datahub_pipeline.authority_files.branch }}"
+
+- name: Override vocabularies.sh
+  template:
+    src: vocabularies.sh
+    dest: "{{ datahub_pipeline.fixes.repo_dir }}/repo/scripts/vocabularies.sh"
+  become_user: "{{ application_user }}"
+
+- name: Copy datahub.ini for datahub pipeline
+  template:
+    src: datahub.ini
+    dest: "{{ datahub_pipeline.dir }}/datahub.ini"
+  become_user: "{{ application_user }}"
+
+- name: Link fixes and authority_files repos
+  file:
+    src: "{{ item.src }}/repo/"
+    dest: "{{ item.dest }}"
+    state: link
+    owner: "{{ application_user }}"
+    group: "{{ application_user }}"
+  with_items:
+    - src: "{{ datahub_pipeline.fixes.repo_dir }}"
+      dest: "{{ datahub_pipeline.dir }}/fixes"
+    - src: "{{ datahub_pipeline.authority_files.repo_dir }}"
+      dest: "{{ datahub_pipeline.dir }}/authority_files"
+
+- name: Provide crontab entry for daily reload of datahub records
+  set_fact:
+    cronjobs: "{{ cronjobs }} + [ 'PERL5LIB=~{{ application_user }}/perl5/lib/perl5/ ~{{ application_user }}/perl5/bin/dhconveyor transport -p {{ datahub_pipeline.dir }}/datahub.ini -L1' ]"

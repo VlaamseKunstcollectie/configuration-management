@@ -1,0 +1,18 @@
+[Unit]
+Description=Cantaloupe image server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User={{ application_user }}
+Group={{ application_user }}
+WorkingDirectory={{ cantaloupe.dir }}
+ExecStart=java -Dcantaloupe.config={{ cantaloupe.dir }}/cantaloupe.properties {{ cantaloupe.jvm_args }} -jar {{ cantaloupe.dir }}/cantaloupe-{{ cantaloupe.version }}.jar
+StandardOutput=file:{{ cantaloupe.dir }}/output.log
+StandardError=file:{{ cantaloupe.dir }}/error.log
+KillMode=process
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+

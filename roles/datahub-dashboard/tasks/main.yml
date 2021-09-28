@@ -1,0 +1,136 @@
+---
+- name: Include MongoDB admin user role for datahub dashboard
+  include_role:
+    name: mongodb
+    tasks_from: create_admin_user.yml
+    apply:
+      vars:
+        db_user_name: datahub dashboard
+        db_login_user: "{{  datahub_dashboard.mongodb.root_username }}"
+        db_login_password: "{{ datahub_dashboard.mongodb.root_password }}"
+        db_database: "{{ datahub_dashboard.mongodb.database }}"
+        db_name: "{{ datahub_dashboard.mongodb.username }}"
+        db_password: "{{ datahub_dashboard.mongodb.password }}"
+
+- name: Store secret in vars
+  set_fact:
+    datahub_dashboard:
+      repo_dir: "{{ datahub_dashboard.repo_dir | regex_replace('\\/$', '') }}"
+      secret_token: "{{ lookup('password', '/dev/null chars=ascii_lowercase,digits length=32') }}"
+
+- name: Create repo folder
+  file: 
+    path: "{{ datahub_dashboard.repo_dir }}"
+    state: directory
+    recurse: true 
+    owner: "{{ application_user }}"
+    group: "{{ application_user }}"
+
+- name: Checkout datahub dashboard repo
+  git:
+    repo: "{{ datahub_dashboard.repo_url }}"
+    dest: "{{ datahub_dashboard.repo_dir }}/repo/"
+    force: true
+    version: "{{ datahub_dashboard.branch }}"
+  become_user: "{{ application_user }}"
+
+- name: Create shared folders
+  file:
+    path: "{{ datahub_dashboard.repo_dir }}/shared/{{ item }}/"
+    state: directory
+    recurse: true
+    mode: "775"
+    owner: "{{ application_user }}"
+    group: "{{ php.group }}"
+  with_items:
+    - cache
+    - logs
+    - sessions
+    - vendor
+
+- name: Delete existing shared folders
+  file:
+    path: "{{ datahub_dashboard.repo_dir }}/repo/{{ item }}"
+    state: absent
+  with_items:
+    - var/cache
+    - var/logs
+    - var/sessions
+    - vendor
+  become_user: "{{ application_user }}"
+
+- name: Link shared folders
+  file:
+    src: "{{ datahub_dashboard.repo_dir }}/shared/{{ item.src }}"
+    dest: "{{ datahub_dashboard.repo_dir }}/repo/{{ item.dest }}"
+    state: link
+    force: true
+  with_items:
+    - src: cache
+      dest: var/cache
+    - src: logs
+      dest: var/logs
+    - src: sessions
+      dest: var/sessions
+    - src: vendor
+      dest: vendor
+  become_user: "{{ application_user }}"
+
+- name: Copy parameters.yml for datahub dashboard
+  template:
+    src: parameters.yml
+    dest: "{{ datahub_dashboard.repo_dir }}/repo/app/config/parameters.yml"
+  become_user: "{{ application_user }}"
+
+- name: Link datahub dashboard repo
+  file:
+    src: "{{ datahub_dashboard.repo_dir }}/repo/"
+    dest: "{{ datahub_dashboard.dir }}"
+    state: link
+
+- name: Install datahub dashboard through composer
+  command: composer install
+  args:
+    chdir: "{{ datahub_dashboard.dir }}"
+  become_user: "{{ application_user }}"
+
+- name: Chown cache, logs and sessions folders
+  file:
+    path: "{{ datahub_dashboard.repo_dir }}/shared/{{ item }}/"
+    state: directory
+    recurse: true
+    mode: "g+w"
+    owner: "{{ application_user }}"
+    group: "{{ php.group }}"
+  with_items:
+    - cache
+    - logs
+    - sessions
+
+- name: Provide crontab entry for daily reload of dashboard records
+  set_fact:
+    cronjobs: "{{ cronjobs }} + [ 'php {{ datahub_dashboard.dir }}/bin/console app:fetch-data' ]"
+
+- name: Set up datahub dashboard php-fpm pool
+  include_role:
+    name: php-fpm
+    tasks_from: create_pool.yml
+    apply:
+      vars:
+        pool_name: "{{ datahub_dashboard.nginx.name }}"
+
+- name: Set up datahub dashboard nginx vhost
+  include_role:
+    name: nginx
+    tasks_from: create_vhost.yml
+    apply:
+      vars:
+        nginx_vhost:
+          server_name: "{{ datahub_dashboard.nginx.server_name }}"
+          name: "{{ datahub_dashboard.nginx.name }}"
+          type: php
+          document_root: "{{ datahub_dashboard.nginx.document_root }}"
+          index: "{{ datahub_dashboard.nginx.index }}"
+          php_socket_name: "{{ datahub_dashboard.nginx.name }}"
+          ssl: "{{ datahub_dashboard.nginx.ssl }}"
+          redirect_to_https: "{{ datahub_dashboard.nginx.redirect_to_https }}"

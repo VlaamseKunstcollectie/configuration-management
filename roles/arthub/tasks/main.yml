@@ -1,0 +1,226 @@
+---
+- name: Install openjdk-11-jre
+  apt:
+    name: openjdk-11-jre
+
+- name: Install sqlite3
+  apt:
+    name:
+      - sqlite3
+      - libsqlite3-dev
+
+- name: Install ImageMagick
+  apt:
+    name: imagemagick
+
+- name: Install ruby dependencies
+  apt:
+    name:
+      - libgdbm-dev
+      - libncurses5-dev
+      - automake
+      - libtool
+      - bison
+      - libffi-dev
+
+- name: Install ruby
+  apt:
+    name:
+      - ruby=1:2.*
+      - ruby-dev=1:2.*
+
+- name: Install bundler, rails and sqlite dependencies
+  community.general.gem:
+    name: "{{ item.name }}"
+    version: "{{ item.version }}"
+    state: present
+  with_items:
+    - name: bundler
+      version: 2.1.2
+    - name: rails
+      version: 5.1
+    - name: sqlite3
+      version: ''
+  become_user: "{{ application_user }}"
+
+- name: Create repo folder
+  file:
+    path: "{{ arthub.repo_dir }}"
+    state: directory
+    recurse: true
+    owner: "{{ application_user }}"
+    group: "{{ application_user }}"
+
+- name: Checkout arthub repo
+  git:
+    repo: "{{ arthub.repo_url }}"
+    dest: "{{ arthub.repo_dir }}/repo/"
+    force: true
+    version: "{{ arthub.branch }}"
+  become_user: "{{ application_user }}"
+  register: gitrc
+
+- name: Link arthub repo
+  file:
+    src: "{{ arthub.repo_dir }}/repo/"
+    dest: "{{ arthub.dir }}"
+    state: link
+    owner: "{{ application_user }}"
+    group: "{{ application_user }}" 
+
+- name: Install gems through bundler
+  community.general.bundler:
+    state: present
+    executable: "{{ arthub.dir }}/bin/bundle"
+    gemfile: "{{ arthub.dir }}/Gemfile"
+    deployment_mode: yes
+  become_user: "{{ application_user }}"
+
+- name: Initialize db/production.sqlite3
+  command: "{{ arthub.dir }}/bin/bundle exec rake db:migrate"
+  args:
+    chdir: "{{ arthub.dir }}"
+  environment:
+    RAILS_ENV: production
+  become_user: "{{ application_user }}"
+
+- name: Clean up solr installation
+  command: "{{ arthub.dir }}/bin/bundle exec rake solr:clean"
+  args:
+    chdir: "{{ arthub.dir }}"
+  become_user: "{{ application_user }}"
+  when: gitrc is changed
+
+- name: Copy solr.conf
+  template:
+    src: solr.conf
+    dest: /etc/security/limits.d/solr.conf
+
+- name: Create solr daemon
+  template:
+    src: solr.service
+    dest: /etc/systemd/system/solr.service
+  register: solr_template
+
+- name: Enable solr
+  systemd:
+    name: solr
+    daemon_reload: yes
+    enabled: yes
+
+- name: Stop solr on redeploying
+  systemd:
+    name: solr
+    state: stopped
+  when: gitrc is changed
+
+- name: Copy solr configuration
+  copy:
+    src: "{{ arthub.dir }}/solr-conf/blacklight-core/"
+    dest: "{{ arthub.dir }}/solr/server/solr/blacklight-core/"
+    remote_src: yes
+  become_user: "{{ application_user }}"
+  when: gitrc is changed
+
+- name: Restart solr on redeploy
+  systemd:
+    name: solr
+    state: started
+  when: gitrc is changed
+
+- name: Compile assets
+  command: "{{ arthub.dir }}/bin/bundle exec rake assets:precompile"
+  args:
+    chdir: "{{ arthub.dir }}"
+  become_user: "{{ application_user }}"
+  environment:
+    RAILS_ENV: "{{ arthub.environment }}"
+  when: gitrc is changed
+
+- name: Check if rails secret file exists
+  stat:
+    path: "{{ arthub.dir }}/.rails_secret.txt"
+  register: stat_result
+
+- name: Generate rails secret if it does not yet exists
+  command: "{{ arthub.dir }}/bin/rails secret"
+  args:
+    chdir: "{{ arthub.dir }}"
+  register: rails_secret_cmd
+  become_user: "{{ application_user }}"
+  when: not stat_result.stat.exists
+
+- name: Set rails secret from previously run command
+  set_fact:
+    rails_secret: "{{ rails_secret_cmd.stdout }}"
+  when: not stat_result.stat.exists
+
+- name: Fetch rails secret from file if it exists
+  command: "cat {{ arthub.dir }}/.rails_secret.txt"
+  register: rails_secret_file
+  when: stat_result.stat.exists
+
+- name: Set rails secret from previously run command
+  set_fact:
+    rails_secret: "{{ rails_secret_file.stdout }}"
+  when: stat_result.stat.exists
+
+- name: Copy rails secret into file
+  copy:
+    content: "{{ rails_secret }}"
+    dest: "{{ arthub.dir }}/.rails_secret.txt"
+  become_user: "{{ application_user }}"
+  when: not stat_result.stat.exists
+
+- name: Set rails environment file
+  copy:
+    dest: /etc/default/arthub
+    content: |
+      RAILS_SERVE_STATIC_FILES=true
+      SECRET_KEY_BASE={{ rails_secret }}
+
+- name: Create arthub daemon
+  template:
+    src: arthub.service
+    dest: /etc/systemd/system/arthub.service
+
+- name: Enable arthub
+  systemd:
+    name: arthub
+    daemon_reload: yes
+    enabled: yes
+
+- name: Restart rails if gitrc has changed
+  systemd: 
+    name: arthub
+    state: restarted
+  when: gitrc is changed
+
+- name: Include arthub nginx vhost
+  include_role:
+    name: nginx
+    tasks_from: create_vhost.yml
+    apply:
+      vars:
+        nginx_vhost:
+          server_name: "{{ arthub.nginx.server_name }}"
+          name: "{{ arthub.nginx.name }}"
+          type: proxy
+          upstream: http://localhost:3000
+          ssl: "{{ arthub.nginx.ssl }}"
+          redirect_to_https: "{{ arthub.nginx.redirect_to_https }}"
+
+- name: Provide crontab entry for daily reload of arthub records
+  set_fact:
+    cronjobs: "{{ cronjobs }} + [ '{{ item }}' ]"
+  with_items:
+    - "(cd {{ datahub_pipeline.dir }}/fixes/scripts; PERL5LIB=~{{ application_user }}/perl5/lib/perl5/ PATH=~{{ application_user }}/perl5/bin/:$PATH {{ datahub_pipeline.dir }}/fixes/scripts/arthub-index.sh -e http://{{ datahub.nginx.server_name }}/oai -l nl)"
+    - "(cd {{ datahub_pipeline.dir }}/fixes/scripts; PERL5LIB=~{{ application_user }}/perl5/lib/perl5/ PATH=~{{ application_user }}/perl5/bin/:$PATH {{ datahub_pipeline.dir }}/fixes/scripts/arthub-index.sh -e http://{{ datahub.nginx.server_name }}/oai -l en)"
+    - "(cd {{ arthub.dir }}; {{ arthub.dir }}/bin/bundle exec rake solr:stop)"
+    - "sleep 10"
+    - "rm -rf {{ arthub.dir }}/solr/server/solr/blacklight-core/data/*"
+    - "(cd {{ arthub.dir }}; {{ arthub.dir }}/bin/bundle exec rake solr:start)"
+    - "sleep 30"
+    - "PERL5LIB=~{{ application_user }}/perl5/lib/perl5/ PATH=~{{ application_user }}/perl5/bin/:$PATH dhconveyor index -p {{ datahub_pipeline.dir }}/fixes/pipelines/arthub_nl.ini"
+    - "PERL5LIB=~{{ application_user }}/perl5/lib/perl5/ PATH=~{{ application_user }}/perl5/bin/:$PATH dhconveyor index -p {{ datahub_pipeline.dir }}/fixes/pipelines/arthub_en.ini"
+
