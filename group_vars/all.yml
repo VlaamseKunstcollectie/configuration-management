@@ -19,7 +19,7 @@ datahub:
     server_name: datahub.example.com
     document_root: /opt/datahub/web
     index: app.php
-    redirect_to_https: false
+    redirect_to_https: true
     ssl : {}
   mongodb:
     host: 127.0.0.1
@@ -120,6 +120,8 @@ resourcespace:
     memory_limit: 256M
     post_max_size: 50000M
     upload_max_filesize: 50000M
+  imagehub_commands: []
+  imagehub_curl_calls: []
 cantaloupe:
   version: 5.0.4
   repo_dir: /opt/.repos/cantaloupe

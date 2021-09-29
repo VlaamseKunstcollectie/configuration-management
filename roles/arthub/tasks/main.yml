@@ -76,21 +76,26 @@
     deployment_mode: yes
   become_user: "{{ application_user }}"
 
-- name: Initialize db/production.sqlite3
+- name: Check if rails secret file exists
+  stat:
+    path: "{{ arthub.dir }}/.rails_secret.txt"
+  register: stat_result
+
+- name: Initialize db/production.sqlite3 on first run
   command: "{{ arthub.dir }}/bin/bundle exec rake db:migrate"
   args:
     chdir: "{{ arthub.dir }}"
   environment:
     RAILS_ENV: production
   become_user: "{{ application_user }}"
-  when: gitrc is changed
+  when: not stat_result.stat.exists
 
-- name: Clean up solr installation
+- name: Clean up solr installation on first run
   command: "{{ arthub.dir }}/bin/bundle exec rake solr:clean"
   args:
     chdir: "{{ arthub.dir }}"
   become_user: "{{ application_user }}"
-  when: gitrc is changed
+  when: not stat_result.stat.exists
 
 - name: Copy solr.conf
   template:
@@ -137,11 +142,6 @@
   environment:
     RAILS_ENV: "{{ arthub.environment }}"
   when: gitrc is changed
-
-- name: Check if rails secret file exists
-  stat:
-    path: "{{ arthub.dir }}/.rails_secret.txt"
-  register: stat_result
 
 - name: Generate rails secret if it does not yet exists
   command: "{{ arthub.dir }}/bin/rails secret"

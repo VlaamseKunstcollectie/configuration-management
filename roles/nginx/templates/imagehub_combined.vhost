@@ -27,14 +27,23 @@ server {
   }
 {% endif %}
 
-#  location / {
-    index index.php index.html index.htm;
-#    try_files $uri /{{ vhost.index }}$is_args$args;
-#  }
+  index index.php index.html index.htm;
 
 {% if vhost.document_root is defined %}
   # Pass requests for the Imagehub to the appropriate PHP file
   location ~ /iiif/2/.*(manifest\.json|collection/top) {
+    add_header Access-Control-Allow-Origin *;
+    try_files $uri /{{ vhost.index }}$is_args$args;
+  }
+
+  # Pass requests for the Imagehub to the appropriate PHP file
+  location /datahub-to-resourcespace {
+    add_header Access-Control-Allow-Origin *;
+    try_files $uri /{{ vhost.index }}$is_args$args;
+  }
+
+  # Pass requests for the Imagehub to the appropriate PHP file
+  location /generate-iiif-manifests {
     add_header Access-Control-Allow-Origin *;
     try_files $uri /{{ vhost.index }}$is_args$args;
   }
