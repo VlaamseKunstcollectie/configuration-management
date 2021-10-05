@@ -1,5 +1,5 @@
 ---
-- name: Install subversion, php-gd, php-mysql, exiftool, imagemagick, inkscape, ghostscript, antiword, postfix, libimage-exiftool-perl, ffmpeg, poppler-utils, wget and libvips
+- name: Install subversion, php-gd, php-mysql, exiftool, imagemagick, inkscape, ghostscript, antiword, postfix, libimage-exiftool-perl, ffmpeg, poppler-utils, wget and vips
   apt:
     name:
       - subversion
@@ -16,6 +16,7 @@
       - poppler-utils
       - wget
       - libvips
+      - libvips-tools
 
 - name: Clone ResourceSpace
   subversion:
