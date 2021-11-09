@@ -71,7 +71,7 @@ Folder structure:
 |       └── vkc-ecosystem
 ```
 
-If you want to install everything (Datahub, Dashboard, Arthub, ResourceSpace, Cantaloupe and Imagehub), then your `hosts` file will look like this:
+If you want to install everything (Datahub, Dashboard, Arthub, ResourceSpace, Cantaloupe, Imagehub and Condition reporting tool), then your `hosts` file will look like this:
 
 ```
 all:
@@ -98,6 +98,9 @@ all:
       hosts:
         vkc-ecosystem
     imagehub:
+      hosts:
+        vkc-ecosystem
+    condition_reports:
       hosts:
         vkc-ecosystem
 ```
@@ -128,7 +131,7 @@ datahub:
     password: gmail_app_password
     delivery_address: my_name@gmail.com
   admin:
-  	username: admin
+    username: admin
     password: datahub_admin_password
     first_name: Admin first name
     last_name: Admin last name
@@ -191,9 +194,13 @@ imagehub:
     password: imagehub_mysql_password
   nginx:
     server_name: imagehub.example.com
+condition_reports:
+  service_url: https://conditionreports.example.com/iiif/3/
+  nginx:
+    server_name: conditionreports.example.com
 ```
 
-It is recommended to randomly generate the following passwords (the longer, the better, minimum 16 characters recommended):
+It is recommended to randomly generate the following passwords (the longer the better, minimum 16 characters recommended):
 * mariadb_root_password (if you are not running any MariaDB instance on the controlled machine yet)
 * mongodb_root_password (make sure you use the same password for both `datahub` and `datahub_dashboard`)
 * dashboard_user_password

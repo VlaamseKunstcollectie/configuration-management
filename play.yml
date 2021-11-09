@@ -69,7 +69,7 @@
   roles:
     - omeka
 
-- name: Install condition reports (currently only PHP-FPM and nginx configuration)
+- name: Install condition reports
   hosts: condition_reports
   roles:
     - condition_reports

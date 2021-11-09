@@ -183,6 +183,16 @@ omeka:
     redirect_to_https: true
     ssl : {}
 condition_reports:
+  repo_url: https://github.com/Hero-Solutions/iiif-condition-reports.git
+  repo_dir: /opt/.repos/condition_reports
+  branch: main
+  dir: /opt/condition_reports
+  service_url: https://conditionreports.example.com/iiif/3/
+  mysql:
+    hostname: 127.0.0.1
+    port: 3306
+    username: condition_reports
+    database: condition_reports
   nginx:
     name: condition_reports
     server_name: conditionreports.example.com
