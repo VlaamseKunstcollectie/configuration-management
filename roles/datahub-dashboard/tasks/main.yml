@@ -134,3 +134,5 @@
           php_socket_name: "{{ datahub_dashboard.nginx.name }}"
           ssl: "{{ datahub_dashboard.nginx.ssl }}"
           redirect_to_https: "{{ datahub_dashboard.nginx.redirect_to_https }}"
+          auth_basic: "{{ datahub_dashboard.nginx.auth_basic | default('') }}"
+          auth_basic_whitelist: "{{ datahub_dashboard.nginx.auth_basic_whitelist | default([]) }}"

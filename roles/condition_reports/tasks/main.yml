@@ -1,0 +1,30 @@
+---
+- name: Include condition reports php-fpm pool
+  include_role:
+    name: php-fpm
+    tasks_from: create_pool.yml
+    apply:
+      vars:
+        pool_name: "{{ condition_reports.nginx.name }}"
+
+- name: Include condition reorts nginx vhost
+  include_role:
+    name: nginx
+    tasks_from: create_vhost.yml
+    apply:
+      vars:
+        nginx_vhost:
+          server_name: "{{ condition_reports.nginx.server_name }}"
+          name: "{{ condition_reports.nginx.name }}"
+          type: php
+          document_root: "{{ condition_reports.nginx.document_root }}"
+          index: "{{ condition_reports.nginx.index }}"
+          php_socket_name: "{{ condition_reports.nginx.name }}"
+          ssl: "{{ condition_reports.nginx.ssl }}"
+          redirect_to_https: "{{ condition_reports.nginx.redirect_to_https }}"
+          auth_basic: "{{ condition_reports.nginx.auth_basic | default('') }}"
+          auth_basic_whitelist: "{{ condition_reports.nginx.auth_basic_whitelist | default([]) }}"
+          other_settings:
+            - "fastcgi_buffer_size          128k"
+            - "fastcgi_buffers              4 256k"
+            - "fastcgi_busy_buffers_size    256k"

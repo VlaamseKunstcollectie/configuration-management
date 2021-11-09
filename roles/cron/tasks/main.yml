@@ -1,8 +1,8 @@
 ---
 - name: Create shell script for cron task
   template:
-    src: import_data.sh
-    dest: "{{ cron_dir }}/import_data.sh"
+    src: cronjobs.sh
+    dest: "{{ cron_dir }}/cron/import_data.sh"
     mode: '755'
   with_items: "{{ cronjobs }}"
 
@@ -20,13 +20,35 @@
     minute: "0"
     hour: "2"
     user: "{{ application_user }}"
-    job: "bash {{ cron_dir }}/import_data.sh > {{ cron_dir }}/cron/output.log 2>&1"
+    job: "bash {{ cron_dir }}/cron/import_data.sh > {{ cron_dir }}/cron/output.log 2>&1"
 
 - name: Renew SSL certificates through LetsEncrypt
   cron:
-    name: "Renew LetsEncrypt certificates"
+    name: "Renew {{ cron_name }} LetsEncrypt certificates"
     minute: "0"
     hour: "2"
     user: "root"
     job: "certbot renew -n -q --agree-tos --webroot -w /var/lib/letsencrypt/ --post-hook '/etc/init.d/nginx reload'"
     state: "{{ 'present' if (letsencrypt_vhosts | length > 0) else 'absent' }}"
+
+- name: Set cronjobs for arthub check task
+  set_fact:
+    cronjobs:
+      - "date \"+%Y-%m-%d %H:%M:%S\" >> {{ cron_dir }}/cron/check_arthub.log"
+      - "curl -s -o /dev/null -I -L -w \"%{http_code}\" '{{ arthub.nginx.server_name }}/nl' | grep 200 || /usr/sbin/service arthub restart"
+  when: is_arthub is defined and is_arthub
+
+- name: Create shell script for arthub check task
+  template:
+    src: cronjobs.sh
+    dest: "{{ cron_dir }}/cron/check_arthub.sh"
+    mode: '755'
+  with_items: "{{ cronjobs }}"
+  when: is_arthub is defined and is_arthub
+
+- name: Provide crontab entry to check for failure and restart when needed
+  cron:
+    name: "Check and restart {{ cron_name }} Arthub if needed"
+    user: "root"
+    job: "bash {{ cron_dir }}/cron/check_arthub.sh >> {{ cron_dir }}/cron/check_arthub.log 2>&1"
+  when: is_arthub is defined and is_arthub

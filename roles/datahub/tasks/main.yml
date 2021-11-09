@@ -201,3 +201,5 @@
           php_socket_name: "{{ datahub.nginx.name }}"
           ssl: "{{ datahub.nginx.ssl }}"
           redirect_to_https: "{{ datahub.nginx.redirect_to_https }}"
+          auth_basic: "{{ datahub.nginx.auth_basic | default('') }}"
+          auth_basic_whitelist: "{{ datahub.nginx.auth_basic_whitelist | default([]) }}"

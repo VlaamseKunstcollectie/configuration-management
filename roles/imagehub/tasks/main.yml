@@ -141,6 +141,7 @@
           upstream: "{{ cantaloupe.nginx.upstream }}"
           ssl: "{{ cantaloupe.nginx.ssl }}"
           redirect_to_https: "{{ cantaloupe.nginx.redirect_to_https }}"
+          auth_basic: "{{ cantaloupe.nginx.auth_basic | default('') }}"
   when: is_cantaloupe and (cantaloupe.nginx.server_name != imagehub.nginx.server_name and cantaloupe.nginx.server_name != resourcespace.nginx.server_name)
 
 - name: Add cantaloupe vhost for imagehub

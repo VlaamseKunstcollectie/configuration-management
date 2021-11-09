@@ -64,6 +64,16 @@
   roles:
     - resourcespace_setup
 
+- name: Install Omeka-S (currently only PHP-FPM and nginx configuration)
+  hosts: omeka
+  roles:
+    - omeka
+
+- name: Install condition reports (currently only PHP-FPM and nginx configuration)
+  hosts: condition_reports
+  roles:
+    - condition_reports
+
 - name: Set up cronjob
   hosts: datahub_pipeline,datahub_dashboard,arthub,imagehub
   roles:

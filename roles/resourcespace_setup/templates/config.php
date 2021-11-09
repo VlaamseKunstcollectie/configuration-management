@@ -88,4 +88,4 @@ $file_checksums_50k = true;
 $file_checksums_offline = false;
 $file_checksums_fullfile = false;
 $file_upload_block_duplicates = true;
-
+$tempdir = '{{ cron_dir }}/tmp/';

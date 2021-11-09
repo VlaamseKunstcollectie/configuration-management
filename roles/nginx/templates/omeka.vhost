@@ -34,15 +34,29 @@ server {
   auth_basic_user_file /etc/nginx/.htpasswd;
 {% endif %}
 
-{% if vhost.other_settings is defined %}
-{% for setting in vhost.other_settings %}
-  {{ setting }};
-{% endfor %}
-{% endif %}
-
   location / {
     index index.php index.html index.htm;
     try_files $uri /{{ vhost.index }}$is_args$args;
+  }
+
+  location = /favicon.ico {
+    log_not_found off;
+    access_log off;
+  }
+
+  location = /robots.txt {
+    allow all;
+    log_not_found off;
+    access_log off;
+  }
+
+  location ~ \..*/.*\.php$ {
+    return 403;
+  }
+
+  location ^~ /config/ {
+    deny all;
+    return 403;
   }
 
   # Deny access to hidden files & dirs.
