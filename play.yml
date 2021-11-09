@@ -1,16 +1,16 @@
 ---
 - name: Install common packages
-  hosts: datahub,datahub_pipeline,datahub_dashboard,arthub,resourcespace,cantaloupe,imagehub
+  hosts: datahub,datahub_pipeline,datahub_dashboard,arthub,resourcespace,cantaloupe,imagehub,condition_reports
   roles:
     - common
 
 - name: Install mariadb
-  hosts: resourcespace,imagehub
+  hosts: resourcespace,imagehub,condition_reports
   roles:
     - mariadb
 
 - name: Install php-fpm
-  hosts: datahub,datahub_dashboard,resourcespace,cantaloupe,imagehub
+  hosts: datahub,datahub_dashboard,resourcespace,cantaloupe,imagehub,condition_reports
   roles:
     - php-fpm
 
@@ -20,7 +20,7 @@
     - mongodb
 
 - name: Install nginx
-  hosts: datahub,datahub_dashboard,arthub,resourcespace,cantaloupe,imagehub
+  hosts: datahub,datahub_dashboard,arthub,resourcespace,cantaloupe,imagehub,condition_reports
   roles:
     - nginx
 
