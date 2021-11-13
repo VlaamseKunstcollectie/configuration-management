@@ -47,6 +47,7 @@ datahub_pipeline:
     repo_url: https://github.com/Hero-Solutions/Authority-Files.git
     repo_dir: /opt/.repos/authority-files
     branch: master
+  imagehub_cronjobs: []
   eiz:
     url: https://cjm-web.adlibhosting.com/arthubflanders/oai.ashx
     set: vkc
@@ -80,11 +81,12 @@ datahub_dashboard:
     database: datahub_dashboard
     username: datahub_dashboard
 arthub:
-  repo_url: https://github.com/VlaamseKunstcollectie/Arthub-Frontend
+  repo_url: https://github.com/Hero-Solutions/Arthub-Frontend
   repo_dir: /opt/.repos/arthub
   branch: master
   dir: /opt/arthub
   environment: production
+  fix_script: arthub-index.sh
   nginx:
     name: arthub
     server_name: arthub.example.com
