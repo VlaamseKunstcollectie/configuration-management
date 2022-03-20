@@ -1,4 +1,12 @@
 ---
+- name: Create cron folder
+  file:
+    path: "{{ cron_dir }}/cron/"
+    state: directory
+    recurse: true
+    owner: "{{ application_user }}"
+    group: "{{ application_user }}"
+
 - name: Create shell script for cron task
   template:
     src: cronjobs.sh
@@ -6,13 +14,12 @@
     mode: '755'
   with_items: "{{ cronjobs }}"
 
-- name: Create cron folder to store output
-  file:
-    path: "{{ cron_dir }}/cron/"
-    state: directory
-    recurse: true
-    owner: "{{ application_user }}"
-    group: "{{ application_user }}"
+- name: Create shell script for cron task
+  template:
+    src: cronjobs.sh
+    dest: "{{ cron_dir }}/cron/import_data.sh"
+    mode: '755'
+  with_items: "{{ cronjobs }}"
 
 - name: Provide crontab entry for daily reload of arthub records
   cron:
@@ -28,7 +35,7 @@
     minute: "0"
     hour: "2"
     user: "root"
-    job: "certbot renew -n -q --agree-tos --webroot -w /var/lib/letsencrypt/ --post-hook '/etc/init.d/nginx reload'"
+    job: "certbot renew -n -q --agree-tos --webroot -w /var/lib/letsencrypt/"
     state: "{{ 'present' if (letsencrypt_vhosts | length > 0) else 'absent' }}"
 
 - name: Set cronjobs for arthub check task
