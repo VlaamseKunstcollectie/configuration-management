@@ -9,4 +9,3 @@
     roles: readWrite,dbAdmin
     state: present
   become_user: "{{ application_user }}"
-

@@ -18,6 +18,8 @@ server {
 {% if '80' in listen_ports %}
   # Allow LetsEncrypt domain validation
   location ~ ^/\.well-known/acme-challenge/ {
+    auth_basic off;
+    allow all;
     default_type text/plain;
     root /var/lib/letsencrypt;
   }
