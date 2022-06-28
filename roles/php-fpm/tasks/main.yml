@@ -12,6 +12,7 @@
       - php{{ php.version }}-cli
       - php{{ php.version }}-fileinfo
       - php{{ php.version }}-intl
+      - php{{ php.version }}-json
       - php{{ php.version }}-mbstring
       - php{{ php.version }}-curl
       - php{{ php.version }}-mongodb
@@ -19,8 +20,7 @@
       - php{{ php.version }}-zip
       - php{{ php.version }}-dev
       - php-pear
-#      - composer=1.*
-      - composer
+      - composer=1.10
     state: present
 
 # First run of install will output a huge error, but this can be safely ignored

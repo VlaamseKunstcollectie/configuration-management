@@ -160,7 +160,7 @@
     group: "{{ application_user }}"
 
 - name: Install datahub through composer
-  command: composer install
+  command: /usr/bin/composer install
   args:
     chdir: "{{ datahub.dir }}"
   become_user: "{{ application_user }}"

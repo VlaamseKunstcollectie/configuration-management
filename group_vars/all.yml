@@ -154,6 +154,7 @@ imagehub:
   iiif_versions:
     - 2
     - 3
+  main_iiif_version: 2
   repo_url: https://github.com/Hero-Solutions/Imagehub.git
   repo_dir: /opt/.repos/imagehub
   branch: master

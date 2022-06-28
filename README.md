@@ -29,6 +29,7 @@ Along with the following Ansible collections:
 * community.mysql
 * community.mongodb
 * community.general
+* geerlingguy.composer
 * rvm.ruby
 
 Set the Ansible hash behavior strategy to 'merge' by ensuring the following line is present in `/etc/ansible/ansible.cfg` (assuming your Ansible configuration is in `/etc/ansible`):
@@ -48,6 +49,7 @@ activate-global-python-argcomplete
 ansible-galaxy collection install community.mysql
 ansible-galaxy collection install community.mongodb
 ansible-galaxy collection install community.general
+ansible-galaxy collection install geerlingguy.composer
 ansible-galaxy install rvm.ruby
 vim /etc/ansible/ansible.cfg
 ```

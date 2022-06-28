@@ -13,6 +13,7 @@
   hosts: datahub,datahub_dashboard,resourcespace,cantaloupe,imagehub,condition_reports
   roles:
     - php-fpm
+    - geerlingguy.composer
 
 - name: Install mongodb
   hosts: datahub,datahub_dashboard
