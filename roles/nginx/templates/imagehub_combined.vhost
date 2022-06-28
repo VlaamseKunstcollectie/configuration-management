@@ -31,7 +31,7 @@ server {
 
 {% if vhost.document_root is defined %}
   # Pass requests for the Imagehub to the appropriate PHP file
-  location ~ /iiif/2/.*(manifest\.json|collection/top) {
+  location ~ /iiif/(2|3)/.*(manifest\.json|collection/top) {
     add_header Access-Control-Allow-Origin *;
     try_files $uri /{{ vhost.index }}$is_args$args;
   }
@@ -84,7 +84,7 @@ server {
 
 {% if image_server_upstream is defined %}
   # Pass all other requests for /iiif/.* to Cantaloupe
-  location ~ ^/iiif/2/(private|public).*$ {
+  location ~ ^/iiif/(2|3)/(private|public).*$ {
     proxy_redirect     off;
     proxy_set_header   Host              $host;
     proxy_set_header   X-Real-IP         $remote_addr;
