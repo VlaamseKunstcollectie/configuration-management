@@ -151,6 +151,9 @@ cantaloupe:
     ssl: {}
 imagehub:
   public: false
+  iiif_versions:
+    - 2
+    - 3
   repo_url: https://github.com/Hero-Solutions/Imagehub.git
   repo_dir: /opt/.repos/imagehub
   branch: master
