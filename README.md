@@ -49,7 +49,7 @@ activate-global-python-argcomplete
 ansible-galaxy collection install community.mysql
 ansible-galaxy collection install community.mongodb
 ansible-galaxy collection install community.general
-ansible-galaxy collection install geerlingguy.composer
+ansible-galaxy install geerlingguy.composer
 ansible-galaxy install rvm.ruby
 vim /etc/ansible/ansible.cfg
 ```
