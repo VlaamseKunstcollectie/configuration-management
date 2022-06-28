@@ -1,7 +1,11 @@
 ---
-- name: Install openjdk-11-jre
-  apt:
-    name: openjdk-11-jre
++# NOTE: latest openjdk 11.0.14.1 is NOT supported by solr, see /opt/arthub/solr/server/logs/ if solr fails to start
+ - name: Install openjdk-11-jre
+   apt:
+     name:
+       - openjdk-11-jre-headless=11.0.7
+       - openjdk-11-jre=11.0.7
+     force: yes
 
 - name: Install sqlite3
   apt:
