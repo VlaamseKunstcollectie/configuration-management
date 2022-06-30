@@ -1,10 +1,20 @@
 ---
 # NOTE: latest openjdk 11.0.14.1 is NOT supported by solr, see /opt/arthub/solr/server/logs/ if solr fails to start
-- name: Install openjdk-11-jre
+- name: Install openjdk-11-jre for Debian 11
   apt:
     name:
-      - openjdk-11-jre-headless
-      - openjdk-11-jre
+      - openjdk-11-jre-headless=11.0.7+10-3ubuntu1
+      - openjdk-11-jre=11.0.7+10-3ubuntu1
+    force: yes
+  when: ansible_facts.distribution == 'Debian' and ansible_facts.distribution_major_version == '11'
+
+- name: Install openjdk-11-jre for Debian 10
+  apt:
+    name:
+      - openjdk-11-jre-headless=11.0.7+10-3~deb10u1
+      - openjdk-11-jre=11.0.7+10-3~deb10u1
+    force: yes
+  when: ansible_facts.distribution == 'Debian' and ansible_facts.distribution_major_version == '10'
 
 - name: Install sqlite3
   apt:
