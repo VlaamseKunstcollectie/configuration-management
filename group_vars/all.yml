@@ -166,6 +166,7 @@ imagehub:
   datahub_record_id_prefix: 'oai:datahub.example.com:example.com:'
   credit_line_suffix: Collectie example
   service_url: https://imagehub.example.com/public/iiif/2/
+  meemoo_service_url: https://imagehub.example.com/meemoo/iiif/2/
   authentication_url: https://imagehub.example.com/public/authenticate/
   authentication_service_description: Example requires that you log in with your museum account to view this content
   mysql:
