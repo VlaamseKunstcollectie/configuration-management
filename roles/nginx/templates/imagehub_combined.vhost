@@ -38,7 +38,7 @@ server {
   }
 
   # Pass requests for the Imagehub to the appropriate PHP file
-  location ~ /iiif/(2|3)/.*(manifest\.json|collection/top) {
+  location ~ (meemoo)?/iiif/(2|3)/.*(manifest\.json|collection/top) {
     add_header Access-Control-Allow-Origin *;
     try_files $uri /{{ vhost.index }}$is_args$args;
   }
