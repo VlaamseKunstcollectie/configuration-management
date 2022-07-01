@@ -217,3 +217,8 @@
 - name: Provide crontab entry for daily update of ResourceSpace data and generation of manifests
   set_fact:
     cronjobs: "{{ cronjobs }} + [  'php {{ imagehub.dir }}/bin/console app:datahub-to-resourcespace', 'php {{ imagehub.dir }}/bin/console app:generate-iiif-manifests' ]"
+
+- name: Provide crontab entry for daily update of meemoo manifests
+  set_fact:
+    cronjobs: "{{ cronjobs }} + [  'php {{ imagehub.dir }}/bin/console app:generate-meemoo-iiif-manifests' ]"
+  when: imagehub.meemoo_url != 'https://imagehub.example.com/meemoo/iiif/2/'

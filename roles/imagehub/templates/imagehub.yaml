@@ -67,7 +67,7 @@ parameters:
         height: 'Technical.Height'
         photographer: 'Descriptive.Authors.Author'
         url: 'url'
-      url_regex_replace: '^(https://images\.meemoo\.be/iiif/.*)/full/full/0/default\.jpg$'
+      url_regex_replace: '/^(https:\/\/images\.meemoo\.be\/iiif\/.*)\/full\/full\/0\/default\.jpg$/'
       url_regex_replace_with: '$1'
 
     credit_line:
