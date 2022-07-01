@@ -221,4 +221,4 @@
 - name: Provide crontab entry for daily update of meemoo manifests
   set_fact:
     cronjobs: "{{ cronjobs }} + [  'php {{ imagehub.dir }}/bin/console app:generate-meemoo-iiif-manifests' ]"
-  when: imagehub.meemoo_url != 'https://imagehub.example.com/meemoo/iiif/2/'
+  when: imagehub.meemoo_service_url != 'https://imagehub.example.com/meemoo/iiif/2/'
