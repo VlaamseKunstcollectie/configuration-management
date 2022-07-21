@@ -23,8 +23,10 @@ if ($handle) {
 			$message = '';
 			foreach($allowedSources as $allowedSource) {
 				foreach($allowedDestination as $allowedDestination) {
-					if(preg_match('/^rewrite ' $allowedSource . '[a-zA-Z0-9\-_]+' . '$ https?://' . $allowedDestination . '/?[^ ]* redirect ;', $line)) {
-						if (filter_var(strstr($line, 'http'), FILTER_VALIDATE_URL)) {
+					if(preg_match('/^rewrite ' . $allowedSource . '[a-zA-Z0-9\-_]+$ https?://' . $allowedDestination . '/?[^ ]* redirect ;', $line)) {
+						$substr = 'http' . strstr($line, '$ http');
+						$substr = substr($substr, 0, -11);
+						if (filter_var($substr, FILTER_VALIDATE_URL)) {
 							$thisValid = true;
 							break;
 						}
