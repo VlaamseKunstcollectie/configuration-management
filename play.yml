@@ -77,7 +77,7 @@
 
 - name: Install CultURIze
   hosts: culturize
-  roles
+  roles:
     - culturize
 
 - name: Set up cronjob
