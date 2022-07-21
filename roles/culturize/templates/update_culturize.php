@@ -56,5 +56,5 @@ if ($handle) {
 }
 
 if($valid) {
-	copy('{{ culturize.dir }}/nginx_redirect.conf', '/etc/nginx/{{ vhost.name }}/nginx_redirect.conf');
+	copy('{{ culturize.dir }}/nginx_redirect.conf', '/etc/nginx/{{ culturize.nginx.name }}/nginx_redirect.conf');
 }
