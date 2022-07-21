@@ -23,7 +23,7 @@ if ($handle) {
 			$message = '';
 			foreach($allowedSources as $allowedSource) {
 				foreach($allowedDestinations as $allowedDestination) {
-					if(preg_match('/^rewrite ' . $allowedSource . '[a-zA-Z0-9\-_]+$ https?://' . $allowedDestination . '/?[^ ]* redirect ;', $line)) {
+					if(preg_match('/^rewrite ' . $allowedSource . '[a-zA-Z0-9\-_]+\$ https?://' . $allowedDestination . '\/?[^ ]* redirect ;$/', $line)) {
 						$substr = 'http' . strstr($line, '$ http');
 						$substr = substr($substr, 0, -11);
 						if (filter_var($substr, FILTER_VALIDATE_URL)) {
