@@ -211,19 +211,19 @@ culturize:
   dir: /opt/culturize
   github_file: https://raw.githubusercontent.com/example_org/culturize-example/main/work/nginx_redirect.conf
   allowed_sources:
-    - '\/data\/'
-    - '/work\/id\/'
-    - '/work\/data\/'
-    - '/work\/representation\/'
+    - '/data/'
+    - '/work/id/'
+    - '/work/data/'
+    - '/work/representation/'
   allowed_destinations:
-    - 'www\.vlaamsekunstcollectie\.be'
-    - 'erfgoedinzicht\.be'
-    - 'kmska\.be'
-    - 'muzee\.be'
-    - 'mskgent\.be'
-    - 'museabrugge\.be'
-    - 'www\.museabrugge\.be'
-    - 'collectie\.museabrugge\.be'
+    - 'www.vlaamsekunstcollectie.be'
+    - 'erfgoedinzicht.be'
+    - 'kmska.be'
+    - 'muzee.be'
+    - 'mskgent.be'
+    - 'museabrugge.be'
+    - 'www.museabrugge.be'
+    - 'collectie.museabrugge.be'
   nginx:
     server_name: culturize.example.com
     name: culturize_example
