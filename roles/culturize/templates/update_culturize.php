@@ -24,8 +24,8 @@ if ($handle) {
 			foreach($allowedSources as $allowedSource) {
 				foreach($allowedDestinations as $allowedDestination) {
 					if(preg_match('/^rewrite ' . $allowedSource . '[a-zA-Z0-9\-_]+\$ https?:\/\/' . $allowedDestination . '\/?[^ ]* redirect ;$/', $line)) {
-						$substr = 'http' . strstr($line, '$ http');
-						$substr = substr($substr, 0, -11);
+						$substr = strstr($line, '$ http');
+						$substr = substr($substr, 2, -11);
 						if (filter_var($substr, FILTER_VALIDATE_URL)) {
 							$thisValid = true;
 							break;
