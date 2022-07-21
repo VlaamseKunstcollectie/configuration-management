@@ -7,10 +7,21 @@
     owner: root
     group: root
 
+- name: Set up nginx dir for redirect file
+  file:
+    path: "/etc/nginx/{{ culturize.nginx.name }}/"
+    state: directory
+    recurse: true
+    owner: root
+    group: root
+
 - name: Set up shell script to download and check the latest nginx culturize redirect file
   template:
     src: update_culturize.php
     dest: "{{ culturize.dir }}/update_culturize.php"
+
+- name: Download and check the latest nginx culturize redirect file
+  shell: "php {{ culturize.dir }}/update_culturize.php"
 
 - name: Include culturize nginx vhost
   include_role:
