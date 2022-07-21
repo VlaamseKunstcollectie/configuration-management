@@ -1,0 +1,77 @@
+server {
+{% for listen_port in listen_ports %}
+  listen      {{ listen_port }}{{ ' ssl' if listen_port == '443' else '' }};
+{% endfor %}
+  server_name {{ vhost.server_name }};
+
+  access_log  /var/log/nginx/{{ vhost.name }}_access.log combined;
+  error_log   /var/log/nginx/{{ vhost.name }}_error.log;
+
+{% if '443' in listen_ports %}
+  ssl_certificate {{ vhost.ssl.cert }};
+  ssl_certificate_key {{ vhost.ssl.key }};
+  ssl_trusted_certificate {{ vhost.ssl.chain }};
+{% endif %}
+
+  root        {{ vhost.document_root }};
+  
+{% if '80' in listen_ports %}
+  # Allow LetsEncrypt domain validation
+  location ~ ^/\.well-known/acme-challenge/ {
+    auth_basic off;
+    allow all;
+    default_type text/plain;
+    root /var/lib/letsencrypt;
+  }
+{% endif %}
+
+{% if vhost.auth_basic | length > 0 %}
+  satisfy any;
+  allow 127.0.0.1;
+{% for ip in vhost.auth_basic_whitelist %}
+  allow {{ ip }};
+{% endfor %}
+  deny all;
+  auth_basic "{{ vhost.auth_basic }}";
+  auth_basic_user_file /etc/nginx/.htpasswd;
+{% endif %}
+
+{% if vhost.other_settings is defined %}
+{% for setting in vhost.other_settings %}
+  {{ setting }};
+{% endfor %}
+{% endif %}
+
+  # Deny access to hidden files & dirs.
+  location ~ /\. {
+    access_log off;
+    log_not_found off;
+    return 404;
+    deny all;
+  }
+
+  location {{ vhost.location }} {
+    include /etc/nginx/{{ vhost.name }}/nginx_redirect.conf;
+  }
+}
+
+{% if '80' not in listen_ports %}
+server {
+  listen      80;
+  server_name {{ vhost.server_name }};
+
+  # Allow LetsEncrypt domain validation
+  location ~ ^/\.well-known/acme-challenge/ {
+    default_type text/plain;
+    root /var/lib/letsencrypt;
+  }
+
+  location / {
+    # See https://www.nginx.com/resources/wiki/start/topics/tutorials/config_pitfalls/#taxing-rewrites
+    # Good
+    #rewrite ^ https://$host$request_uri? permanent;
+    # Better
+    return 301 https://$host$request_uri;
+  }
+}
+{% endif %}

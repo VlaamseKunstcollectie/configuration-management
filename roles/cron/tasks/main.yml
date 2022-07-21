@@ -59,3 +59,22 @@
     user: "root"
     job: "bash {{ cron_dir }}/cron/check_arthub.sh >> {{ cron_dir }}/cron/check_arthub.log 2>&1"
   when: is_arthub is defined and is_arthub
+
+- name: Create shell script for root cron task
+  template:
+    src: cronjobs.sh
+    dest: "{{ cron_dir }}/cron/root_cronjobs.sh"
+    mode: '755'
+    owner: root
+    group: root
+  with_items: "{{ root_cronjobs }}"
+  when: root_cronjobs | length > 0
+
+- name: Set cronjobs for root user
+  cron:
+    name: "Additional root cronjobs"
+    minute: "0"
+    hour: "3"
+    user: "root"
+    job: "bash {{ cron_dir }}/root_cronjobs.sh"
+  when: root_cronjobs | length > 0
