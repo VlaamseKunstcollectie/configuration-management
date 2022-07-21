@@ -8,9 +8,9 @@
     group: root
 
 - name: Set up shell script to download and check the latest nginx culturize redirect file
-    template:
-      src: update_culturize.php
-      dest: "{{ culturize.dir }}/update_culturize.php"
+  template:
+    src: update_culturize.php
+    dest: "{{ culturize.dir }}/update_culturize.php"
 
 - name: Include culturize nginx vhost
   include_role:
