@@ -2,12 +2,12 @@
 
 $allowedSources = [
 {% for allowed_source in culturize.allowed_sources %}
-  {{ allowed_source }}{{ "," if not loop.last else "" }}
+  '{{ allowed_source }}'{{ "," if not loop.last else "" }}
 {% endfor %}
 ];
 $allowedDestinations = [
 {% for allowed_destination in culturize.allowed_destinations %}
-  {{ allowed_destination }}{{ "," if not loop.last else "" }}
+  '{{ allowed_destination }}'{{ "," if not loop.last else "" }}
 {% endfor %}
 ];
 
