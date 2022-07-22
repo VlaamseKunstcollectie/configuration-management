@@ -76,5 +76,5 @@
     minute: "0"
     hour: "3"
     user: "root"
-    job: "bash {{ cron_dir }}/root_cronjobs.sh"
+    job: "bash {{ cron_dir }}/cron/root_cronjobs.sh"
   when: root_cronjobs | length > 0
