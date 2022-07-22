@@ -212,6 +212,7 @@ culturize:
   dir: /opt/culturize
   github_file: https://raw.githubusercontent.com/example_org/culturize-example/main/work/nginx_redirect.conf
   allowed_sources:
+    - '/id/'
     - '/data/'
     - '/work/id/'
     - '/work/data/'
