@@ -1,0 +1,26 @@
+---
+- name: Include omeka php-fpm pool
+  include_role:
+    name: php-fpm
+    tasks_from: create_pool.yml
+    apply:
+      vars:
+        pool_name: "{{ omeka.nginx.name }}"
+
+- name: Include Omeka-S nginx vhost
+  include_role:
+    name: nginx
+    tasks_from: create_vhost.yml
+    apply:
+      vars:
+        nginx_vhost:
+          server_name: "{{ omeka.nginx.server_name }}"
+          name: "{{ omeka.nginx.name }}"
+          type: omeka
+          document_root: "{{ omeka.nginx.document_root }}"
+          index: "{{ omeka.nginx.index }}"
+          php_socket_name: "{{ omeka.nginx.name }}"
+          ssl: "{{ omeka.nginx.ssl }}"
+          redirect_to_https: "{{ omeka.nginx.redirect_to_https }}"
+          auth_basic: "{{ omeka.nginx.auth_basic | default('') }}"
+          auth_basic_whitelist: "{{ omeka.nginx.auth_basic_whitelist | default([]) }}"

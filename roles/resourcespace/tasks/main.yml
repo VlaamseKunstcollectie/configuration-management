@@ -1,9 +1,10 @@
 ---
-- name: Install subversion, php-gd, php-mysql, exiftool, imagemagick, inkscape, ghostscript, antiword, postfix, libimage-exiftool-perl, ffmpeg, poppler-utils, wget and libvips
+- name: Install subversion, php-gd, php-imagick, php-mysql, exiftool, imagemagick, inkscape, ghostscript, antiword, postfix, libimage-exiftool-perl, ffmpeg, poppler-utils, wget and vips
   apt:
     name:
       - subversion
       - php{{ php.version }}-gd
+      - php{{ php.version }}-imagick
       - php{{ php.version }}-mysql
       - exiftool
       - imagemagick
@@ -16,11 +17,19 @@
       - poppler-utils
       - wget
       - libvips
+      - libvips-tools
+
+- name: Set ImageMagick policy
+  template:
+    src: policy.xml
+    dest: "/etc/ImageMagick-6/policy.xml"
+    mode: "644"
 
 - name: Clone ResourceSpace
   subversion:
     repo: "{{ resourcespace.repo_url }}/{{ resourcespace.version }}"
     dest: "{{ resourcespace.repo_dir }}"
+    update: no
 
 - name: Create the iiif_ptif folder inside the filestore
   file:

@@ -1,22 +1,27 @@
 ---
 - name: Install common packages
-  hosts: datahub,datahub_pipeline,datahub_dashboard,arthub,resourcespace,cantaloupe,imagehub
+  hosts: datahub,datahub_pipeline,datahub_dashboard,arthub,resourcespace,cantaloupe,imagehub,condition_reports,culturize
   roles:
     - common
 
 - name: Install mariadb
-  hosts: resourcespace,imagehub
+  hosts: resourcespace,imagehub,condition_reports
   roles:
     - mariadb
 
-- name: Install php-fpm and mongodb
-  hosts: datahub,datahub_dashboard
+- name: Install php-fpm
+  hosts: datahub,datahub_dashboard,resourcespace,cantaloupe,imagehub,condition_reports,culturize
   roles:
     - php-fpm
+    - geerlingguy.composer
+
+- name: Install mongodb
+  hosts: datahub,datahub_dashboard
+  roles:
     - mongodb
 
 - name: Install nginx
-  hosts: datahub,datahub_dashboard,arthub
+  hosts: datahub,datahub_dashboard,arthub,resourcespace,cantaloupe,imagehub,condition_reports,culturize
   roles:
     - nginx
 
@@ -60,13 +65,28 @@
   roles:
     - resourcespace_setup
 
+- name: Install Omeka-S (currently only PHP-FPM and nginx configuration)
+  hosts: omeka
+  roles:
+    - omeka
+
+- name: Install condition reports
+  hosts: condition_reports
+  roles:
+    - condition_reports
+
+- name: Install CultURIze
+  hosts: culturize
+  roles:
+    - culturize
+
 - name: Set up cronjob
-  hosts: datahub_pipeline,datahub_dashboard,arthub,imagehub
+  hosts: datahub_pipeline,datahub_dashboard,arthub,imagehub,culturize
   roles:
     - cron
 
 - name: Set up SSL Certificates through LetsEncrypt
-  hosts: datahub,datahub_dashboard,arthub,imagehub
+  hosts: datahub,datahub_dashboard,arthub,imagehub,condition_reports,culturize
   roles:
     - name: certbot
       when: letsencrypt_vhosts | length > 0

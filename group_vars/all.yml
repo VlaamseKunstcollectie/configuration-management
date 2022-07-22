@@ -19,13 +19,15 @@ datahub:
     server_name: datahub.example.com
     document_root: /opt/datahub/web
     index: app.php
-    redirect_to_https: false
+    redirect_to_https: true
     ssl : {}
   mongodb:
     host: 127.0.0.1
     port: 27017
     database: datahub
     username: datahub
+  php:
+    memory_limit: 512M
   mailer:
     transport: gmail
   admin:
@@ -37,14 +39,16 @@ datahub:
 datahub_pipeline:
   dir: /opt/datahub-pipeline
   datahub_protocol: https
+  condition_path: _metadata.institution\\.name
   fixes:
     repo_url: https://github.com/Hero-Solutions/Datahub-Fixes.git
     repo_dir: /opt/.repos/datahub-fixes
     branch: master
   authority_files:
-    repo_url: https://github.com/VlaamseKunstcollectie/Authority-Files.git
+    repo_url: https://github.com/Hero-Solutions/Authority-Files.git
     repo_dir: /opt/.repos/authority-files
     branch: master
+  imagehub_cronjobs: []
   eiz:
     url: https://cjm-web.adlibhosting.com/arthubflanders/oai.ashx
     set: vkc
@@ -78,11 +82,12 @@ datahub_dashboard:
     database: datahub_dashboard
     username: datahub_dashboard
 arthub:
-  repo_url: https://github.com/VlaamseKunstcollectie/Arthub-Frontend
+  repo_url: https://github.com/Hero-Solutions/Arthub-Frontend
   repo_dir: /opt/.repos/arthub
   branch: master
   dir: /opt/arthub
   environment: production
+  fix_script: arthub-index.sh
   nginx:
     name: arthub
     server_name: arthub.example.com
@@ -118,6 +123,8 @@ resourcespace:
     memory_limit: 256M
     post_max_size: 50000M
     upload_max_filesize: 50000M
+  imagehub_commands: []
+  imagehub_curl_calls: []
 cantaloupe:
   version: 5.0.4
   repo_dir: /opt/.repos/cantaloupe
@@ -145,6 +152,10 @@ cantaloupe:
     ssl: {}
 imagehub:
   public: false
+  iiif_versions:
+    - 2
+    - 3
+  main_iiif_version: 2
   repo_url: https://github.com/Hero-Solutions/Imagehub.git
   repo_dir: /opt/.repos/imagehub
   branch: master
@@ -156,6 +167,7 @@ imagehub:
   datahub_record_id_prefix: 'oai:datahub.example.com:example.com:'
   credit_line_suffix: Collectie example
   service_url: https://imagehub.example.com/public/iiif/2/
+  meemoo_service_url: https://imagehub.example.com/meemoo/iiif/2/
   authentication_url: https://imagehub.example.com/public/authenticate/
   authentication_service_description: Example requires that you log in with your museum account to view this content
   mysql:
@@ -170,6 +182,58 @@ imagehub:
     index: imagehub.php
     redirect_to_https: true
     ssl: {}
+omeka:
+  nginx:
+    name: omeka
+    server_name: omeka.example.com
+    document_root: /opt/omeka
+    index: index.php
+    redirect_to_https: true
+    ssl : {}
+condition_reports:
+  repo_url: https://github.com/Hero-Solutions/iiif-condition-reports.git
+  repo_dir: /opt/.repos/condition_reports
+  branch: main
+  dir: /opt/condition_reports
+  service_url: https://conditionreports.example.com/iiif/3/
+  mysql:
+    hostname: 127.0.0.1
+    port: 3306
+    username: condition_reports
+    database: condition_reports
+  nginx:
+    name: condition_reports
+    server_name: conditionreports.example.com
+    document_root: /opt/condition_reports
+    index: index.php
+    redirect_to_https: true
+    ssl : {}
+culturize:
+  dir: /opt/culturize
+  github_file: https://raw.githubusercontent.com/example_org/culturize-example/main/work/nginx_redirect.conf
+  allowed_sources:
+    - '/id/'
+    - '/data/'
+    - '/work/id/'
+    - '/work/data/'
+    - '/work/representation/'
+  allowed_destinations:
+    - 'www.vlaamsekunstcollectie.be'
+    - 'erfgoedinzicht.be'
+    - 'kmska.be'
+    - 'muzee.be'
+    - 'mskgent.be'
+    - 'museabrugge.be'
+    - 'www.museabrugge.be'
+    - 'collectie.museabrugge.be'
+  nginx:
+    server_name: culturize.example.com
+    name: culturize_example
+    document_root: /var/www/culturize.example.com
+    location: /collection/work/
+    redirect_to_https: false
+    ssl: {}
 cronjobs:
   - /opt/datahub-pipeline/fixes/scripts/vocabularies.sh
+root_cronjobs: []
 letsencrypt_vhosts: []

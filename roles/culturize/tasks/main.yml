@@ -1,0 +1,45 @@
+---
+- name: Set up culturize dir
+  file:
+    path: "{{ culturize.dir }}/"
+    state: directory
+    recurse: true
+    owner: root
+    group: root
+
+- name: Set up nginx dir for redirect file
+  file:
+    path: "/etc/nginx/{{ culturize.nginx.name }}/"
+    state: directory
+    recurse: true
+    owner: root
+    group: root
+
+- name: Set up shell script to download and check the latest nginx culturize redirect file
+  template:
+    src: update_culturize.php
+    dest: "{{ culturize.dir }}/update_culturize.php"
+
+- name: Download and check the latest nginx culturize redirect file
+  shell: "php {{ culturize.dir }}/update_culturize.php"
+
+- name: Include culturize nginx vhost
+  include_role:
+    name: nginx
+    tasks_from: create_vhost.yml
+    apply:
+      vars:
+        nginx_vhost:
+          server_name: "{{ culturize.nginx.server_name }}"
+          name: "{{ culturize.nginx.name }}"
+          type: culturize
+          document_root: "{{ culturize.nginx.document_root }}"
+          location: "{{ culturize.nginx.location }}"
+          ssl: "{{ culturize.nginx.ssl }}"
+          redirect_to_https: "{{ culturize.nginx.redirect_to_https }}"
+          auth_basic: "{{ culturize.nginx.auth_basic | default('') }}"
+          auth_basic_whitelist: "{{ culturize.nginx.auth_basic_whitelist | default([]) }}"
+
+- name: Set up cron task for daily reload of nginx culturize redirect file
+  set_fact:
+    root_cronjobs: "{{ root_cronjobs }} + [ 'php {{ culturize.dir }}/update_culturize.php', 'systemctl reload nginx' ]"

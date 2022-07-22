@@ -27,14 +27,30 @@ server {
   }
 {% endif %}
 
-#  location / {
-    index index.php index.html index.htm;
-#    try_files $uri /{{ vhost.index }}$is_args$args;
-#  }
+  index index.php index.html index.htm;
 
 {% if vhost.document_root is defined %}
+
+  # Serve the import.iiif_manifests.sqlite file publicly
+  location /import.iiif_manifests.sqlite$ {
+    root {{ vhost.document_root }}/public;
+    try_files $uri =404;
+  }
+
   # Pass requests for the Imagehub to the appropriate PHP file
-  location ~ /iiif/2/.*(manifest\.json|collection/top) {
+  location ~ (meemoo)?/iiif/(2|3)/.*(manifest\.json|collection/top) {
+    add_header Access-Control-Allow-Origin *;
+    try_files $uri /{{ vhost.index }}$is_args$args;
+  }
+
+  # Pass requests for the Imagehub to the appropriate PHP file
+  location /datahub-to-resourcespace {
+    add_header Access-Control-Allow-Origin *;
+    try_files $uri /{{ vhost.index }}$is_args$args;
+  }
+
+  # Pass requests for the Imagehub to the appropriate PHP file
+  location /generate-iiif-manifests {
     add_header Access-Control-Allow-Origin *;
     try_files $uri /{{ vhost.index }}$is_args$args;
   }
@@ -75,7 +91,7 @@ server {
 
 {% if image_server_upstream is defined %}
   # Pass all other requests for /iiif/.* to Cantaloupe
-  location ~ ^/iiif/2/(private|public).*$ {
+  location ~ ^/iiif/(2|3)/(private|public).*$ {
     proxy_redirect     off;
     proxy_set_header   Host              $host;
     proxy_set_header   X-Real-IP         $remote_addr;

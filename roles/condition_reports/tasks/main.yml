@@ -1,0 +1,161 @@
+---
+- name: Make sure Condition reports database is present
+  mysql_db:
+    name: "{{ condition_reports.mysql.database }}"
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    login_password: "{{ mariadb_root_password }}"
+
+- name: Create Condition reports user in MariaDB
+  mysql_user:
+    name: "{{ condition_reports.mysql.username }}"
+    password: "{{ condition_reports.mysql.password }}"
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    login_password: "{{ mariadb_root_password }}"
+    priv: "{{ condition_reports.mysql.database }}.*:ALL,GRANT"
+    check_implicit_admin: true
+
+- name: Create repo folder
+  file:
+    path: "{{ condition_reports.repo_dir }}"
+    state: directory
+    recurse: true
+    owner: "{{ application_user }}"
+    group: "{{ application_user }}"
+
+- name: Checkout condition reports repo
+  git:
+    repo: "{{ condition_reports.repo_url }}"
+    dest: "{{ condition_reports.repo_dir }}/repo/"
+    force: true
+    version: "{{ condition_reports.branch }}"
+  become_user: "{{ application_user }}"
+
+- name: Create necessary Condition reports tables
+  mysql_db:
+    name: "{{ condition_reports.mysql.database }}"
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    login_user: "{{ condition_reports.mysql.username }}"
+    login_password: "{{ condition_reports.mysql.password }}"
+    state: import
+    target: "{{ condition_reports.repo_dir }}/repo/condition_report_tables.sql"
+
+- name: Create shared folders
+  file:
+    path: "{{ condition_reports.repo_dir }}/shared/{{ item }}/"
+    state: directory
+    recurse: true
+    mode: "775"
+    owner: "{{ application_user }}"
+    group: "{{ php.group }}"
+  with_items:
+    - cache
+    - log
+    - vendor
+
+- name: Delete existing shared folders
+  file:
+    path: "{{ condition_reports.repo_dir }}/repo/{{ item }}"
+    state: absent
+  with_items:
+    - var/cache
+    - var/log
+    - vendor
+  become_user: "{{ application_user }}"
+
+- name: Make sure var folder exists in repo
+  file:
+    path: "{{ condition_reports.repo_dir }}/repo/var"
+    state: directory
+    recurse: true
+    owner: "{{ application_user }}"
+    group: "{{ application_user }}"
+
+- name: Link shared folders
+  file:
+    src: "{{ condition_reports.repo_dir }}/shared/{{ item.src }}"
+    dest: "{{ condition_reports.repo_dir }}/repo/{{ item.dest }}"
+    state: link
+    force: true
+  with_items:
+    - src: cache
+      dest: var/cache
+    - src: log
+      dest: var/log
+    - src: vendor
+      dest: vendor
+  become_user: "{{ application_user }}"
+
+- name: Copy .env for condition reports
+  template:
+    src: .env
+    dest: "{{ condition_reports.repo_dir }}/shared/.env"
+  become_user: "{{ application_user }}"
+
+- name: Copy condition-reports.yaml
+  template:
+    src: condition-reports.yaml
+    dest: "{{ condition_reports.repo_dir }}/repo/config/condition-reports.yaml"
+  become_user: "{{ application_user }}"
+
+- name: Link condition reports repo
+  file:
+    src: "{{ condition_reports.repo_dir }}/repo/"
+    dest: "{{ condition_reports.dir }}"
+    state: link
+
+- name: Install condition reports tool through composer
+  command: composer install
+  args:
+    chdir: "{{ condition_reports.dir }}"
+  become_user: "{{ application_user }}"
+
+- name: Chown cache and log folders
+  file:
+    path: "{{ condition_reports.repo_dir }}/shared/{{ item }}/"
+    state: directory
+    recurse: true
+    mode: "g+w"
+    owner: "{{ application_user }}"
+    group: "{{ php.group }}"
+  with_items:
+    - cache
+    - log
+
+- name: Make sure public/annotation_images folder exists
+  file:
+    path: "{{ condition_reports.dir }}/public/annotation_images"
+    state: directory
+    recurse: true
+    owner: "{{ php.user }}"
+    group: "{{ php.group }}"
+
+- name: Include condition reports php-fpm pool
+  include_role:
+    name: php-fpm
+    tasks_from: create_pool.yml
+    apply:
+      vars:
+        pool_name: "{{ condition_reports.nginx.name }}"
+
+- name: Include condition reports nginx vhost
+  include_role:
+    name: nginx
+    tasks_from: create_vhost.yml
+    apply:
+      vars:
+        nginx_vhost:
+          server_name: "{{ condition_reports.nginx.server_name }}"
+          name: "{{ condition_reports.nginx.name }}"
+          type: php
+          document_root: "{{ condition_reports.nginx.document_root }}"
+          index: "{{ condition_reports.nginx.index }}"
+          php_socket_name: "{{ condition_reports.nginx.name }}"
+          ssl: "{{ condition_reports.nginx.ssl }}"
+          redirect_to_https: "{{ condition_reports.nginx.redirect_to_https }}"
+          auth_basic: "{{ condition_reports.nginx.auth_basic | default('') }}"
+          auth_basic_whitelist: "{{ condition_reports.nginx.auth_basic_whitelist | default([]) }}"
+          other_settings:
+            - "fastcgi_buffer_size          128k"
+            - "fastcgi_buffers              4 256k"
+            - "fastcgi_busy_buffers_size    256k"
+

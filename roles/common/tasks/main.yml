@@ -3,30 +3,33 @@
   apt:
     update_cache: yes
 
-- name: Install git, screen, pip, virtualenv, setuptools, software-properties-common, dirmngr, apt-transport-https and ca-certificates
+- name: Install git, screen, curl, pip, virtualenv, setuptools, software-properties-common, dirmngr, apt-transport-https and ca-certificates
   apt:
     name:
       - git
       - screen
+      - curl
       - software-properties-common
       - dirmngr
       - apt-transport-https
       - ca-certificates
 
-- name: Install python-pip, python-virtualenv and python-setuptools when python 2.*
+- name: Install python-pip, python-virtualenv, python-setuptools and python-passlib when python 2.*
   apt:
     name:
       - python-pip
       - python-virtualenv
       - python-setuptools
+      - python-passlib
   when: ansible_python_version is match("2\..*")
 
-- name: Install python3-pip, python3-virtualenv and python3-setuptools when python 3.*
+- name: Install python3-pip, python3-virtualenv, python3-setuptools and python3-passlib when python 3.*
   apt:
     name:
       - python3-pip
       - python3-virtualenv
       - python3-setuptools
+      - python3-passlib
   when: ansible_python_version is match("3\..*")
 
 - name: Create application user if it does not yet exist

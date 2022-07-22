@@ -13,8 +13,8 @@ server {
   ssl_trusted_certificate {{ vhost.ssl.chain }};
 {% endif %}
 
-  root        /var/empty;
-
+  root        {{ vhost.document_root }};
+  
 {% if '80' in listen_ports %}
   # Allow LetsEncrypt domain validation
   location ~ ^/\.well-known/acme-challenge/ {
@@ -36,13 +36,22 @@ server {
   auth_basic_user_file /etc/nginx/.htpasswd;
 {% endif %}
 
-  location / {
-    proxy_redirect     off;
-    proxy_set_header   Host              $host;
-    proxy_set_header   X-Real-IP         $remote_addr;
-    proxy_set_header   X-Forwarded-Proto $scheme;
-    proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
-    proxy_pass         {{ vhost.upstream }};
+{% if vhost.other_settings is defined %}
+{% for setting in vhost.other_settings %}
+  {{ setting }};
+{% endfor %}
+{% endif %}
+
+  # Deny access to hidden files & dirs.
+  location ~ /\. {
+    access_log off;
+    log_not_found off;
+    return 404;
+    deny all;
+  }
+
+  location {{ vhost.location }} {
+    include /etc/nginx/{{ vhost.name }}/nginx_redirect.conf;
   }
 }
 

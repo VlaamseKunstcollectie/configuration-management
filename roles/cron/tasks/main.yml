@@ -1,12 +1,5 @@
 ---
-- name: Create shell script for cron task
-  template:
-    src: import_data.sh
-    dest: "{{ cron_dir }}/import_data.sh"
-    mode: '755'
-  with_items: "{{ cronjobs }}"
-
-- name: Create cron folder to store output
+- name: Create cron folder
   file:
     path: "{{ cron_dir }}/cron/"
     state: directory
@@ -14,19 +7,65 @@
     owner: "{{ application_user }}"
     group: "{{ application_user }}"
 
+- name: Create shell script for cron task
+  template:
+    src: cronjobs.sh
+    dest: "{{ cron_dir }}/cron/import_data.sh"
+    mode: '755'
+
 - name: Provide crontab entry for daily reload of arthub records
   cron:
     name: "Reload {{ cron_name }} records"
     minute: "0"
     hour: "2"
     user: "{{ application_user }}"
-    job: "bash {{ cron_dir }}/import_data.sh > {{ cron_dir }}/cron/output.log 2>&1"
+    job: "bash {{ cron_dir }}/cron/import_data.sh > {{ cron_dir }}/cron/output.log 2>&1"
 
 - name: Renew SSL certificates through LetsEncrypt
   cron:
-    name: "Renew LetsEncrypt certificates"
+    name: "Renew {{ cron_name }} LetsEncrypt certificates"
     minute: "0"
     hour: "2"
     user: "root"
-    job: "certbot renew -n -q --agree-tos --webroot -w /var/lib/letsencrypt/ --post-hook '/etc/init.d/nginx reload'"
+    job: "certbot renew -n -q --agree-tos --webroot -w /var/lib/letsencrypt/"
     state: "{{ 'present' if (letsencrypt_vhosts | length > 0) else 'absent' }}"
+
+- name: Set cronjobs for arthub check task
+  set_fact:
+    cronjobs:
+      - "date \"+%Y-%m-%d %H:%M:%S\" >> {{ cron_dir }}/cron/check_arthub.log"
+      - "curl -s -o /dev/null -I -L -w \"%{http_code}\" '{{ arthub.nginx.server_name }}/nl' | grep 200 || /usr/sbin/service arthub restart"
+  when: is_arthub is defined and is_arthub
+
+- name: Create shell script for arthub check task
+  template:
+    src: cronjobs.sh
+    dest: "{{ cron_dir }}/cron/check_arthub.sh"
+    mode: '755'
+  with_items: "{{ cronjobs }}"
+  when: is_arthub is defined and is_arthub
+
+- name: Provide crontab entry to check for failure and restart when needed
+  cron:
+    name: "Check and restart {{ cron_name }} Arthub if needed"
+    user: "root"
+    job: "bash {{ cron_dir }}/cron/check_arthub.sh >> {{ cron_dir }}/cron/check_arthub.log 2>&1"
+  when: is_arthub is defined and is_arthub
+
+- name: Create shell script for root cron task
+  template:
+    src: root_cronjobs.sh
+    dest: "{{ cron_dir }}/cron/root_cronjobs.sh"
+    mode: '755'
+    owner: root
+    group: root
+  when: root_cronjobs | length > 0
+
+- name: Set cronjobs for root user
+  cron:
+    name: "Additional root cronjobs"
+    minute: "0"
+    hour: "3"
+    user: "root"
+    job: "bash {{ cron_dir }}/cron/root_cronjobs.sh"
+  when: root_cronjobs | length > 0

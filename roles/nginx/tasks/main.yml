@@ -11,3 +11,10 @@
     name: nginx
     state: started
     enabled: yes
+
+- name: Create htpasswd entry if needed
+  htpasswd:
+    path: /etc/nginx/.htpasswd
+    name: "{{ nginx.auth_basic_username }}"
+    password: "{{ nginx.auth_basic_password }}"
+  when: nginx.auth_basic_username is defined and nginx.auth_basic_password is defined

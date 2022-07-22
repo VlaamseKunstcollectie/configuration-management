@@ -18,9 +18,28 @@ server {
 {% if '80' in listen_ports %}
   # Allow LetsEncrypt domain validation
   location ~ ^/\.well-known/acme-challenge/ {
+    auth_basic off;
+    allow all;
     default_type text/plain;
     root /var/lib/letsencrypt;
   }
+{% endif %}
+
+{% if vhost.auth_basic | length > 0 %}
+  satisfy any;
+  allow 127.0.0.1;
+{% for ip in vhost.auth_basic_whitelist %}
+  allow {{ ip }};
+{% endfor %}
+  deny all;
+  auth_basic "{{ vhost.auth_basic }}";
+  auth_basic_user_file /etc/nginx/.htpasswd;
+{% endif %}
+
+{% if vhost.other_settings is defined %}
+{% for setting in vhost.other_settings %}
+  {{ setting }};
+{% endfor %}
 {% endif %}
 
   location / {

@@ -27,3 +27,9 @@
       vars:
         letsencrypt_vhost: "{{ item }}"
   with_items: "{{ letsencrypt_vhosts }}"
+
+- name: Copy script to reload nginx after certificates have been renewed
+  template:
+    src: 01-nginx.sh
+    dest: "/etc/letsencrypt/renewal-hooks/deploy/01-nginx.sh"
+    mode: "u+x"

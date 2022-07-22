@@ -23,7 +23,7 @@ parameters:
             xpath: 'objectPublishedID'
             field: 'pidobject'
         title_nl:
-            xpath: 'descriptiveMetadata[@xml:lang="{language}"]/objectIdentificationWrap/titleWrap/titleSet/appellationValue[@xml:lang="nl"]'
+            xpath: 'descriptiveMetadata[@xml:lang="{language}"]/objectIdentificationWrap/titleWrap/titleSet/appellationValue[@pref="preferred"]'
             field: 'nl-titleartwork'
         title_en:
             xpath: 'descriptiveMetadata[@xml:lang="{language}"]/objectIdentificationWrap/titleWrap/titleSet/appellationValue[@xml:lang="en"]'
@@ -55,6 +55,21 @@ parameters:
             xpath: 'administrativeMetadata[@xml:lang="{language}"]/rightsWorkWrap/rightsWorkSet/creditLine'
             field: 'copyrightnoticeofart'
 
+    meemoo:
+      service_url: '{{ imagehub.meemoo_service_url }}'
+      iiif_url: 'https://images.meemoo.be/iiif/'
+      inventory_url: 'https://images.meemoo.be/inventory'
+      csv_headers:
+        id: 'Dynamic.PID'
+        inventory_number: 'Dynamic.dc_identifier_localids.Inventarisnummer'
+        copyright: 'Dynamic.dc_rights_credit'
+        width: 'Technical.Width'
+        height: 'Technical.Height'
+        photographer: 'Descriptive.Authors.Author'
+        url: 'url'
+      url_regex_replace: '/^(https:\/\/images\.meemoo\.be\/iiif\/.*)\/full\/full\/0\/default\.jpg$/'
+      url_regex_replace_with: '$1'
+
     credit_line:
         nl:
           field: 'nl-creditline'
@@ -73,6 +88,13 @@ parameters:
           photo: 'Photo'
           photographer: 'Photographer'
 
+    iiif_versions:
+{% for value in imagehub.iiif_versions %}
+      - {{ value }}
+{% endfor %}
+
+    main_iiif_version: {{ imagehub.main_iiif_version }}
+
     cantaloupe_url: '{{ imagehub.cantaloupe_url }}'
     cantaloupe_curl_opts:
         CURLOPT_SSL_VERIFYHOST: false
@@ -81,6 +103,8 @@ parameters:
 #        CURLOPT_CAPATH: /path/to/cacert.pem
 
     service_url: '{{ imagehub.service_url }}'
+
+    resourcespace_manifest_field: 'pidafbeelding'
 
     validate_manifests: false
     validator_url: 'http://localhost:8080/validate?url='
@@ -117,13 +141,49 @@ parameters:
       label: '{{ imagehub.auth_label }}'
       profile: 'http://iiif.io/api/auth/1/login'
 
-    iiif_label: 'nl-titleartwork'
-    iiif_description: 'description'
-    iiif_attribution: 'publisher'
-    iiif_metadata_fields:
+    iiif2_label: 'nl-titleartwork'
+    iiif2_description: 'description'
+    iiif2_attribution: 'publisher'
+    iiif2_metadata_fields:
       nl-titleartwork: 'NL - Title'
       en-titleartwork: 'EN - Title'
       sourceinvnr: 'Object ID'
       publisher: 'Publisher'
       nl-creditline: 'NL - Credit Line'
       en-creditline: 'EN - Credit Line'
+
+    iiif_label:
+      nl: 'nl-titleartwork'
+      en: 'en-titleartwork'
+    iiif_summary:
+      nl: 'description'
+      en: 'description'
+    iiif_required_statement:
+      label:
+        nl: 'NL - Credit Line'
+        en: 'EN - Creddit Line'
+      value:
+        nl: 'nl-creditline'
+        en: 'en-creditline'
+    iiif_metadata_fields:
+      title:
+        label:
+          nl: 'Titel'
+          en: 'Title'
+        value:
+          nl: 'nl-titleartwork'
+          en: 'en-titleartwork'
+      publisher:
+        label:
+          nl: 'Publisher'
+          en: 'Publisher'
+        value:
+          nl: 'publisher'
+          en: 'publisher'
+      inventory_number:
+        label:
+          nl: 'Inventarisnummer'
+          en: 'Object ID'
+        value:
+          nl: 'sourceinvnr'
+          en: 'sourceinvnr'

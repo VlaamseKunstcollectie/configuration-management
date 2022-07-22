@@ -1,4 +1,12 @@
 ---
+- name: Make sure the tmp directory exists
+  file:
+    path: "{{ cron_dir }}/tmp/"
+    state: directory
+    recurse: true
+    owner: "{{ php.user }}"
+    group: "{{ php.group }}"
+
 - name: Set base_url without https
   set_fact:
     base_url_http: "{{ resourcespace.base_url | replace('https://', 'http://') }}"

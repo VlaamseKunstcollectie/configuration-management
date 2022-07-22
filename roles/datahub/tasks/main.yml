@@ -160,7 +160,7 @@
     group: "{{ application_user }}"
 
 - name: Install datahub through composer
-  command: composer install
+  command: /usr/bin/composer install
   args:
     chdir: "{{ datahub.dir }}"
   become_user: "{{ application_user }}"
@@ -183,6 +183,8 @@
     apply:
       vars:
         pool_name: "{{ datahub.nginx.name }}"
+        php_admin_values:
+          memory_limit: "{{ datahub.php.memory_limit }}"
 
 - name: Include datahub nginx vhost
   include_role:
@@ -199,3 +201,5 @@
           php_socket_name: "{{ datahub.nginx.name }}"
           ssl: "{{ datahub.nginx.ssl }}"
           redirect_to_https: "{{ datahub.nginx.redirect_to_https }}"
+          auth_basic: "{{ datahub.nginx.auth_basic | default('') }}"
+          auth_basic_whitelist: "{{ datahub.nginx.auth_basic_whitelist | default([]) }}"

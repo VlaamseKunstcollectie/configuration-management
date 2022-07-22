@@ -89,7 +89,7 @@
     state: link
 
 - name: Install datahub dashboard through composer
-  command: composer install
+  command: /usr/bin/composer install
   args:
     chdir: "{{ datahub_dashboard.dir }}"
   become_user: "{{ application_user }}"
@@ -134,3 +134,5 @@
           php_socket_name: "{{ datahub_dashboard.nginx.name }}"
           ssl: "{{ datahub_dashboard.nginx.ssl }}"
           redirect_to_https: "{{ datahub_dashboard.nginx.redirect_to_https }}"
+          auth_basic: "{{ datahub_dashboard.nginx.auth_basic | default('') }}"
+          auth_basic_whitelist: "{{ datahub_dashboard.nginx.auth_basic_whitelist | default([]) }}"

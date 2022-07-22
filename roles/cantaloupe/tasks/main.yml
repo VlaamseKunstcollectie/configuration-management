@@ -1,4 +1,8 @@
 ---
+- name: Install openjdk-11-jre
+  apt:
+    name: openjdk-11-jre
+
 - name: Create cantaloupe folder
   file:
     path: "{{ cantaloupe.dir }}"
