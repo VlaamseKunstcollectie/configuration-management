@@ -39,6 +39,7 @@ datahub:
 datahub_pipeline:
   dir: /opt/datahub-pipeline
   datahub_protocol: https
+  condition_path: _metadata.institution\\.name
   fixes:
     repo_url: https://github.com/Hero-Solutions/Datahub-Fixes.git
     repo_dir: /opt/.repos/datahub-fixes
