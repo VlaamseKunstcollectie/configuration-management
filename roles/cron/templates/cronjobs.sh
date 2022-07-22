@@ -1,4 +1,4 @@
 #!/bin/bash
-{% for command in cronjobs %}
-{{ command }}
+{% for item in items %}
+{{ item }}
 {% endfor %}

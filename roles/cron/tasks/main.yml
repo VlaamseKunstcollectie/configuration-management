@@ -14,13 +14,6 @@
     mode: '755'
   with_items: "{{ cronjobs }}"
 
-- name: Create shell script for cron task
-  template:
-    src: cronjobs.sh
-    dest: "{{ cron_dir }}/cron/import_data.sh"
-    mode: '755'
-  with_items: "{{ cronjobs }}"
-
 - name: Provide crontab entry for daily reload of arthub records
   cron:
     name: "Reload {{ cron_name }} records"
