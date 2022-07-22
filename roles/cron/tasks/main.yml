@@ -12,7 +12,6 @@
     src: cronjobs.sh
     dest: "{{ cron_dir }}/cron/import_data.sh"
     mode: '755'
-  with_items: "{{ cronjobs }}"
 
 - name: Provide crontab entry for daily reload of arthub records
   cron:
@@ -55,12 +54,11 @@
 
 - name: Create shell script for root cron task
   template:
-    src: cronjobs.sh
+    src: root_cronjobs.sh
     dest: "{{ cron_dir }}/cron/root_cronjobs.sh"
     mode: '755'
     owner: root
     group: root
-  with_items: "{{ root_cronjobs }}"
   when: root_cronjobs | length > 0
 
 - name: Set cronjobs for root user
