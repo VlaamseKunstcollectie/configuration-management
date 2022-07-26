@@ -86,7 +86,7 @@
     - cron
 
 - name: Set up SSL Certificates through LetsEncrypt
-  hosts: datahub,datahub_dashboard,arthub,imagehub,condition_reports,culturize
+  hosts: datahub,datahub_dashboard,arthub,cantaloupe,resourcespace,imagehub,condition_reports,culturize
   roles:
     - name: certbot
       when: letsencrypt_vhosts | length > 0
