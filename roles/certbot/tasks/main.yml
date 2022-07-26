@@ -27,6 +27,7 @@
       vars:
         letsencrypt_vhost: "{{ item }}"
   with_items: "{{ letsencrypt_vhosts }}"
+  ignore_errors: true
 
 - name: Copy script to reload nginx after certificates have been renewed
   template:
