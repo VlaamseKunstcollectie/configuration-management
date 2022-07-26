@@ -66,7 +66,7 @@ $iiif_ptif_quality_field = 'iiifquality';
 $iiif_ptif_commands = array(
     # vips cannot properly handle psb, so we need to use convert instead.
     array(
-        'extensions'   => array('jpg', 'jpeg', 'psb'),
+        'extensions'   => array('jpg', 'jpeg', 'psb', 'png'),
         'command'      => 'convert',
         'arguments'    => '-define tiff:tile-geometry=256x256 -colorspace sRGB -compress jpeg -quality #ptif_quality# -depth 8',
         'dest_prefix'  => 'ptif:',
