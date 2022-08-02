@@ -81,7 +81,6 @@ parameters:
           invnr: 'Inv.nr.'
           photo: 'Foto'
           photographer: 'Fotograaf'
-          extra_info: '{{ imagehub.credit_extra_info_nl }}'
         en:
           field: 'en-creditline'
           title_field: 'en-titleartwork'
@@ -90,7 +89,6 @@ parameters:
           invnr: 'Inv.no.'
           photo: 'Photo'
           photographer: 'Photographer'
-          extra_info: '{{ imagehub.credit_extra_info_en }}'
 
     iiif_versions:
 {% for value in imagehub.iiif_versions %}
@@ -174,6 +172,9 @@ parameters:
       value:
         nl: 'nl-creditline'
         en: 'en-creditline'
+      extra_info:
+        nl: '{{ imagehub.credit_extra_info_nl }}'
+        en: '{{ imagehub.credit_extra_info_en }}'
     iiif_metadata_fields:
       title:
         label:
