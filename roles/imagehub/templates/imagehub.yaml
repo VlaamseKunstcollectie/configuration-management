@@ -95,6 +95,11 @@ parameters:
       - {{ value }}
 {% endfor %}
 
+    manifest_languages:
+{% for value in imagehub.manifest_languages %}
+      - {{ value }}
+{% endfor %}
+
     main_iiif_version: {{ imagehub.main_iiif_version }}
 
     cantaloupe_url: '{{ imagehub.cantaloupe_url }}'
@@ -189,3 +194,12 @@ parameters:
         value:
           nl: 'sourceinvnr'
           en: 'sourceinvnr'
+
+    extra_iiif_metadata:
+      credit_line:
+        label:
+          nl: 'Auteursrechtelijke informatie'
+          en: 'Copyright information'
+        value:
+          nl: '{{ imagehub.copyright_nl }}'
+          en: '{{ imagehub.copyright_en }}'
