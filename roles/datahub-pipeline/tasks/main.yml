@@ -156,6 +156,12 @@
     cronjobs: "{{ cronjobs }} + [ '{{ item}}' ]"
   with_items: "{{ datahub_pipeline.imagehub_cronjobs }}"
 
-- name: Provide crontab entry for daily reload of datahub records
+- name: Provide crontab entry for daily reload of datahub records (without output file)
   set_fact:
     cronjobs: "{{ cronjobs }} + [ 'PERL5LIB=~{{ application_user }}/perl5/lib/perl5/ ~{{ application_user }}/perl5/bin/dhconveyor transport -p {{ datahub_pipeline.dir }}/datahub.ini -L1' ]"
+  when: datahub_pipeline.output_file | length == 0
+
+- name: Provide crontab entry for daily reload of datahub records (with output file)
+  set_fact:
+    cronjobs: "{{ cronjobs }} + [ 'PERL5LIB=~{{ application_user }}/perl5/lib/perl5/ ~{{ application_user }}/perl5/bin/dhconveyor transport -p {{ datahub_pipeline.dir }}/datahub.ini -L1 > {{ datahub_pipeline.output_file }}' ]"
+  when: datahub_pipeline.output_file | length > 0
