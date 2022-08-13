@@ -56,3 +56,6 @@ parameters:
     datahub_oai_repo_name: 'Datahub' # name of the OAI endpoint
     datahub_oai_contact_email: {{ datahub.contact_email }} # comma separated 'email1', 'email2'
     datahub_oai_pagination_num_records: {{ datahub.pagination_num_records }} # number of records per page
+
+    # Pipeline logfile
+    pipeline_logfile: '{{ datahub_pipeline.output_file }}'
