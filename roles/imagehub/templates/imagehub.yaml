@@ -159,19 +159,17 @@ parameters:
       nl-creditline: 'NL - Credit Line'
       en-creditline: 'EN - Credit Line'
 
+    iiif_rights_source: 'copyrightnoticeofart'
     iiif_label:
       nl: 'nl-titleartwork'
       en: 'en-titleartwork'
-    iiif_summary:
-      nl: 'description'
-      en: 'description'
     iiif_required_statement:
       label:
-        nl: 'NL - Credit Line'
-        en: 'EN - Credit Line'
+        nl: 'Attributie/Collectie'
+        en: 'Attribution/Collection'
       value:
-        nl: 'nl-creditline'
-        en: 'en-creditline'
+        nl: 'publisher'
+        en: 'publisher'
       extra_info:
         nl: '{{ imagehub.credit_extra_info_nl }}'
         en: '{{ imagehub.credit_extra_info_en }}'
@@ -183,17 +181,42 @@ parameters:
         value:
           nl: 'nl-titleartwork'
           en: 'en-titleartwork'
-      publisher:
+      creator:
         label:
-          nl: 'Publisher'
-          en: 'Publisher'
+          nl: 'Vervaardiger'
+          en: 'Creator'
         value:
-          nl: 'publisher'
-          en: 'publisher'
+          nl: 'creatorofartworkobje'
+          en: 'creatorofartworkobje'
+      date:
+        label:
+          nl: 'Vervaardigingsdatum'
+          en: 'Date created'
       inventory_number:
         label:
           nl: 'Inventarisnummer'
-          en: 'Object ID'
+          en: 'Inventory no.'
         value:
           nl: 'sourceinvnr'
           en: 'sourceinvnr'
+      description:
+        label:
+          nl: 'Beschrijving'
+          en: 'Description'
+        value:
+          nl: 'description'
+          en: 'description'
+      creator_of_image:
+        label:
+          nl: 'Fotograaf'
+          en: 'Photographer'
+        value:
+          nl: 'creatorofimage'
+          en: 'creatorofimage'
+      photographer:
+        label:
+          nl: 'Fotograaf'
+          en: 'Photographer'
+        value:
+          nl: 'photographer'
+          en: 'photographer'
