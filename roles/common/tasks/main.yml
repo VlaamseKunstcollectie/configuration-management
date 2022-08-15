@@ -2,7 +2,7 @@
 - name: Update apt repositories
   apt:
     update_cache: yes
-  when: ansible_facts.distribution == 'Debian' and ansible_facts.distribution_major_version == '10' or ansible_facts.distribution == 'Ubuntu' and ansible_facts.distribution_major_version == '18'
+  when: not (ansible_facts.distribution == 'Debian' and ansible_facts.distribution_major_version == '10' or ansible_facts.distribution == 'Ubuntu' and ansible_facts.distribution_major_version == '18')
 
 - name: Install git, screen, curl, pip, virtualenv, setuptools, software-properties-common, dirmngr, apt-transport-https and ca-certificates
   apt:
