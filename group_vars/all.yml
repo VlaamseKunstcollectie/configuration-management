@@ -171,6 +171,7 @@ imagehub:
   resourcespace_api_username: admin
   datahub_url: https://datahub.example.com
   datahub_record_id_prefix: 'oai:datahub.example.com:example.com:'
+  store_datahub_record_ids: false
   credit_suffix_nl: Collectie example
   credit_suffix_en: Collection example
   credit_extra_info_nl: '<p>De originele TIFF-bestanden van dit werk, in hoogste resolutie en met kleurencode, kunnen worden besteld bij <a href="https://artinflanders.be">Art in Flanders</a> (meemoo). Wanneer dit beeld gebruikt wordt voor een gedrukte publicatie of een commercieel product, dan stellen we het op prijs dat drie exemplaren worden toegestuurd naar ons.</p>'
