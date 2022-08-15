@@ -161,65 +161,65 @@ parameters:
 
     iiif_rights_source: 'copyrightnoticeofart'
     iiif_label:
-      nl: 'nl-titleartwork'
       en: 'en-titleartwork'
+      nl: 'nl-titleartwork'
     iiif_required_statement:
       label:
-        nl: 'Attributie/Collectie'
         en: 'Attribution/Collection'
+        nl: 'Attributie/Collectie'
       value:
-        nl: 'publisher'
         en: 'publisher'
+        nl: 'publisher'
       extra_info:
-        nl: '{{ imagehub.credit_extra_info_nl }}'
         en: '{{ imagehub.credit_extra_info_en }}'
+        nl: '{{ imagehub.credit_extra_info_nl }}'
     iiif_metadata_fields:
       title:
         label:
-          nl: 'Titel'
           en: 'Title'
+          nl: 'Titel'
         value:
-          nl: 'nl-titleartwork'
           en: 'en-titleartwork'
+          nl: 'nl-titleartwork'
       creator:
         label:
-          nl: 'Vervaardiger'
           en: 'Creator'
+          nl: 'Vervaardiger'
         value:
-          nl: 'creatorofartworkobje'
           en: 'creatorofartworkobje'
+          nl: 'creatorofartworkobje'
       date:
         label:
-          nl: 'Vervaardigingsdatum'
           en: 'Date created'
+          nl: 'Vervaardigingsdatum'
         value:
-          en: 'datecreatedofartwork'
           nl: 'datecreatedofartwork'
+          en: 'datecreatedofartwork'
       inventory_number:
         label:
-          nl: 'Inventarisnummer'
           en: 'Inventory no.'
+          nl: 'Inventarisnummer'
         value:
-          nl: 'sourceinvnr'
           en: 'sourceinvnr'
+          nl: 'sourceinvnr'
       description:
         label:
-          nl: 'Beschrijving'
           en: 'Description'
+          nl: 'Beschrijving'
         value:
-          nl: 'description'
           en: 'description'
+          nl: 'description'
       creator_of_image:
         label:
-          nl: 'Fotograaf'
           en: 'Photographer'
+          nl: 'Fotograaf'
         value:
-          nl: 'creatorofimage'
           en: 'creatorofimage'
+          nl: 'creatorofimage'
       photographer:
         label:
-          nl: 'Fotograaf'
           en: 'Photographer'
+          nl: 'Fotograaf'
         value:
-          nl: 'photographer'
           en: 'photographer'
+          nl: 'photographer'

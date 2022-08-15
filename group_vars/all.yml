@@ -158,8 +158,8 @@ imagehub:
     - 2
     - 3
   manifest_languages:
-    - nl
     - en
+    - nl
   main_iiif_version: 2
   placeholder_id: -1
   repo_url: https://github.com/Hero-Solutions/Imagehub.git
