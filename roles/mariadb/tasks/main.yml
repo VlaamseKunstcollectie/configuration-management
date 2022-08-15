@@ -2,10 +2,10 @@
 - name: Add apt repository
   include_tasks: add_apt_repository.yml
 
-- name: Update apt repositories
-  apt:
-    update_cache: yes
-  when: not (ansible_facts.distribution == 'Debian' and ansible_facts.distribution_major_version == '10' or ansible_facts.distribution == 'Ubuntu' and ansible_facts.distribution_major_version == '18')
+# apt update currently not working, disabled for now
+#- name: Update apt repositories
+#  apt:
+#    update_cache: yes
 
 - name: Install MariaDB
   apt:
