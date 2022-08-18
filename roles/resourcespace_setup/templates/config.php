@@ -57,6 +57,9 @@ $iiif_ptif_public_folder = 'public/';
 # Metadata field that denotes the quality of the generated PTIF image
 $iiif_ptif_quality_field = 'iiifquality';
 
+# Metadata field that denotes whether to generate a PTIF image or not
+$iiif_generate_ptif_field = 'generateiiifimage';
+
 # CLI Commands to perform image conversion to PTIF.
 # 'extensions' defines a list of file extensions and the command that should be used to convert images with these extensions to PTIF.
 # 'command' should probably be 'vips im_vips2tiff' or 'convert', but accepts any installed command for image conversion (can be the full path to an executable).
