@@ -17,7 +17,7 @@
   cron:
     name: "Reload {{ cron_name }} records"
     minute: "0"
-    hour: "2"
+    hour: "20"
     user: "{{ application_user }}"
     job: "bash {{ cron_dir }}/cron/import_data.sh > {{ cron_dir }}/cron/output.log 2>&1"
 
@@ -25,7 +25,7 @@
   cron:
     name: "Renew {{ cron_name }} LetsEncrypt certificates"
     minute: "0"
-    hour: "2"
+    hour: "20"
     user: "root"
     job: "certbot renew -n -q --agree-tos --webroot -w /var/lib/letsencrypt/"
     state: "{{ 'present' if (letsencrypt_vhosts | length > 0) else 'absent' }}"
@@ -65,7 +65,7 @@
   cron:
     name: "Additional root cronjobs"
     minute: "0"
-    hour: "3"
+    hour: "21"
     user: "root"
     job: "bash {{ cron_dir }}/cron/root_cronjobs.sh"
   when: root_cronjobs | length > 0
