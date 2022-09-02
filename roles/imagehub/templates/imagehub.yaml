@@ -26,7 +26,7 @@ parameters:
             xpath: 'objectPublishedID'
             field: 'pidobject'
         title_nl:
-            xpath: 'descriptiveMetadata[@xml:lang="{language}"]/objectIdentificationWrap/titleWrap/titleSet/appellationValue[@pref="preferred"]'
+            xpath: '(descriptiveMetadata[@xml:lang="{language}"]/objectIdentificationWrap/titleWrap/titleSet/appellationValue[@pref="preferred"])[1]'
             field: 'nl-titleartwork'
         title_en:
             xpath: 'descriptiveMetadata[@xml:lang="{language}"]/objectIdentificationWrap/titleWrap/titleSet/appellationValue[@xml:lang="en"]'
@@ -213,8 +213,8 @@ parameters:
       nl: 'nl-titleartwork'
     iiif_required_statement:
       label:
-        en: 'Attribution/Collection'
-        nl: 'Attributie/Collectie'
+        en: 'Collection'
+        nl: 'Collectie'
       value:
         en: 'publisher'
         nl: 'publisher'
@@ -250,13 +250,6 @@ parameters:
         value:
           en: 'sourceinvnr'
           nl: 'sourceinvnr'
-      description:
-        label:
-          en: 'Description'
-          nl: 'Beschrijving'
-        value:
-          en: 'description'
-          nl: 'description'
       creator_of_image:
         label:
           en: 'Photographer'
@@ -271,3 +264,10 @@ parameters:
         value:
           en: 'photographer'
           nl: 'photographer'
+      description:
+        label:
+          en: 'Description'
+          nl: 'Beschrijving'
+        value:
+          en: 'description'
+          nl: 'description'
