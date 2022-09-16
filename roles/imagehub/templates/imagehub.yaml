@@ -47,7 +47,7 @@ parameters:
             xpath: 'descriptiveMetadata[@xml:lang="{language}"]/eventWrap/eventSet/event[eventType/term="production"]/eventDate/date/latestDate'
             label: 'latestdate'
         publisher:
-            xpath: 'administrativeMetadata[@xml:lang="{language}"]/recordWrap/recordSource/legalBodyName/appellationValue'
+            xpath: '(administrativeMetadata[@xml:lang="{language}"]/recordWrap/recordSource/legalBodyName/appellationValue)[1]'
             field: 'publisher'
         keywords:
             xpaths:
