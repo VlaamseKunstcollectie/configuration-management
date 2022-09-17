@@ -120,14 +120,6 @@ parameters:
             nl: 'photographer'
 
     credit_line:
-        nl:
-          field: 'nl-creditline'
-          title_field: 'nl-titleartwork'
-          suffix: '{{ imagehub.credit_suffix_nl }}'
-          sabam_suffix: 'België'
-          invnr: 'Inv.nr.'
-          photo: 'Foto'
-          photographer: 'Fotograaf'
         en:
           field: 'en-creditline'
           title_field: 'en-titleartwork'
@@ -136,6 +128,14 @@ parameters:
           invnr: 'Inv.no.'
           photo: 'Photo'
           photographer: 'Photographer'
+        nl:
+          field: 'nl-creditline'
+          title_field: 'nl-titleartwork'
+          suffix: '{{ imagehub.credit_suffix_nl }}'
+          sabam_suffix: 'België'
+          invnr: 'Inv.nr.'
+          photo: 'Foto'
+          photographer: 'Fotograaf'
 
     iiif_versions:
 {% for value in imagehub.iiif_versions %}
@@ -195,7 +195,9 @@ parameters:
       label: '{{ imagehub.auth_label }}'
       profile: 'http://iiif.io/api/auth/1/login'
 
-    iiif2_label: 'nl-titleartwork'
+    iiif2_labels:
+      en: 'en-titleartwork'
+      nl: 'nl-title-artwork'
     iiif2_attribution: 'publisher'
 
     publishers:
