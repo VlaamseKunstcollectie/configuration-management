@@ -265,8 +265,8 @@ parameters:
           en: 'Date created'
           nl: 'Vervaardigingsdatum'
         value:
-          nl: 'datecreatedofartwork'
           en: 'datecreatedofartwork'
+          nl: 'datecreatedofartwork'
       inventory_number:
         label:
           en: 'Inventory no.'
