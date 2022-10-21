@@ -67,23 +67,22 @@ $iiif_generate_ptif_field = 'generateiiifimage';
 # 'dest_prefix' will be prefixed to the destination path, necessary for convert.
 # 'dest_postfix' will be postfixed to the destination path, necessary for vips.
 $iiif_ptif_commands = array(
-    # vips cannot properly handle psb, so we need to use convert instead.
+    # Use vips for TIFF images as it is generally faster and consumes fewer resources than convert, however it does not appear able to handle any other image formats
     array(
-        'extensions'   => array('jpg', 'jpeg', 'psb', 'png'),
+        'extensions'   => array('tif', 'tiff', 'ptif'),
+        'command'      => 'vips im_vips2tiff',
+        'arguments'    => '',
+        'dest_prefix'  => '',
+        'dest_postfix' => ':jpeg:#ptif_quality#,tile:256x256,pyramid'
+    ),
+    # define catchall command for all other extensions with '*'
+    array(
+        'extensions'   => array('*'),
         'command'      => 'convert',
         'arguments'    => '-define tiff:tile-geometry=256x256 -colorspace sRGB -compress jpeg -quality #ptif_quality# -depth 8',
         'dest_prefix'  => 'ptif:',
         'dest_postfix' => ''
     ),
-    # define catchall command for all other extensions with '*'
-    # vips is generally faster and consumes fewer resources than convert, so use wherever possible.
-    array(
-        'extensions'   => array('*'),
-        'command'      => 'vips im_vips2tiff',
-        'arguments'    => '',
-        'dest_prefix'  => '',
-        'dest_postfix' => ':jpeg:#ptif_quality#,tile:256x256,pyramid'
-    )
 );
 
 $file_checksums     = true;
