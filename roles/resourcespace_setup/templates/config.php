@@ -82,7 +82,7 @@ $iiif_ptif_commands = array(
         'arguments'    => '-define tiff:tile-geometry=256x256 -colorspace sRGB -compress jpeg -quality #ptif_quality# -depth 8',
         'dest_prefix'  => 'ptif:',
         'dest_postfix' => ''
-    ),
+    )
 );
 
 $file_checksums     = true;
