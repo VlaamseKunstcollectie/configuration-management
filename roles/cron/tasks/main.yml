@@ -7,6 +7,15 @@
     owner: "{{ application_user }}"
     group: "{{ application_user }}"
 
+- name: Provide crontab entry to restart Cantaloupe image server once per day
+  cron:
+    name: "Restart Cantaloupe"
+    minute: "50"
+    hour: "19"
+    user: "root"
+    job: "systemctl restart {{ cantaloupe.service_name }}"
+  when: is_cantaloupe
+
 - name: Create shell script for cron task
   template:
     src: cronjobs.sh
