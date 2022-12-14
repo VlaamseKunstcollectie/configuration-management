@@ -70,17 +70,17 @@ $iiif_ptif_commands = array(
     # Use vips for TIFF images as it is generally faster and consumes fewer resources than convert, however it does not appear able to handle any other image formats
     array(
         'extensions'   => array('tif', 'tiff', 'ptif'),
-        'command'      => 'vips im_vips2tiff',
+        'command'      => 'TMPDIR={{ resourcespace.imagemagick.temporary_path }} vips im_vips2tiff',
         'arguments'    => '',
         'dest_prefix'  => '',
-        'dest_postfix' => ':jpeg:#ptif_quality#,tile:256x256,pyramid'
+        'dest_postfix' => ':jpeg:#ptif_quality#,tile:256x256,pyramid,,,{{ resourcespace.rs_ptif.repo_dir }}/sRGB2014.icc'
     ),
     # define catchall command for all other extensions with '*'
     array(
         'extensions'   => array('*'),
         'command'      => 'convert',
-        'arguments'    => '-define tiff:tile-geometry=256x256 -colorspace sRGB -compress jpeg -quality #ptif_quality# -depth 8',
-        'dest_prefix'  => 'ptif:',
+        'arguments'    => '-define tiff:tile-geometry=256x256 -compress jpeg -quality #ptif_quality#',
+        'dest_prefix'  => '-profile {{ resourcespace.rs_ptif.repo_dir }}/sRGB2014.icc ptif:',
         'dest_postfix' => ''
     )
 );
@@ -90,4 +90,5 @@ $file_checksums_50k = true;
 $file_checksums_offline = false;
 $file_checksums_fullfile = false;
 $file_upload_block_duplicates = true;
-$tempdir = '{{ cron_dir }}/tmp/';
+$tempdir = '{{ resourcespace.imagemagick.temporary_path }}';
+$debug_log_location = '{{ resourcespace.repo_dir }}/debug.log';

@@ -32,7 +32,7 @@ server {
 {% if vhost.document_root is defined %}
 
   # Serve the import.iiif_manifests.sqlite file publicly
-  location /import.iiif_manifests.sqlite$ {
+  location /import.iiif_manifests.sqlite {
     root {{ vhost.document_root }}/public;
     try_files $uri =404;
   }

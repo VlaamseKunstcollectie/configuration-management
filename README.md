@@ -15,6 +15,11 @@ The controlled machine must also have an application user with sudo privileges a
 NOTE: for the Arthub, openjdk-11-jre version 11.0.9.1 does not work with solr, so make sure that either version 8 or version 11.0.11 is installed.
 On Debian 10, do this by adding the security repos!
 
+For ResourceSpace and the RS_PTIF extensions, it is important to have adequate space in the /tmp folder (at root level) in order to perform image operatations. If not, it is recommended to add the following line to `include/config.php` in your ResourceSpace setup:
+```
+$tempdir = tmp_dir_location; # tmp_dir_location can be /opt/tmp/ for example (must be chowned to www-data:www-data)
+```
+
 # Requirements
 
 To use this Ansible playbook for an installation of the Flemish Art Collection's ecosystem, you need to have a controller (could be either a PC or server) with the following packages installed:

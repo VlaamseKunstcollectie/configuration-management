@@ -7,6 +7,14 @@
     owner: "{{ php.user }}"
     group: "{{ php.group }}"
 
+- name: Make sure the ImageMagick tmp directory exists
+  file:
+    path: "{{ resourcespace.imagemagick.temporary_path }}"
+    state: directory
+    recurse: true
+    owner: "{{ php.user }}"
+    group: "{{ php.group }}"
+
 - name: Set base_url without https
   set_fact:
     base_url_http: "{{ resourcespace.base_url | replace('https://', 'http://') }}"
@@ -161,6 +169,11 @@
     src: config.php
     dest: /tmp/rs_ptif_config.php
   when: first_rs_run.rc == 1
+
+- name: Put the sRGB ICC profile file
+  template:
+    src: sRGB2014.icc
+    dest: "{{ resourcespace.rs_ptif.repo_dir }}"
 
 - name: Append rs_ptif_config.php to config.php if not already done so
   shell: "cat /tmp/rs_ptif_config.php >> {{ resourcespace.repo_dir }}/include/config.php"

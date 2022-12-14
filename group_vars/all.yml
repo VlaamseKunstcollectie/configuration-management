@@ -127,7 +127,7 @@ resourcespace:
     post_max_size: 50000M
     upload_max_filesize: 50000M
   imagemagick:
-    temporary_path: /tmp
+    temporary_path: /tmp/
     memory: 8GiB
   imagehub_commands: []
   imagehub_curl_calls: []
