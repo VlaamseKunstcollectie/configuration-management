@@ -27,7 +27,7 @@ datahub:
     database: datahub
     username: datahub
   php:
-    memory_limit: 512M
+    memory_limit: 1024M
   mailer:
     transport: gmail
   admin:
