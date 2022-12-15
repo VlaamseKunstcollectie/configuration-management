@@ -171,7 +171,7 @@
   when: first_rs_run.rc == 1
 
 - name: Put the sRGB ICC profile file
-  template:
+  copy:
     src: sRGB2014.icc
     dest: "{{ resourcespace.rs_ptif.repo_dir }}"
 
