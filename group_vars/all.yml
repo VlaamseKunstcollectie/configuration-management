@@ -175,6 +175,7 @@ imagehub:
   resourcespace_api_username: admin
   datahub_url: https://datahub.example.com
   datahub_record_id_prefix: 'oai:datahub.example.com:example.com:'
+  related_works_xpath: 'descriptiveMetadata[@xml:lang="{language}"]/objectRelationWrap/relatedWorksWrap/relatedWorkSet'
   store_datahub_record_ids: false
   credit_suffix_nl: Collectie example
   credit_suffix_en: Collection example
