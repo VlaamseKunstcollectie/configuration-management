@@ -11,6 +11,7 @@ parameters:
     datahub_metadataprefix: 'oai_lido'
     datahub_related_works_xpath: '{{ imagehub.related_works_xpath }}'
     store_datahub_record_ids: {{ imagehub.store_datahub_record_ids }}
+    one_manifest_per_object: {{ imagehub.one_manifest_per_object }}
 
     placeholder_id: {{ imagehub.placeholder_id }}
 
