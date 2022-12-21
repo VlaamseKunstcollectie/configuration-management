@@ -250,5 +250,6 @@ culturize:
     ssl: {}
 cronjobs:
   - /opt/datahub-pipeline/fixes/scripts/vocabularies.sh
+final_cronjobs: []
 root_cronjobs: []
 letsencrypt_vhosts: []
