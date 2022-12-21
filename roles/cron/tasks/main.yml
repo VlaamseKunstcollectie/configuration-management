@@ -18,7 +18,7 @@
 
 - name: Add additional cronjobs at the end if needed
   set_fact:
-    cronjobs: "{{ cronjobs + final_cronjobs }}"
+    cronjobs: "{{ cronjobs }} + {{ final_cronjobs }}"
 
 - name: Create shell script for cron task
   template:
