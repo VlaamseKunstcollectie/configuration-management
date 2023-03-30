@@ -61,7 +61,7 @@ parameters:
 {% for field in imagehub.extra_datahub_fields %}
         {{ field.name }}:
             xpath: '{{ field.xpath }}'
-            xpath: '{{ field.rs_shorthand }}'
+            field: '{{ field.rs_shorthand }}'
 {% endfor %}
 
     meemoo:
