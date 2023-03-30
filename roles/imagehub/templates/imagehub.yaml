@@ -58,6 +58,11 @@ parameters:
         copyright:
             xpath: 'administrativeMetadata[@xml:lang="{language}"]/rightsWorkWrap/rightsWorkSet/creditLine'
             field: 'copyrightnoticeofart'
+{% for field in imagehub.extra_datahub_fields %}
+        {{ field.name }}:
+            xpath: '{{ field.xpath }}'
+            xpath: '{{ field.rs_shorthand }}'
+{% endfor %}
 
     meemoo:
       service_url: '{{ imagehub.meemoo_service_url }}'
@@ -216,8 +221,8 @@ parameters:
             en: Royal Museum of Fine Arts Antwerp - Flemish Community
             nl: Koninklijk Museum voor Schone Kunsten Antwerpen - Vlaamse Gemeenschap
           creditline:
-            en: '<p>De jpg-bestanden van kunstwerken in het publieke domein zijn downloadbaar in hoge resolutie via de website van KMSKA. Beelden aanvragen kan via het contactformulier op <a href="https://kmska.be/nl/contact">kmska.be/nl/contact</a>.</p>'
-            nl: '<p>The jpg files of public domain artworks are downloadable in high resolution through the KMSKA website. Requesting images can be done through the contact form at <a href="https://kmska.be/en/contact">kmska.be/en/contact</a>.</p>'
+            en: '<p>The jpg files of public domain artworks are downloadable in high resolution through the KMSKA website. Requesting images can be done through the contact form at <a href="https://kmska.be/en/contact">kmska.be/en/contact</a>.</p>'
+            nl: '<p>De jpg-bestanden van kunstwerken in het publieke domein zijn downloadbaar in hoge resolutie via de website van KMSKA. Beelden aanvragen kan via het contactformulier op <a href="https://kmska.be/nl/contact">kmska.be/nl/contact</a>.</p>'
         Museum voor Schone Kunsten Gent:
           url:
             en: 'https://www.mskgent.be/en'
