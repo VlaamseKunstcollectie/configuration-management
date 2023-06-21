@@ -43,6 +43,15 @@
     job: "certbot renew -n -q --agree-tos --webroot -w /var/lib/letsencrypt/"
     state: "{{ 'present' if (letsencrypt_vhosts | length > 0) else 'absent' }}"
 
+- name: Configure offline jobs for ResourceSpace
+  cron:
+    name: "Run ResourceSpace offline jobs"
+    minute: "*/5"
+    user: "root"
+    job: "cd {{ resourcespace.repo_dir }}/pages/tools; php offline_jobs.php"
+    state: "present"
+  when: is_resourcespace
+
 - name: Set cronjobs for arthub check task
   set_fact:
     cronjobs:

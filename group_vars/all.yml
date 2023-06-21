@@ -167,6 +167,7 @@ imagehub:
     - nl
   main_iiif_version: 2
   placeholder_id: -1
+  ftp_folder: /home/user/ftp/
   repo_url: https://github.com/Hero-Solutions/Imagehub.git
   repo_dir: /opt/.repos/imagehub
   branch: master

@@ -15,6 +15,8 @@ parameters:
 
     placeholder_id: {{ imagehub.placeholder_id }}
 
+    ftp_folder: '{{ imagehub.ftp_folder }}'
+
     # The value of 'field' within each definition is the shorthand name of the field in ResourceSpace where this data is sent.
     # These fields should not be manually edited in ResourceSpace, as any data within will automatically be overwritten with data from the Datahub!
     # Field 'id' must always be present in the data definition (= inventory number, used a primary key in MySQL).
@@ -215,8 +217,8 @@ parameters:
     publishers:
         Koninklijk Museum voor Schone Kunsten Antwerpen:
           url:
-            en: https://kmska.be/nl
-            nl: https://kmska.be/en
+            en: https://kmska.be/en
+            nl: https://kmska.be/nl
           translations:
             en: Royal Museum of Fine Arts Antwerp - Flemish Community
             nl: Koninklijk Museum voor Schone Kunsten Antwerpen - Vlaamse Gemeenschap
