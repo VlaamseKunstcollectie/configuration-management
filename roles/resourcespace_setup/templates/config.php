@@ -91,4 +91,5 @@ $file_checksums_offline = false;
 $file_checksums_fullfile = false;
 $file_upload_block_duplicates = true;
 $tempdir = '{{ resourcespace.imagemagick.temporary_path }}';
+$offline_job_queue = true;
 $debug_log_location = '{{ resourcespace.repo_dir }}/debug.log';
