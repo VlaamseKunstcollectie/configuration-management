@@ -181,6 +181,7 @@ imagehub:
   extra_datahub_fields: []
   store_datahub_record_ids: false
   one_manifest_per_object: true
+  use_placeholder_for_images_in_copyright: false
   meemoo_manifest_label_nl: title
   meemoo_manifest_label_en: title
   meemoo_canvas_label_nl: title
