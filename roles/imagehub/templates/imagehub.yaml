@@ -10,6 +10,10 @@ parameters:
     datahub_namespace: 'lido'
     datahub_metadataprefix: 'oai_lido'
     datahub_related_works_xpath: '{{ imagehub.related_works_xpath }}'
+    exclude_relations:
+{% for field in imagehub.exclude_relations %}
+      - {{ field }}
+{% endfor %}
     store_datahub_record_ids: {{ imagehub.store_datahub_record_ids }}
     one_manifest_per_object: {{ imagehub.one_manifest_per_object }}
     use_placeholder_for_images_in_copyright : {{ imagehub.use_placeholder_for_images_in_copyright }}
