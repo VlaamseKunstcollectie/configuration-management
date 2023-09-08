@@ -60,7 +60,7 @@ server {
     try_files $uri /{{ vhost.index }}$is_args$args;
   }
 
-  location ~ ^/imagehub\.php(/|$) {
+  location ~ ^/imagehub\.php {
     alias {{ vhost.document_root }}/public;
 
     fastcgi_pass unix:/run/php/php{{ php.version }}-fpm-{{ vhost.php_socket_name }}.sock;
