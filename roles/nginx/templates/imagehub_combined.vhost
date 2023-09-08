@@ -31,6 +31,16 @@ server {
 
 {% if vhost.document_root is defined %}
 
+{% if dam_document_root is not defined %}
+
+  # Pass requests for the Imagehub to the appropriate PHP file
+  location / {
+    add_header Access-Control-Allow-Origin *;
+    try_files $uri /imagehub.php$is_args$args;
+  }
+
+{% endif %}
+
   # Serve the import.iiif_manifests.sqlite file publicly
   location /import.iiif_manifests.sqlite {
     root {{ vhost.document_root }}/public;
