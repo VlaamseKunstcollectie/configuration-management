@@ -16,7 +16,7 @@ server {
 {% if dam_document_root is defined %}
   root        {{ dam_document_root }};
 {% else %}
-  root        {{ vhost.document_root }};
+  root        {{ vhost.document_root }}/public;
 {% endif %}
 
 {% if '80' in listen_ports %}
