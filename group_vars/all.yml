@@ -226,6 +226,7 @@ condition_reports:
   branch: main
   dir: /opt/condition_reports
   service_url: https://conditionreports.example.com/iiif/3/
+  mailer_dsn: smtp://condition_reports@example.com:password@default
   mysql:
     hostname: 127.0.0.1
     port: 3306
