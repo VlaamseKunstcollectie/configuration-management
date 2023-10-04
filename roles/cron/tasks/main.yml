@@ -48,7 +48,7 @@
     name: "Put files uploaded through FTP into ResourceSpace"
     minute: "*/5"
     user: "{{ application_user }}"
-    job: "php {{ imagehub.repo_dir }}/bin/console app:ftp-to-resourcespace -vvv >> {{ cron_dir }}/cron/imagehub_ftp_output.log 2>&1"
+    job: "php {{ imagehub.dir }}/bin/console app:ftp-to-resourcespace -vvv >> {{ cron_dir }}/cron/imagehub_ftp_output.log 2>&1"
   when: imagehub.ftp_cronjob
 
 - name: Configure offline jobs for ResourceSpace
