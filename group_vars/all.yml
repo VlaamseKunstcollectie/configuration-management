@@ -161,6 +161,7 @@ cantaloupe:
     ssl: {}
 imagehub:
   public: false
+  ftp_cronjob: false
   iiif_versions:
     - 2
     - 3
