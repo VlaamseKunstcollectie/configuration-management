@@ -4,6 +4,7 @@
     path: "{{ cron_dir }}/cron/"
     state: directory
     recurse: true
+    mode: '777'
     owner: "{{ application_user }}"
     group: "{{ application_user }}"
 
@@ -57,7 +58,7 @@
     minute: "0"
     hour: "20"
     user: "{{ php.user }}"
-    job: "cd {{ resourcespace.repo_dir }}/pages/tools; php offline_jobs.php >> {{ cron_dir }}/cron/resourcespace_cron_output.log 2>&1; cd {{ resourcespace.repo_dir }}/batch; php create_previews.php >> {{ cron_dir }}/cron/resourcespace_cron_output.log 2>&1"
+    job: "php {{ resourcespace.repo_dir }}/batch/create_previews.php >> {{ cron_dir }}/cron/resourcespace_cron_output.log 2>&1; php {{ resourcespace.repo_dir }}/pages/tools/offline_jobs.php >> {{ cron_dir }}/cron/resourcespace_cron_output.log 2>&1"
     state: "present"
   when: is_resourcespace
 
