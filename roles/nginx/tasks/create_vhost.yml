@@ -76,6 +76,15 @@
     listen_ports: "{{ listen_ports }} + [ '443' ]"
   when: cert_exists.stat is defined and cert_exists.stat.exists and key_exists.stat is defined and key_exists.stat.exists and chain_exists.stat is defined and chain_exists.stat.exists
 
+- name: Create fastcgi temp path if needed
+  file:
+    path: "{{ php.temp_path }}"
+    state: directory
+    recurse: true
+    owner: "{{ php.user }}"
+    group: "{{ php.group }}"
+  when: php.temp_path != "fastcgi_temp"
+
 - name: "Copy nginx vhost for {{ vhost.name }}"
   template:
     src: "{{ vhost.type }}.vhost"
