@@ -7,6 +7,8 @@ php:
   version: 7.2
   user: www-data
   group: www-data
+  request_buffering: on
+  temp_path: fastcgi_temp
 datahub:
   environment: production
   repo_url: https://github.com/Hero-Solutions/Datahub.git

@@ -60,6 +60,12 @@ server {
     fastcgi_pass unix:/run/php/php{{ php.version }}-fpm-{{ vhost.php_socket_name }}.sock;
     fastcgi_param SCRIPT_FILENAME  $document_root$fastcgi_script_name;
     include /etc/nginx/fastcgi_params;
+{% if php.request_buffering != "on" %}
+    fastcgi_request_buffering {{ php.request_buffering }};
+{% endif %}
+{% if php.temp_path != "fastcgi_temp" %}
+    fastcgi_temp_path {{ php.temp_path }};
+{% endif %}
   }
 
   # Set proper expiration times for static files & don't log them.

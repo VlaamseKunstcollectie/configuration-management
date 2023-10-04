@@ -79,6 +79,12 @@ server {
     fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
     fastcgi_param DOCUMENT_ROOT $realpath_root;
     internal;
+{% if php.request_buffering != "on" %}
+    fastcgi_request_buffering {{ php.request_buffering }};
+{% endif %}
+{% if php.temp_path != "fastcgi_temp" %}
+    fastcgi_temp_path {{ php.temp_path }};
+{% endif %}
   }
 
   location ^~ /simplesaml_imagehub {
@@ -95,6 +101,12 @@ server {
       fastcgi_param SCRIPT_NAME /simplesaml_imagehub$phpfile;
 
       fastcgi_param PATH_INFO $pathinfo if_not_empty;
+{% if php.request_buffering != "on" %}
+      fastcgi_request_buffering {{ php.request_buffering }};
+{% endif %}
+{% if php.temp_path != "fastcgi_temp" %}
+      fastcgi_temp_path {{ php.temp_path }};
+{% endif %}
     }
   }
 {% endif %}
@@ -126,6 +138,12 @@ server {
       fastcgi_param SCRIPT_NAME /simplesaml$phpfile;
 
       fastcgi_param PATH_INFO $pathinfo if_not_empty;
+{% if php.request_buffering != "on" %}
+      fastcgi_request_buffering {{ php.request_buffering }};
+{% endif %}
+{% if php.temp_path != "fastcgi_temp" %}
+      fastcgi_temp_path {{ php.temp_path }};
+{% endif %}
     }
   }
 
@@ -137,6 +155,12 @@ server {
     include /etc/nginx/fastcgi_params;
     fastcgi_read_timeout 300;
     client_max_body_size 50000M;
+{% if php.request_buffering != "on" %}
+    fastcgi_request_buffering {{ php.request_buffering }};
+{% endif %}
+{% if php.temp_path != "fastcgi_temp" %}
+    fastcgi_temp_path {{ php.temp_path }};
+{% endif %}
   }
 {% endif %}
 
