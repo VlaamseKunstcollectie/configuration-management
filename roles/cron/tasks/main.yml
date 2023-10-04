@@ -56,7 +56,7 @@
     name: "Run ResourceSpace offline jobs"
     minute: "*/5"
     user: "root"
-    job: "cd {{ resourcespace.repo_dir }}/pages/tools; php offline_jobs.php"
+    job: "cd {{ resourcespace.repo_dir }}/pages/tools; php offline_jobs.php >> {{ cron_dir }}/cron/resourcespace_cron_output.log 2>&1; cd {{ resourcespace.repo_dir }}/batch; php create_previews.php >> {{ cron_dir }}/cron/resourcespace_cron_output.log 2>&1"
     state: "present"
   when: is_resourcespace
 

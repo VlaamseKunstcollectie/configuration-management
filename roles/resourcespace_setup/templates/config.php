@@ -93,3 +93,4 @@ $file_upload_block_duplicates = true;
 $tempdir = '{{ resourcespace.imagemagick.temporary_path }}';
 $offline_job_queue = true;
 $debug_log_location = '{{ resourcespace.repo_dir }}/debug.log';
+$preview_generate_max_file_size = 100;
