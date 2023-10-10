@@ -48,7 +48,7 @@
   cron:
     name: "Put files uploaded through FTP into ResourceSpace"
     minute: "*/5"
-    user: "{{ application_user }}"
+    user: "root"
     job: "php {{ imagehub.dir }}/bin/console app:ftp-to-resourcespace -vvv >> {{ cron_dir }}/cron/imagehub_ftp_output.log 2>&1"
   when: imagehub.ftp_cronjob
 
