@@ -216,7 +216,7 @@
 
 - name: Create static filedir folder
   file:
-    path: "{{ imagehub.repo_dir }}/public/{{ imagehub.static_filedir }}"
+    path: "{{ imagehub.dir }}/public/{{ imagehub.static_filedir }}"
     state: directory
     recurse: true
     owner: "{{ application_user }}"
