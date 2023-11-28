@@ -216,12 +216,12 @@
 
 - name: Create static filedir folder
   file:
-    path: "{{ imagehub.dir }}/public/{{ imagehub.static_filedir }}"
+    path: "{{ imagehub.dir }}/public/{{ item }}"
     state: directory
     recurse: true
     owner: "{{ application_user }}"
     group: "{{ application_user }}"
-  when: imagehub.static_filedir | length
+  with_items: imagehub.static_filedirs
 
 - name: Provide crontab entry for daily update of ResourceSpace data and generation of manifests
   set_fact:

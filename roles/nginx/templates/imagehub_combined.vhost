@@ -37,16 +37,15 @@ server {
   }
 {% endif %}
 
-{% if imagehub.static_filedir|length  %}
+{% for filedir in imagehub.static_filedirs  %}
 
   # Serve the static filedir publicly
-  location {{ imagehub.static_filedir }} {
+  location {{ filedir }} {
     add_header Access-Control-Allow-Origin *;
     root {{ vhost.document_root }}/public;
     try_files $uri =404;
   }
-
-{% endif %}
+{% endfor %}
 
   # Serve the import.iiif_manifests.sqlite file publicly
   location /import.iiif_manifests.sqlite {

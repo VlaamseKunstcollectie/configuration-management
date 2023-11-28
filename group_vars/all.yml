@@ -203,7 +203,7 @@ imagehub:
   meemoo_service_url: https://imagehub.example.com/meemoo/iiif/2/
   authentication_url: https://imagehub.example.com/public/authenticate/
   authentication_service_description: Example requires that you log in with your museum account to view this content
-  static_filedir: ''
+  static_filedirs: []
   reverse_proxy: ''
   reverse_proxy_filedir: ''
   mysql:
