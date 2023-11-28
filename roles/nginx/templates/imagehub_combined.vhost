@@ -32,15 +32,15 @@ server {
 {% if vhost.document_root is defined %}
 
 {% if imagehub.reverse_proxy|length and imagehub.reverse_proxy_filedir|length %}
-  location /{{ imagehub.reverse_proxy_filedir }} {
-    reverse_proxy {{ imagehub.reverse_proxy }};
+  location {{ imagehub.reverse_proxy_filedir }} {
+    proxy_pass {{ imagehub.reverse_proxy }};
   }
 {% endif %}
 
 {% if imagehub.static_filedir|length  %}
 
   # Serve the static filedir publicly
-  location /{{ imagehub.static_filedir }} {
+  location {{ imagehub.static_filedir }} {
     add_header Access-Control-Allow-Origin *;
     root {{ vhost.document_root }}/public;
     try_files $uri =404;
