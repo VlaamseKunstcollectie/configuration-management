@@ -31,6 +31,12 @@ server {
 
 {% if vhost.document_root is defined %}
 
+{% if imagehub.reverse_proxy|length and imagehub.reverse_proxy_filedir|length %}
+  location /{{ imagehub.reverse_proxy_filedir }} {
+    reverse_proxy {{ imagehub.reverse_proxy }};
+  }
+{% endif %}
+
 {% if imagehub.static_filedir|length  %}
 
   # Serve the static filedir publicly
