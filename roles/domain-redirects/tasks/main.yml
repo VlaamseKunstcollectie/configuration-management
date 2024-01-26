@@ -10,7 +10,7 @@
           name: "{{ item.name }}"
           redirect_to: "{{ item.redirect_to }}"
           type: redirect
-          ssl: "{{ item.ssl }}"
+          ssl: "{{ item.ssl | default({}) }}"
           redirect_to_https: "{{ item.redirect_to_https | default(true) }}"
           auth_basic: "{{ item.auth_basic | default('') }}"
           auth_basic_whitelist: "{{ item.auth_basic_whitelist | default([]) }}"
