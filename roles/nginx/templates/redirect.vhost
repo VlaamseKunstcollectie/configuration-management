@@ -29,7 +29,9 @@ server {
 {% endfor %}
 {% endif %}
 
-  return 301 {{ vhost.redirect_to }};
+  location / {
+    return 301 {{ vhost.redirect_to }};
+  }
 }
 
 {% if '80' not in listen_ports %}
@@ -52,4 +54,3 @@ server {
   }
 }
 {% endif %}
-
