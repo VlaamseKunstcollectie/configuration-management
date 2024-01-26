@@ -8,7 +8,7 @@
         nginx_vhost:
           server_name: "{{ item.server_name }}"
           name: "{{ item.name }}"
-          redirected_domain: "{{ item.redirected_domain }}"
+          redirect_to: "{{ item.redirect_to }}"
           type: redirect
           ssl: "{{ item.ssl }}"
           redirect_to_https: "{{ item.redirect_to_https | default(true) }}"

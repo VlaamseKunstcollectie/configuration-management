@@ -31,7 +31,7 @@ server {
 {% endfor %}
 {% endif %}
 
-  return 302 {{ vhost.redirected_domain }};
+  return 301 {{ vhost.redirect_to }};
 }
 
 {% if '80' not in listen_ports %}
