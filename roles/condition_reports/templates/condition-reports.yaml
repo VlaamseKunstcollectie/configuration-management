@@ -12,6 +12,12 @@ parameters:
   placeholder_images:
     - 'https://iiif.kmska.be/c/iiif/2/public@27254.tif'
 
+  # Certificate Authority (also known as 'cacert') may not work on its own depending on your system and PHP configuration,
+  # that's why a cacert.pem is included in this project (from https://curl.haxx.se/docs/caextract.html).
+  # Set override_certificate_authority to 'true' when we need to specify our own cacert.pem (can be a relative path or an absolute system path).
+  override_certificate_authority: false
+  ssl_certificate_authority_file: 'cacert.pem'
+
   datahub_data_definition:
     id:
       xpath: 'descriptiveMetadata[@xml:lang="{language}"]/objectIdentificationWrap/repositoryWrap/repositorySet/workID[@type="object-number"]'
@@ -48,9 +54,9 @@ parameters:
     handling_en:
       xpath: 'descriptiveMetadata[@xml:lang="{language}"]/objectIdentificationWrap/objectDescriptionWrap/objectDescriptionSet[@type="handling"]/descriptiveNoteValue[@xml:lang="en"]'
     iiif_manifest_url:
-      xpath: 'administrativeMetadata[@xml:lang="{language}"]/resourceWrap/resourceSet[resourceType/term="IIIF Manifest"]/resourceID[@source="ImagehubKMSKA"]'
+      xpath: 'administrativeMetadata[@xml:lang="{language}"]/resourceWrap/resourceSet[resourceType/term="IIIF Manifest"]/resourceID[contains(@source, "Imagehub")]'
     iiif_image_url:
-      xpath: 'administrativeMetadata[@xml:lang="{language}"]/resourceWrap/resourceSet[resourceType/term="thumbnail"]/resourceID[@source="ImagehubKMSKA"]'
+      xpath: 'administrativeMetadata[@xml:lang="{language}"]/resourceWrap/resourceSet[resourceType/term="thumbnail"]/resourceID[contains(@source, "Imagehub")]'
 
   service_url: '{{ condition_reports.service_url }}'
 

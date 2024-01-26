@@ -80,13 +80,18 @@
   roles:
     - culturize
 
+- name: Set up domain redirects
+  hosts: redirects
+  roles:
+    - domain-redirects
+
 - name: Set up cronjob
   hosts: datahub_pipeline,datahub_dashboard,arthub,imagehub,culturize
   roles:
     - cron
 
 - name: Set up SSL Certificates through LetsEncrypt
-  hosts: datahub,datahub_dashboard,arthub,cantaloupe,resourcespace,imagehub,condition_reports,culturize
+  hosts: datahub,datahub_dashboard,arthub,cantaloupe,resourcespace,imagehub,condition_reports,culturize,redirects
   roles:
     - name: certbot
       when: letsencrypt_vhosts | length > 0

@@ -271,6 +271,7 @@ culturize:
     location: /collection/work/
     redirect_to_https: false
     ssl: {}
+domain_redirects: []
 cronjobs:
   - /opt/datahub-pipeline/fixes/scripts/vocabularies.sh
 final_cronjobs: []
