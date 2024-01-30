@@ -2,6 +2,7 @@
 ansible_become: yes
 cron_dir: /opt
 cron_name: arthub
+is_resourcespace: false
 is_cantaloupe: false
 php:
   version: 7.2
