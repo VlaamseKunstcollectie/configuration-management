@@ -129,6 +129,10 @@
     owner: "{{ php.user }}"
     group: "{{ php.group }}"
 
+- name: Provide crontab entry for daily reload of condition report records
+  set_fact:
+    cronjobs: "{{ cronjobs }} + [ 'php {{ condition_reports.dir }}/bin/console app:datahub-to-mysql' ]"
+
 - name: Include condition reports php-fpm pool
   include_role:
     name: php-fpm
