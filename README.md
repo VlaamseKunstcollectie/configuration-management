@@ -203,6 +203,10 @@ imagehub:
     server_name: imagehub.example.com
 condition_reports:
   service_url: https://conditionreports.example.com/iiif/3/
+  admin:
+    email: admin@example.com
+    full_name: Firstname Lastname
+    password_hash: condition_reports_admin_password_hash
   nginx:
     server_name: conditionreports.example.com
 ```
@@ -219,6 +223,7 @@ It is recommended to randomly generate the following passwords (the longer the b
 * resourcespace_readonly_mysql_password
 * imagehub_app_secret_md5 (this ought be a random MD5 hash)
 * imagehub_mysql_password
+* condition_reports_admin_password_hash (must be a Bcrypt password hash, you can generate one at https://bcrypt.online; use cost factor 13)
 
 After you are happy about the configuration of your host_vars, you can execute the play on the control machine to install everything on the controlled machine:
 ```
