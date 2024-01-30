@@ -245,7 +245,7 @@ condition_reports:
   nginx:
     name: condition_reports
     server_name: conditionreports.example.com
-    document_root: /opt/condition_reports
+    document_root: /opt/condition_reports/public
     index: index.php
     redirect_to_https: true
     ssl : {}
