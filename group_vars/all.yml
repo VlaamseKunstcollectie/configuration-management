@@ -231,7 +231,11 @@ condition_reports:
   repo_dir: /opt/.repos/condition_reports
   branch: main
   dir: /opt/condition_reports
+  datahub_url: https://datahub.example.com
+  placeholder_images: []
   service_url: https://conditionreports.example.com/iiif/3/
+  authentication_url: https://conditionreports.example.com/public/authenticate/
+  authentication_service_description: Example requires that you log in with your museum account to view this content
   mailer_dsn: smtp://condition_reports@example.com:password@default
   mysql:
     hostname: 127.0.0.1

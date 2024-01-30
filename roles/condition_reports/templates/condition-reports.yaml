@@ -5,12 +5,14 @@ parameters:
     - en
     - nl
 
-  datahub_url: 'http://datahub.kmska.be'
+  datahub_url: '{{ condition_reports.datahub_url }}'
   datahub_language: nl
   datahub_namespace: 'lido'
   datahub_metadataprefix: 'oai_lido'
   placeholder_images:
-    - 'https://iiif.kmska.be/c/iiif/2/public@27254.tif'
+{% for image in condition_reports.placeholder_images %}
+    - '{{ image }}'
+{% endfor %}
 
   # Certificate Authority (also known as 'cacert') may not work on its own depending on your system and PHP configuration,
   # that's why a cacert.pem is included in this project (from https://curl.haxx.se/docs/caextract.html).
@@ -63,12 +65,12 @@ parameters:
   validate_manifests: false
   validator_url: 'http://localhost:8080/validate?url='
 
-  authentication_url: 'https://imagehub.kmska.be/public/authenticate'
+  authentication_url: '{{ condition_reports.authentication_url }}'
   authentication_whitelist:
     - '127.0.0.1'
   authentication_service_description:
     confirmLabel: 'Login'
-    description: 'The Flemish Art Collection requires that you log in with your museum account to view this content.'
+    description: '{{ condition_reports.authentication_service_description }}'
     failureDescription: 'Authentication failed'
     failureHeader: 'Authentication Failed'
     header: 'Please log in'
