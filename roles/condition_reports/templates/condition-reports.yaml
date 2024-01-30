@@ -9,10 +9,14 @@ parameters:
   datahub_language: nl
   datahub_namespace: 'lido'
   datahub_metadataprefix: 'oai_lido'
+{% if condition_reports.placeholder_images|length > 0 %}
   placeholder_images:
 {% for image in condition_reports.placeholder_images %}
     - '{{ image }}'
 {% endfor %}
+{% else %}
+  placeholder_images: []
+{% endif %}
 
   # Certificate Authority (also known as 'cacert') may not work on its own depending on your system and PHP configuration,
   # that's why a cacert.pem is included in this project (from https://curl.haxx.se/docs/caextract.html).
