@@ -71,7 +71,7 @@ server {
     try_files $uri /{{ vhost.index }}$is_args$args;
   }
 
-  location ~ /imagehub/(authenticate|authcheck).* {
+  location ~ /(authenticate|authcheck).* {
     add_header Access-Control-Allow-Origin *;
     try_files $uri /{{ vhost.index }}$is_args$args;
   }
