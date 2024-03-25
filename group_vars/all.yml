@@ -20,6 +20,7 @@ datahub:
   pagination_num_records: 25 
   nginx:
     name: datahub
+    configfile: datahub
     server_name: datahub.example.com
     document_root: /opt/datahub/web
     index: app.php
@@ -78,6 +79,7 @@ datahub_dashboard:
   service_name: Datahub Dashboard
   nginx:
     name: datahub-dashboard
+    configfile: datahub_dashboard
     server_name: dashboard.example.com
     document_root: /opt/datahub-dashboard/web
     index: app.php
@@ -97,6 +99,7 @@ arthub:
   fix_script: arthub-index.sh
   nginx:
     name: arthub
+    configfile: arthub
     server_name: arthub.example.com
     redirect_to_https: true
     ssl: {}
@@ -122,6 +125,7 @@ resourcespace:
     ro_username: resourcespace_ro
   nginx:
     name: resourcespace
+    configfile: resourcespace
     server_name: resourcespace.example.com
     document_root: /var/www/resourcespace
     redirect_to_https: true
@@ -156,6 +160,7 @@ cantaloupe:
     whitelist: []
   nginx:
     name: cantaloupe
+    configfile: cantaloupe
     server_name: images.example.com
     upstream: http://127.0.0.1:8182
     redirect_to_https: true
@@ -214,6 +219,7 @@ imagehub:
     database: imagehub
   nginx:
     name: imagehub
+    configfile: imagehub
     server_name: imagehub.example.com
     document_root: /opt/imagehub
     index: imagehub.php
@@ -222,6 +228,7 @@ imagehub:
 omeka:
   nginx:
     name: omeka
+    configfile: omeka
     server_name: omeka.example.com
     document_root: /opt/omeka
     index: index.php
@@ -245,6 +252,7 @@ condition_reports:
     database: condition_reports
   nginx:
     name: condition_reports
+    configfile: condition_reports
     server_name: conditionreports.example.com
     document_root: /opt/condition_reports/public
     index: index.php
@@ -272,6 +280,7 @@ culturize:
   nginx:
     server_name: culturize.example.com
     name: culturize_example
+    configfile: culturize
     document_root: /var/www/culturize.example.com
     location: /collection/work/
     redirect_to_https: false

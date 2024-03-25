@@ -195,6 +195,7 @@
         nginx_vhost:
           server_name: "{{ datahub.nginx.server_name }}"
           name: "{{ datahub.nginx.name }}"
+          configfile: "{{ datahub.nginx.configfile }}"
           type: php
           document_root: "{{ datahub.nginx.document_root }}"
           index: "{{ datahub.nginx.index }}"

@@ -157,6 +157,7 @@
         nginx_vhost:
           server_name: "{{ condition_reports.nginx.server_name }}"
           name: "{{ condition_reports.nginx.name }}"
+          configfile: "{{ condition_reports.nginx.configfile }}"
           type: php
           document_root: "{{ condition_reports.nginx.document_root }}"
           index: "{{ condition_reports.nginx.index }}"

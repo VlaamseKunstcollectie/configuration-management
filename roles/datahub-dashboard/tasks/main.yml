@@ -128,6 +128,7 @@
         nginx_vhost:
           server_name: "{{ datahub_dashboard.nginx.server_name }}"
           name: "{{ datahub_dashboard.nginx.name }}"
+          configfile: "{{ datahub_dashboard.nginx.configfile }}"
           type: php
           document_root: "{{ datahub_dashboard.nginx.document_root }}"
           index: "{{ datahub_dashboard.nginx.index }}"

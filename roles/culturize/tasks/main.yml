@@ -32,6 +32,7 @@
         nginx_vhost:
           server_name: "{{ culturize.nginx.server_name }}"
           name: "{{ culturize.nginx.name }}"
+          configfile: "{{ culturize.nginx.configfile }}"
           type: culturize
           document_root: "{{ culturize.nginx.document_root }}"
           location: "{{ culturize.nginx.location }}"

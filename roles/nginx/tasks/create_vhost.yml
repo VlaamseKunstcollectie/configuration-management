@@ -88,13 +88,13 @@
 - name: "Copy nginx vhost for {{ vhost.name }}"
   template:
     src: "{{ vhost.type }}.vhost"
-    dest: "/etc/nginx/sites-available/{{ vhost.name }}"
+    dest: "/etc/nginx/sites-available/{{ vhost.configfile }}"
   notify: restart nginx
 
 - name: "Create symlink for {{ vhost.name }} nginx vhost"
   file:
-    src: "/etc/nginx/sites-available/{{ vhost.name }}"
-    dest: "/etc/nginx/sites-enabled/{{ vhost.name }}"
+    src: "/etc/nginx/sites-available/{{ vhost.configfile }}"
+    dest: "/etc/nginx/sites-enabled/{{ vhost.configfile }}"
     state: link
   notify: restart nginx
 

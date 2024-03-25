@@ -137,6 +137,7 @@
         nginx_vhost:
           server_name: "{{ cantaloupe.nginx.server_name }}"
           name: "{{ cantaloupe.nginx.name }}"
+          configfile: "{{ cantaloupe.nginx.configfile }}"
           type: proxy
           upstream: "{{ cantaloupe.nginx.upstream }}"
           ssl: "{{ cantaloupe.nginx.ssl }}"
@@ -158,6 +159,7 @@
         nginx_vhost:
           server_name: "{{ resourcespace.nginx.server_name }}"
           name: "{{ resourcespace.nginx.name }}"
+          configfile: "{{ resourcespace.nginx.configfile }}"
           type: simplesamlphp
           document_root: "{{ resourcespace.nginx.document_root }}"
           index: index.php
@@ -189,6 +191,7 @@
         nginx_vhost:
           server_name: "{{ imagehub.nginx.server_name }}"
           name: "{{ imagehub.nginx.name }}"
+          configfile: "{{ imagehub.nginx.configfile }}"
           type: simplesamlphp
           document_root: "{{ imagehub.nginx.document_root }}"
           index: "{{ imagehub.nginx.index }}"
@@ -206,6 +209,7 @@
         nginx_vhost:
           server_name: "{{ imagehub.nginx.server_name }}"
           name: "{{ imagehub.nginx.name }}"
+          configfile: "{{ imagehub.nginx.configfile }}"
           type: imagehub_combined
           document_root: "{{ imagehub.nginx.document_root }}"
           index: "{{ imagehub.nginx.index }}"

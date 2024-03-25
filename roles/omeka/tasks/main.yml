@@ -16,6 +16,7 @@
         nginx_vhost:
           server_name: "{{ omeka.nginx.server_name }}"
           name: "{{ omeka.nginx.name }}"
+          configfile: "{{ omeka.nginx.configfile }}"
           type: omeka
           document_root: "{{ omeka.nginx.document_root }}"
           index: "{{ omeka.nginx.index }}"
